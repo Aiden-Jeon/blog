@@ -6,17 +6,17 @@ toc: true
 toc_sticky: true
 ---
 
-0. 참고 자료 검색
+## 0. 참고 자료 검색
 -  [빵형의 개발도상국](https://www.youtube.com/watch?v=cx7VONjFEE0&t=83s)
 
-1. mp4 동영상 다운로드 
+## 1. mp4 동영상 다운로드 
 
 - youtube 영상 다운로드
   - ssyoutube로 바꾸면 다운로드 할 수 있는 사이트로 연결됨.
   - https://www.youtube.com/watch?v=naRRqAGIAqQ
   - https://www.ssyoutube.com/watch?v=naRRqAGIAqQ
 
-2. 프로젝트를 위한 가상환경 만들기
+## 2. 프로젝트를 위한 가상환경 만들기
 
 ```bash
 pyenv virtualenv 3.7.8 tracking_idol
@@ -29,7 +29,6 @@ pip install opencv-python==4.1.2.30 opencv-contrib-python==4.1.2.30 numpy
 
 ```python
 import cv2
-import numpy as np
 
 video_path = "tracking_myidol/dumbi_dumbdi.mp4"
 cap = cv2.VideoCapture(video_path)
@@ -48,7 +47,7 @@ while cap.isOpened():
 
 ```
 
-3. ROI Setting 
+## 3. ROI Setting 
 
 - ROI (Region of Interest)
   - 관심 영역, 영상처리할 때 쓰는 보편적인 용어
@@ -63,7 +62,7 @@ cv2.destroyWindow("Select Window")
 
 동영상 제일 처음 frame을 불러와서 cv2.selectROI 를 이용해 처음에 ROI 를 세팅할 수 있는 창을 만든다.
 
-4. tracker
+## 4. tracker
 
 user가 선택한 ROI를 rect 라는 변수에 저장을 하는데, 이를 계속해서 추적하는 obejct tracker가 필요하다.
 
@@ -97,7 +96,7 @@ while cap.isOpened():
 
 
 
-5. 예상되는 문제점 
+## 5. 예상되는 문제점 
 
 - 첫 frame에 원하는 인물이 나오지 않을 경우 다음 frame으로 넘길 수 있는 기능이 필요 (2020.08.17 해결)
   - while loop으로 q 외에 다른 키를 누를 경우 frame 넘길 수 있게 처리함.
@@ -125,8 +124,7 @@ while cap.isOpened():
 - 인물이 다른 인물에 가려져서 안보일 경우 어떻게 처리해야 할지.
 
 
-
-6. 전체코드
+## 6. 전체코드
 
 ```python
 import cv2
