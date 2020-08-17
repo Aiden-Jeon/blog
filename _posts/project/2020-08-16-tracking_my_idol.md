@@ -24,8 +24,9 @@ pyenv activate tracking_idol
 pip install opencv-python==4.1.2.30 opencv-contrib-python==4.1.2.30 numpy
 ```
 - opencv 최신 버전은 mac catalina 버전에서 실행이 안된다.
-  - https://solarianprogrammer.com/2019/10/21/install-opencv-python-macos/
-3. opencv 를 이용해서 동영상 실행시켜보기
+  - [https://solarianprogrammer.com/2019/10/21/install-opencv-python-macos/](https://solarianprogrammer.com/2019/10/21/install-opencv-python-macos/)
+
+## 3. opencv 를 이용해서 동영상 실행시켜보기
 
 ```python
 import cv2
