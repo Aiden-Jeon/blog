@@ -1,12 +1,19 @@
 ---
-title: helm을 이용한 deployment chart 만들기
+title: [CI/CD] helm을 이용한 deployment chart 만들기
 comment: true
-categories: [helm, kubernetes]
+categories: [cicd]
 toc: true
 toc_sticky: true
 ---
+**CI/CD Contents 순서**
+- [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)
+- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-1)
+- [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)
+- [helm을 이용한 deployment chart 만들기](https://aiden-jeon.github.io/cicd/github-cicd-3)
+- [argocd를 이용한 cd](https://aiden-jeon.github.io/cicd/github-cicd-4)
+---
 
-이번 포스트에서는 helm 을 이용해 [이전 포스트](/_posts/github/2020-03-04-github-cicd-2.md) 에서 작성한 파일들을 자동화 하는 법에 대해서 알아 보겠습니다.
+이번 포스트에서는 helm 을 이용해 [이전 포스트](https://aiden-jeon.github.io/cicd/github-cicd-2) 에서 작성한 파일들을 자동화 하는 법에 대해서 알아 보겠습니다.
 
 ## 1. helm start
 helm 을 시작하려는 repo 최상단에서 다음과 같이 입력해줍니다.

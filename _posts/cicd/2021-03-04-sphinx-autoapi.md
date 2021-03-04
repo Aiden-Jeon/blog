@@ -5,7 +5,14 @@ categories: [sphinx]
 toc: true
 toc_sticky: true
 ---
-
+**CI/CD Contents 순서**
+- [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)
+- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-1)
+- [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)
+- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-3)
+- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-4)
+- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-5)
+---
 sphinx-autoapi를 이용해 자동으로 python api 문서를 생성하는 법에 대해 알아보겠습니다.
 
 ## 1. API 코드 작성

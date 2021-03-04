@@ -1,14 +1,21 @@
 ---
-title: github action을 이용한 ci
+title: [CI/CD] github action을 이용한 ci
 comment: true
-categories: [github, ci, ghcr, docker]
+categories: [cicd]
 toc: true
 toc_sticky: true
+---
+**CI/CD Contents 순서**
+- [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)
+- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-1)
+- [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)
+- [helm을 이용한 deployment chart 만들기](https://aiden-jeon.github.io/cicd/github-cicd-3)
+- [argocd를 이용한 cd](https://aiden-jeon.github.io/cicd/github-cicd-4)
 ---
 
 이번 포스트에서는 github action을 이용해 CI(Continuous Integreation)를 하는 법에 대해서 알아보겠습니다.
 이번 포스트에서 사용하는 Dockerfile은 [github](https://github.com/Aiden-Jeon/github-cicd) 를 이용합니다.
-내용은 [이전 포스트](/_posts/github/2020-03-04-sphinx-autoapi.md)를 확인해주세요.
+내용은 [이전 포스트](https://aiden-jeon.github.io/cicd/sphinx-autoapi)를 확인해주세요.
 
 
 ## 1. github package 사용 설정하기
