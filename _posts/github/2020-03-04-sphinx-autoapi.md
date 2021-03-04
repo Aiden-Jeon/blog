@@ -1,7 +1,7 @@
 ---
 title: sphinx-autoapi 를 이용한 자동 api 문서 생성하기
 comment: true
-categories: [dev, github, ci, cd]
+categories: [dev]
 toc: true
 toc_sticky: true
 ---
@@ -186,3 +186,25 @@ index.html 을 열면 아래와 같은 api documentation을 볼 수 있습니다
 
 calculator를 눌러보면 위에서 작성한 docstring이 잘 나오는 것을 볼 수 있습니다.
 ![img](/assets/imgs/github/sphinx-autoapi-1.png)
+
+
+## 5. docker
+이제 생성된 document를 서빙할 수 있는 docker를 만들어 보겠습니다.
+`docker/Dockerfile` 에 다음과 같은 Dockerfile을 만들겠습니다.
+```docker
+FROM nginx:latest
+COPY docs/_build/html /usr/share/nginx/html
+RUN chmod -R +rx /usr/share/nginx/html
+```
+
+이제 build를 하겠습니다.
+```bash
+docker build . -f docker/Dockerfile -t docs
+```
+
+생성된 도커를 실행시켜봅니다.
+```bash
+docker run -p 8000:80 --rm docs
+```
+
+http://localhost:8000 로 접속하면 정상적으로 api document 문서가 보이는 것을 확인할 수 있습니다.
