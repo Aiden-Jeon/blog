@@ -1,7 +1,7 @@
 ---
 title: sphinx-autoapi 를 이용한 자동 api 문서 생성하기
 comment: true
-categories: [dev]
+categories: [sphinx]
 toc: true
 toc_sticky: true
 ---
