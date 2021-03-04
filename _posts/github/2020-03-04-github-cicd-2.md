@@ -1,7 +1,7 @@
 ---
 title: ghcr을 이용한 kubernetes deployment 만들기
 comment: true
-categories: [dev, ghcr, kubernetes]
+categories: [ghcr, kubernetes]
 toc: true
 toc_sticky: true
 ---
