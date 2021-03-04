@@ -1,7 +1,7 @@
 ---
-title: github action을 이용한 ci/cd
+title: github action을 이용한 ci
 comment: true
-categories: [dev, github, ci, cd, ghcr, docker]
+categories: [dev, github, ci, ghcr, docker]
 toc: true
 toc_sticky: true
 ---
