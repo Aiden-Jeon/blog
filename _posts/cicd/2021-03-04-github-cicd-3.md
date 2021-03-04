@@ -38,6 +38,7 @@ Chart.yaml  charts      templates   values.yaml
 ## 2. `deployment.yaml`
 생성된 `deployment.yaml` 을 다음과 같이 수정합니다.
 ```yaml
+{% raw %}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -93,12 +94,14 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
+{% endraw %}
 ```
 
 ## 3. `service.yaml`
 생성된 `service.yaml` 을 다음과 같이 수정합니다.
 
 ```yaml
+{% raw %}
 apiVersion: v1
 kind: Service
 metadata:
@@ -119,11 +122,14 @@ spec:
   selector:
     app: {{ template "sphinx-doc.name" . }}
     release: {{ .Release.Name }}
+{% endraw %}
 ```
 
 ## 4. `ingress.yaml`
 생성된 `ingress.yaml` 을 다음과 같이 수정합니다.
+
 ```yaml
+{% raw %}
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "sphinx-doc.fullname" . -}}
 {{- $ingressPath := .Values.ingress.path -}}
@@ -168,6 +174,7 @@ spec:
               servicePort: {{ $svcPort }}
   {{- end }}
 {{- end }}
+{% endraw %}
 ```
 
 ## 5. `values-local.yaml`
