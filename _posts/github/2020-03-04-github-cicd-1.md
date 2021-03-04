@@ -1,13 +1,14 @@
 ---
 title: github action을 이용한 ci/cd
 comment: true
-categories: [dev, github, ci, cd]
+categories: [dev, github, ci, cd, ghcr, docker]
 toc: true
 toc_sticky: true
 ---
 
 이번 포스트에서는 github action을 이용해 CI(Continuous Integreation)를 하는 법에 대해서 알아보겠습니다.
 이번 포스트에서 사용하는 Dockerfile은 [github](https://github.com/Aiden-Jeon/github-cicd) 를 이용합니다.
+내용은 [이전 포스트](/_posts/github/2020-03-04-sphinx-autoapi.md)를 확인해주세요.
 
 
 ## 1. github package 사용 설정하기
