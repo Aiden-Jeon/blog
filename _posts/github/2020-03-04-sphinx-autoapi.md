@@ -208,3 +208,5 @@ docker run -p 8000:80 --rm docs
 ```
 
 http://localhost:8000 로 접속하면 정상적으로 api document 문서가 보이는 것을 확인할 수 있습니다.
+
+해당 내용은 [github](https://github.com/Aiden-Jeon/github-cicd) 에서 확인할 수 있습니다.
