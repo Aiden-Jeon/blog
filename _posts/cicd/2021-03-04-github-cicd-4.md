@@ -1,17 +1,21 @@
 ---
-title: [CI/CD] argocd를 이용한 cd
+title: (CI/CD) argocd를 이용한 cd
 comment: true
 categories: [cicd]
 toc: true
 toc_sticky: true
 ---
+
 **CI/CD Contents 순서**
-- [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)
-- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-1)
-- [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)
-- [helm을 이용한 deployment chart 만들기](https://aiden-jeon.github.io/cicd/github-cicd-3)
-- [argocd를 이용한 cd](https://aiden-jeon.github.io/cicd/github-cicd-4)
+1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)
+2. [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-1)
+3. [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)
+4. [helm을 이용한 deployment chart 만들기](https://aiden-jeon.github.io/cicd/github-cicd-3)
+5. [argocd를 이용한 cd](https://aiden-jeon.github.io/cicd/github-cicd-4)
+
 ---
+
+
 
 이번 포스트에서는 argocd를 이용해 helm chart를 cd(continuous delivery) 하는 법에 대해서 알아보겠습니다.
 

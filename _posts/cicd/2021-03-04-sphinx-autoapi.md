@@ -1,18 +1,21 @@
 ---
-title: sphinx-autoapi 를 이용한 자동 api 문서 생성하기
+title: (CI/CD) sphinx-autoapi 를 이용한 자동 api 문서 생성하기
 comment: true
-categories: [sphinx]
+categories: [cicd]
 toc: true
 toc_sticky: true
 ---
+
 **CI/CD Contents 순서**
-- [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)
-- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-1)
-- [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)
-- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-3)
-- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-4)
-- [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-5)
+1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)
+2. [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-1)
+3. [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)
+4. [helm을 이용한 deployment chart 만들기](https://aiden-jeon.github.io/cicd/github-cicd-3)
+5. [argocd를 이용한 cd](https://aiden-jeon.github.io/cicd/github-cicd-4)
+
 ---
+
+
 sphinx-autoapi를 이용해 자동으로 python api 문서를 생성하는 법에 대해 알아보겠습니다.
 
 ## 1. API 코드 작성
@@ -70,40 +73,47 @@ pip install sphinx-autoapi sphinx-theme sphinx_rtd_theme
 
 ## 3. sphinx-quickstart
 우선 sphinx 환경을 설정해야 합니다. `docs` 폴더를 만든 후  아래 명령어를 이용해 빠르게 설정을 할 수 있습니다. 
+
 ```bash
 mkdir docs
 cd docs
 sphinx-quickstart
 ```
 
-이제 같이 설정을 해보도록 하겠습니다.
+sphinx-quickstart 설정 과정은 아래와 같습니다.
 
-- 1. default 값으로 source 와 build 디렉토리를 분리하지 않겠습니다. (n 을 입력해주세요.)
-    ```bash
-    Welcome to the Sphinx 3.5.1 quickstart utility.
+1) default 값으로 source 와 build 디렉토리를 분리하지 않겠습니다. (n 을 입력해주세요.)
 
-    Please enter values for the following settings (just press Enter to
-    accept a default value, if one is given in brackets).
+```bash
+Welcome to the Sphinx 3.5.1 quickstart utility.
 
-    Selected root path: .
+Please enter values for the following settings (just press Enter to
+accept a default value, if one is given in brackets).
 
-    You have two options for placing the build directory for Sphinx output.
-    Either, you use a directory "_build" within the root path, or you separate
-    "source" and "build" directories within the root path.
-    > Separate source and build directories (y/n) [n]: n
-    ```
-- 2. 프로젝트 관련 이름들은 다음과 같이 작성했습니다.
-    ```bash
-    > 프로젝트 이름: example
-    > 작성자 이름: aiden-jeon
-    > 프로젝트 출시 버전 []: 0.1
-    ```
-- 3. 프로젝트 언어는 en을 설정하겠습니다. (Enter를 입력해주세요.)
-    ```bash
-    > 프로젝트 언어 [en]: 
-    ```
+Selected root path: .
+
+You have two options for placing the build directory for Sphinx output.
+Either, you use a directory "_build" within the root path, or you separate
+"source" and "build" directories within the root path.
+> Separate source and build directories (y/n) [n]: n
+```
+
+2) 프로젝트 관련 이름들은 다음과 같이 작성했습니다.
+
+```bash
+> 프로젝트 이름: example
+> 작성자 이름: aiden-jeon
+> 프로젝트 출시 버전 []: 0.1
+```
+
+3) 프로젝트 언어는 en을 설정하겠습니다. (Enter를 입력해주세요.)
+
+```bash
+> 프로젝트 언어 [en]: 
+```
 
 설정이 완료되면 `docs/` 밑에 아래와 같은 파일들이 생성됩니다.
+
 ```bash
 > ls
 Makefile   _build     _static    _templates conf.py    index.rst  make.bat
