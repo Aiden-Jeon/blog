@@ -1,0 +1,3 @@
+ser-agent: *
+Allow: /
+Sitemap: http://aiden-jeon.github.io/sitemap.xml
