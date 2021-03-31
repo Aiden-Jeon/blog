@@ -11,7 +11,7 @@ author: Jongseob Jeon
 
 # **(LIME) Local Interpretable Model-agnostic Explanations**​
 
-## Objective of LIME
+## **Objective of LIME**
 
 $$\xi(x)=\underset{g\in G}{\operatorname{argmin}} L(f,g,\pi_{x})+\Omega(g)$$
 
@@ -214,7 +214,7 @@ array([[0.284, 0.716],
 
 ​
 
-## **Spare Linear Explanations**
+## **Sparse Linear Explanations**
 
 ---
 
@@ -247,7 +247,7 @@ distances = distance_fn(sp.sparse.csr_matrix(data))
 distances
 
 array([ 0.        , 40.59114742,  9.2514787 ,  4.001634  ,  4.001634  ,
-       32.84492632,  4.001634  ,  8.17749432, 35.83110521, 80.19704914])**
+       32.84492632,  4.001634  ,  8.17749432, 35.83110521, 80.19704914])
 ```
 
 ​
