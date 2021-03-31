@@ -19,13 +19,13 @@ GHCR 을 이용하기 위해서는 github access key 가 필요하다. 우선 gi
 ## 1. ghcr 을 위한 github access token 발급 받기
 우선 github setting에서 deplotver settings / personal access tokens 로 들어간다.
 
-![img](/imgs/k8s/ghcr/0.png)
+![그림-1](/imgs/k8s/ghcr/0.png)
 여기서 generate new token을 누른다.
 
-![img](/imgs/k8s/ghcr/1.png)
+![그림-2](/imgs/k8s/ghcr/1.png)
 토큰 이름으로 ghcr-token을 입력하고 packages와 관련된 권한을 주고 token을 생성한다.
 
-![img](/imgs/k8s/ghcr/2.png)
+![그림-3](/imgs/k8s/ghcr/2.png)
 다음과 같이 토큰이 생성된다. 이제 이 토큰을 잘 저장해둔다.
 
 

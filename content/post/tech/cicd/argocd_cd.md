@@ -10,11 +10,11 @@ author: Jongseob Jeon
 ---
 
 **CI/CD Contents 순서**
-1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)
-2. [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-1)
-3. [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)
-4. [helm을 이용한 deployment chart 만들기](https://aiden-jeon.github.io/cicd/github-cicd-3)
-5. [argocd를 이용한 cd](https://aiden-jeon.github.io/cicd/github-cicd-4)
+1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기]({{< relref "post/tech/cicd/sphinx_autoapi" >}})
+2. [github action을 이용한 ci]({{< relref "post/tech/cicd/github_action_ci" >}})
+3. [ghcr을 이용한 kubernetes deployment 만들기]({{< relref "post/tech/cicd/ghcr_k8s_deploy" >}})
+4. [helm을 이용한 deployment chart 만들기]({{< relref "post/tech/cicd/helm_deployment_chart" >}})
+5. [argocd를 이용한 cd]({{< relref "post/tech/cicd/argocd_cd" >}})
 
 ---
 
@@ -22,9 +22,11 @@ author: Jongseob Jeon
 
 이번 포스트에서는 argocd를 이용해 helm chart를 cd(continuous delivery) 하는 법에 대해서 알아보겠습니다.
 
-## 1. argocd 설치
+## 1. 설치
 argocd 설치는 [tutorial](https://argoproj.github.io/argo-cd/getting_started/)을 따라했습니다.
 
+
+## 2. 실행
 ```bash
 # 1. argocd namespace
 kubectl create namespace argocd
@@ -45,24 +47,32 @@ kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut
 
 로그인에 성공하면 https://localhost:8080 으로 들어갑니다.
 
+
+## 3. APP 생성
 처음 나오는 화면은 다음 처럼 아무런 app이 없습니다.
-![img](/imgs/github/cicd-8.png)
+
+![그림-1](/imgs/github/cicd-8.png)
 
 NEW APP 을 눌러 추가하겠습니다.
-![img](/imgs/github/cicd-9.png)
-![img](/imgs/github/cicd-10.png)
 
-위와 같이 config를 입력하고 create를 해줍니다. 완성되면 아래와 같이 app이 생성됩니다.
-![img](/imgs/github/cicd-11.png)
+![그림-2](/imgs/github/cicd-9.png)
+![그림-3](/imgs/github/cicd-10.png)
+
+그림-3과 같이 config를 입력하고 create를 해줍니다. 완성되면 아래와 같이 app이 생성됩니다.
+
+![그림-4](/imgs/github/cicd-11.png)
 
 app에 클릭해서 들어가면 다음과 같이 나옵니다. 여기서 SYNC 버튼을 눌러줍니다
-![img](/imgs/github/cicd-12.png)
+
+![그림-5](/imgs/github/cicd-12.png)
 
 SYNCHRONIZE 버튼을 누릅니다.
-![img](/imgs/github/cicd-13.png)
+
+![그림-6](/imgs/github/cicd-13.png)
 
 다음은 sync가 완료된 화면입니다.
-![img](/imgs/github/cicd-14.png)
+
+![그림-7](/imgs/github/cicd-14.png)
 
 command창에서 정상적으로 떴는지 확인해봅니다.
 ```bash
@@ -80,6 +90,8 @@ NAME                                                   DESIRED   CURRENT   READY
 replicaset.apps/sphinx-api-doc-sphinx-doc-5576ff677b   1         1         1       89s
 ```
 
+
+## 4. 확인
 다음 명령어로 접속할 ip와 포트를 얻습니다.
 ```bash
 > minikube service -n sphinx-doc --url sphinx-api-doc-sphinx-doc

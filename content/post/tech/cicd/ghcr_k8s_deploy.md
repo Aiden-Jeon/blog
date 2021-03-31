@@ -10,14 +10,13 @@ author: Jongseob Jeon
 ---
 
 **CI/CD Contents 순서**
-1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)
-2. [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-2)
-3. [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)
-4. [helm을 이용한 deployment chart 만들기](https://aiden-jeon.github.io/cicd/github-cicd-3)
-5. [argocd를 이용한 cd](https://aiden-jeon.github.io/cicd/github-cicd-4)
+1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기]({{< relref "post/tech/cicd/sphinx_autoapi" >}})
+2. [github action을 이용한 ci]({{< relref "post/tech/cicd/github_action_ci" >}})
+3. [ghcr을 이용한 kubernetes deployment 만들기]({{< relref "post/tech/cicd/ghcr_k8s_deploy" >}})
+4. [helm을 이용한 deployment chart 만들기]({{< relref "post/tech/cicd/helm_deployment_chart" >}})
+5. [argocd를 이용한 cd]({{< relref "post/tech/cicd/argocd_cd" >}})
 
 ---
-
 
 
 이번 포스트에서는 minikube를 이용해 [이전 포스트](https://aiden-jeon.github.io/cicd/github-cicd-2)에서 만든 ghcr package를 이용해 deployment를 만드는 법에 대해서 알아보겠습니다.
@@ -54,7 +53,7 @@ spec:
 ```
 
 이전 포스트에서 작성한 sphinx-api를 띄우는 deployment 입니다.
-apply하기에 앞서 secrets를 설정해주어야 합니다. 자세한 방법은 [포스트](/_posts/kubernetes/2021-03-03-kubernetes_ghcr.md)를 참고해주세요.
+apply하기에 앞서 secrets를 설정해주어야 합니다. 자세한 방법은 [포스트]({{< relref "post/tech/kubernetes/kubernetes_ghcr" >}})를 참고해주세요.
 
 secrets를 설정했다면 deployment.yaml 파일을 apply 해줍니다.
 ```bash

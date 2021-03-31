@@ -3,6 +3,8 @@ title: 동영상에서 원하는 인물 따라가기
 comment: true
 categories: [project]
 toc: true
+date: 2020-10-04
+author: Jongseob Jeon
 ---
 
 ## 0. 참고 자료 검색

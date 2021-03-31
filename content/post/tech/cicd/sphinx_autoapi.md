@@ -10,11 +10,11 @@ author: Jongseob Jeon
 ---
 
 **CI/CD Contents 순서**
-1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)
-2. [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-1)
-3. [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)
-4. [helm을 이용한 deployment chart 만들기](https://aiden-jeon.github.io/cicd/github-cicd-3)
-5. [argocd를 이용한 cd](https://aiden-jeon.github.io/cicd/github-cicd-4)
+1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기]({{< relref "post/tech/cicd/sphinx_autoapi" >}})
+2. [github action을 이용한 ci]({{< relref "post/tech/cicd/github_action_ci" >}})
+3. [ghcr을 이용한 kubernetes deployment 만들기]({{< relref "post/tech/cicd/ghcr_k8s_deploy" >}})
+4. [helm을 이용한 deployment chart 만들기]({{< relref "post/tech/cicd/helm_deployment_chart" >}})
+5. [argocd를 이용한 cd]({{< relref "post/tech/cicd/argocd_cd" >}})
 
 ---
 
@@ -202,10 +202,10 @@ _static          genindex.html    objects.inv      search.html
 ```
 
 index.html 을 열면 아래와 같은 api documentation을 볼 수 있습니다.
-![img](/imgs/github/sphinx-autoapi-0.png)
+![그림-1](/imgs/github/sphinx-autoapi-0.png)
 
 calculator를 눌러보면 위에서 작성한 docstring이 잘 나오는 것을 볼 수 있습니다.
-![img](/imgs/github/sphinx-autoapi-1.png)
+![그림-2](/imgs/github/sphinx-autoapi-1.png)
 
 
 ## 5. docker

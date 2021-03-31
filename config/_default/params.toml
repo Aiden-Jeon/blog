@@ -1,8 +1,12 @@
 author = "Aiden Jeon"
 # twitter = "@janedoe"
 # largeTwitterCard = false # set to true if you want to show a large twitter card image. The default is a small twitter card image
-introDescription = "Interested in DL, ML, DS."
-# introURL = "about/" # set the url for the 'read more' button below the introDescription, or set to false to not show the button
+introDescription = """
+Interested in Deep Learning, Machine Learning, Data Science.  
+
+Contact: ells2124@gmail.com
+"""
+introURL = false # set the url for the 'read more' button below the introDescription, or set to false to not show the button
 # description = "" # set your site's description here. will be use for home page content meta tags (seo). Alternatively set this description in your homepage content file i.e content/_index.md. Whatever is set in the latter will take precedence
 
 # showShare = false # Uncomment to not show share buttons on each post. Also available in each post's front matter.
@@ -72,7 +76,7 @@ footerLogo = "icons/ms-icon-150x150.png"
 # numberOfFeaturedPosts = 8
 
 # Date format. Checkout https://gohugo.io/functions/format/#hugo-date-and-time-templating-reference for details.
-# dateFormat = "2006-01-02" # Default to "Jan 2, 2006".
+dateFormat = "2006-01-02" # Default to "Jan 2, 2006".
 # customFonts = false # toggle to true if you want to use custom fonts only.
 
 # The year when ths website was created, this value is used in the copyright

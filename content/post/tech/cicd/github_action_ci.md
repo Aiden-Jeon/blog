@@ -10,11 +10,11 @@ author: Jongseob Jeon
 ---
 
 **CI/CD Contents 순서**  
-1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기](https://aiden-jeon.github.io/cicd/sphinx-autoapi)  
-2. [github action을 이용한 ci](https://aiden-jeon.github.io/cicd/github-cicd-1)  
-3. [ghcr을 이용한 kubernetes deployment 만들기](https://aiden-jeon.github.io/cicd/github-cicd-2)  
-4. [helm을 이용한 deployment chart 만들기](https://aiden-jeon.github.io/cicd/github-cicd-3)  
-5. [argocd를 이용한 cd](https://aiden-jeon.github.io/cicd/github-cicd-4)  
+1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기]({{< relref "post/tech/cicd/sphinx_autoapi" >}})
+2. [github action을 이용한 ci]({{< relref "post/tech/cicd/github_action_ci" >}})
+3. [ghcr을 이용한 kubernetes deployment 만들기]({{< relref "post/tech/cicd/ghcr_k8s_deploy" >}})
+4. [helm을 이용한 deployment chart 만들기]({{< relref "post/tech/cicd/helm_deployment_chart" >}})
+5. [argocd를 이용한 cd]({{< relref "post/tech/cicd/argocd_cd" >}})
 
 ---
 
@@ -22,41 +22,41 @@ author: Jongseob Jeon
 
 이번 포스트에서는 github action을 이용해 CI(Continuous Integreation)를 하는 법에 대해서 알아보겠습니다.
 이번 포스트에서 사용하는 Dockerfile은 [github](https://github.com/Aiden-Jeon/github-cicd) 를 이용합니다.
-내용은 [이전 포스트](https://aiden-jeon.github.io/cicd/sphinx-autoapi)를 확인해주세요.
+내용은 [이전 포스트]({{< relref "post/tech/cicd/sphinx_autoapi" >}})를 확인해주세요.
 
 
 ## 1. github package 사용 설정하기
 이번 포스트에서는 ghcr(GitHub Container Registry for Docker images) 을 이용할 예정입니다. 개인 repo에서 ghcr을 사용하기 위해서는 따로 설정할 부분이 있습니다.
 
 github 페이지에서 오른쪽 위에 있는 프로필을 누른 후 Feature Preview를 열어줍니다.
-![img](/imgs/github/cicd-0.png)
+![그림-1](/imgs/github/cicd-0.png)
 
 Improved continer support enable을 눌러줍니다. 그러면 아래와 같이 바뀌게 됩니다.
-![img](/imgs/github/cicd-1.png)
+![그림-2](/imgs/github/cicd-1.png)
 
 ## 2. secrets 설정해주기
 github action 으로 자동으로 push 하기 위해서는 github packages에 접근할 수 있는 key가 필요합니다.
 
 우선 github setting에서 deplotver settings / personal access tokens 로 들어 갑니다.
 
-![img](/imgs/k8s/ghcr/0.png)
+![그림-3](/imgs/k8s/ghcr/0.png)
 여기서 generate new token을 누릅니다.
 
-![img](/imgs/k8s/ghcr/1.png)
+![그림-4](/imgs/k8s/ghcr/1.png)
 토큰 이름으로 ghcr-token을 입력하고 packages와 관련된 권한을 주고 token을 생성합니다.
 
-![img](/imgs/k8s/ghcr/2.png)
+![그림-5](/imgs/k8s/ghcr/2.png)
 다음과 같이 토큰이 생성됩니다. 이 토큰을 메모장에 잘 적어둡니다.
 
 그리고 ci를 진행할 github repo의 settings에 들어갑니다.
 secrets를 누른 후 New repository secret을 눌러줍니다.
-![img](/imgs/github/cicd-2.png)
+![그림-6](/imgs/github/cicd-2.png)
 
 Name에는 CR_PAT을 value 에는 위에서 생성한 key를 입력합니다.
-![img](/imgs/github/cicd-3.png)
+![그림-7](/imgs/github/cicd-3.png)
 
 정상적으로 생성되면 아래와 같이 나오게 됩니다.
-![img](/imgs/github/cicd-4.png)
+![그림-8](/imgs/github/cicd-4.png)
 
 
 ## 3. github action 작성하기
@@ -117,10 +117,10 @@ ghcr.io/aiden-jeon/sphinx-api:${{ steps.short-sha.outputs.sha }}
 ```
 
 이제 작성한 workflow를 github에 push 해줍니다. github에 들어가보면 자동으로 action을 실행합니다.
-![img](/imgs/github/cicd-5.png)
+![그림-9](/imgs/github/cicd-5.png)
 
 package에 가보면 아래과 같이 생성된 걸 확인할 수 있습니다.
-![img](/imgs/github/cicd-6.png)
+![그림-10](/imgs/github/cicd-6.png)
 
 
 ## 4. local ghcr pull
@@ -135,7 +135,7 @@ echo $CR_PAT | docker login ghcr.io -u <github-username> --password-stdin
 - github-username: ghcr package가 있는 username을 입력합니다.
 
 로그인을 한후 아까 만든 docker를 pull합니다. pull 명령어는 package를 누르면 확인할 수 있습니다.
-![img](/imgs/github/cicd-7.png)
+![그림-11](/imgs/github/cicd-7.png)
 
 ```bash
 docker pull ghcr.io/aiden-jeon/sphinx-api:dc3c4be
