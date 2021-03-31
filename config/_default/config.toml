@@ -1,0 +1,26 @@
+# set `baseurl` to your root domain
+# if you set it to "/" share icons won't work properly on production
+baseurl = "https://aiden-jeon.github.io/"  # Include trailing slash
+title = "Aiden's Deep Machine Learning lab"
+author = "Aiden Jeon"
+copyright = "Copyright © 2020-2021, Aiden Jeon; all rights reserved."
+# canonifyurls = true
+paginate = 10
+theme = "hugo-clarity"
+
+disqusShortname = "jongseob"
+enableRobotsTXT = true
+# [menus]
+# config/_default/menus/menu.xx.toml
+
+[taxonomies]
+category = "categories"
+tag = "tags"
+series = "series"
+
+[outputs]
+home = ["HTML", "RSS"]
+
+[sitemap]
+changefreq = "weekly"
+filename = "sitemap.xml"
