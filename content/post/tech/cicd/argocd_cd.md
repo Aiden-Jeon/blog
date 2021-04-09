@@ -36,20 +36,24 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 
 #port forward
-kubectl port-forward svc/argocd-server -n argocd 8080:443
-
-argocd login localhost:8080
+kubectl port-forward svc/argocd-server -n argocd 8080:80
 ```
-기본 아이디는 admin입니다. 비밀번호는 아래 명령어로 확인할 수 잇습니다.
+
+argocd 를 실행시켰으면 https://localhost:8080 으로 들어갑니다.  
+기본으로 설정되어 있는 아이디는 admin이며 비밀번호는 아래 명령어로 확인할 수 있습니다.
+
+v1.8.0 이하는 아래 명령어로 확인할 수 있습니다.
 ```bash
 kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-server -o name | cut -d'/' -f 2
 ```
 
-로그인에 성공하면 https://localhost:8080 으로 들어갑니다.
-
+v1.9.0 이상은 아래 명령어로 확인할 수 있습니다.
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+```
 
 ## 3. APP 생성
-처음 나오는 화면은 다음 처럼 아무런 app이 없습니다.
+처음 나오는 화면은 다음과 같이 아무런 app이 없습니다.
 
 ![그림-1](/imgs/github/cicd-8.png)
 
