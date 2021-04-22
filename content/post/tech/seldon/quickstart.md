@@ -80,6 +80,11 @@ pod에 모델 파일을 옮기기 위해 pvc를 생성합니다.
 > docker@minikube:~$ sudo mkdir -p /mnt/models/sklearn
 ```
 
+이제 모델을 해당 경로에 넣어주어야 합니다.
+
+```bash
+minikube cp model.joblib /mnt/models/sklearn/models.joblib
+```
 그리고 생성된 경로를 바라보는 pvc를 생성합니다.
 
 ```yaml
