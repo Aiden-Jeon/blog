@@ -4,7 +4,6 @@ comment: true
 categories: [cicd]
 tags: ["sphinx"]
 toc: true
-weight: 1
 date: 2021-03-04
 author: Jongseob Jeon
 ---

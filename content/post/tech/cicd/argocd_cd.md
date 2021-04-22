@@ -4,7 +4,6 @@ comment: true
 categories: [cicd]
 tags: ["argocd"]
 toc: true
-weight: 5
 date: 2021-03-04
 author: Jongseob Jeon
 ---

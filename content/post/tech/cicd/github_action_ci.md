@@ -4,7 +4,6 @@ comment: true
 categories: [cicd]
 tags: ["github", "ghcr"]
 toc: true
-weight: 2
 date: 2021-03-04
 author: Jongseob Jeon
 ---

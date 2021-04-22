@@ -3,7 +3,6 @@ title: Introduction to XAI
 comment: true
 categories: [XAI]
 toc: true
-weight: 1
 date: 2021-03-31
 author: Jongseob Jeon
 ---

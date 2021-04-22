@@ -4,7 +4,6 @@ comment: true
 categories: [cicd]
 tags: ["helm"]
 toc: true
-weight: 4
 date: 2021-03-04
 author: Jongseob Jeon
 ---

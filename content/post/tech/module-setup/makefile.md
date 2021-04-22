@@ -3,7 +3,6 @@ title: setup.py 와 Makefile 설정하기
 comment: true
 categories: [setup-module]
 toc: true
-weight: 1
 date: 2021-03-14
 author: Jongseob Jeon
 ---

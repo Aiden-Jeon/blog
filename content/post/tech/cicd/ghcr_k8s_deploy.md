@@ -4,7 +4,6 @@ comment: true
 categories: [cicd]
 tags: ["k8s", "ghcr"]
 toc: true
-weight: 3
 date: 2021-03-04
 author: Jongseob Jeon
 ---
