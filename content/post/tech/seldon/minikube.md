@@ -1,27 +1,31 @@
 ---
-title: minikube를 이용해 seldon 사용해보기
+title: seldon-core minikube에서 사용해보기
 comment: true
 categories: [kubernetes]
 tags: ["k8s", "seldon"]
 toc: true
-date: 2021-04-21
+date: 2021-04-23
 author: Jongseob Jeon
 ---
 
-이번 포스트는 Seldon Core를 설치하는 법에 대해서 설명합니다.
+이번 포스트는 seldon-core를 minikube에서 사용하는 법에 대해서 설명합니다.
 
-사용한 k8s 환경은 minikube 입니다.
 
+****
 ## 1. Install
-우선, minikube를 시작합니다
+우선, minikube를 시작합니다.
 ```bash
 minikube start
 ```
 
+seldon-core를 설치할 namespace를 생성합니다.
+```bash
+kubectl create ns seldon-system
+```
+
 그리고 helm을 이용해 seldon-core를 설치합니다.
 ```bash
-> kubectl create ns seldon-system
-> helm install seldon-core seldon-core-operator \
+helm install seldon-core seldon-core-operator \
     --repo https://storage.googleapis.com/seldon-charts \
     --set usageMetrics.enabled=true \
     --namespace seldon-system
@@ -31,6 +35,7 @@ minikube start
 
 ```bash
 > kubectl get all -n seldon-system
+
 NAME                                            READY   STATUS    RESTARTS   AGE
 pod/seldon-controller-manager-559c567c9-9tj9w   1/1     Running   0          11s
 
@@ -43,6 +48,8 @@ deployment.apps/seldon-controller-manager   1/1     1            1           11s
 NAME                                                  DESIRED   CURRENT   READY   AGE
 replicaset.apps/seldon-controller-manager-559c567c9   1         1         1       11s
 ```
+seldon-controller-manager pod이 정상적으로 Running 상태여야 합니다.
+
 
 ## 2. Sklearn Model
 deploy에 이용할 모델을 만들어 보겠습니다.
@@ -71,22 +78,26 @@ if __name__ == "__main__":
 
 ## 3. pvc
 
-pod에 모델 파일을 옮기기 위해 pvc를 생성합니다.
+pod에 모델 파일을 옮기기 위해 pvc를 생성해야 합니다.
 
-우선 minikube에 접속해서 폴더를 생성합니다.
+우선 minikube에 접속합니다.
 
 ```bash
-> minikube ssh
-> docker@minikube:~$ sudo mkdir -p /mnt/models/sklearn
+minikube ssh
+```
+폴더를 생성 후 종료합니다.
+```bash
+docker@minikube:~$ sudo mkdir -p /mnt/models/sklearn
+docker@minikube:~$ exit
 ```
 
 이제 모델을 해당 경로에 넣어주어야 합니다.
 
 ```bash
-minikube cp model.joblib /mnt/models/sklearn/models.joblib
+minikube cp model.joblib /mnt/models/sklearn/model.joblib
 ```
-그리고 생성된 경로를 바라보는 pvc를 생성합니다.
 
+그리고 생성된 경로를 바라보는 pvc를 생성합니다.
 ```yaml
 # sklearn-pv-volume.yaml
 apiVersion: v1
@@ -118,15 +129,20 @@ spec:
       storage: 1Gi
 ```
 
+deploy 할 namespace를 생성합니다.
+```bash
+kubectl create ns seldon
+```
 
+그리고 `sklearn-pv-volume.yaml` 를 생성합니다.
+```bash
+kubectl apply -f sklearn-pv-volume.yaml
+```
 생성 후 상태를 확인합니다.
 
 ```bash
-> kubectl create ns seldon
-> kubectl apply -f sklearn-pv-volume.yaml
-persistentvolume/sklearn-pv-volume created
-
 > kubectl get pv sklearn-pv-volume
+
 NAME                CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                      STORAGECLASS   REASON   AGE
 sklearn-pv-volume   1Gi        RWO            Retain           Bound    seldon/sklearn-pv-volume   manual                  53s
 ```
@@ -138,7 +154,7 @@ sklearn-pv-volume   1Gi        RWO            Retain           Bound    seldon/s
 간단하게 SKLEARN_SERVER를 사용하는 deployment를 띄우겠습니다. 우선 아래의 내용을 `deploy.yaml` 파일에 작성합니다.
 
 ```bash
-# seldom-deploy.yaml
+# sklearn-deploy.yaml
 apiVersion: machinelearning.seldon.io/v1
 kind: SeldonDeployment
 metadata:
@@ -163,21 +179,20 @@ spec:
 그리고 apply를 합니다.
 
 ```bash
-kubectl apply -f deploy.yaml
+kubectl apply -f sklearn-deploy.yaml
 ```
 
-상태를 확인합니다.
-
+정상적으로 Running이 되는지 확인합니다.
 ```bash
-> k get po -n seldon
+> kubectl get po -n seldon
 NAME                                               READY   STATUS    RESTARTS   AGE
 iris-model-default-0-classifier-6bb64c9588-5q8ck   0/2     Running   0          18s
 ```
 
+
 ## 5. test
 
-정상적으로 작동하는지 확인하기 위한 테스트를 해보겠습니다.
-
+실제로 predict가 되는지 테스트를 해보겠습니다.
 우선 서비스에 어떤 것들이 있는지 확인해보겠습니다.
 
 ```bash
