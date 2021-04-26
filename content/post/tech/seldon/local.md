@@ -91,7 +91,7 @@ curl -H "Content-Type: application/json" http://localhost:9000/predict -d '{
 clone받은 repo에서 mlflow server가 위치한 경로로 이동합니다.
 
 ```bash
-cd seldon-core/servers/sklearnserver/sklearnserver
+cd seldon-core/servers/mlflowserver/mlflowserver
 ```
 
 mlflow를 이용해 모델을 저장할 스크립트를 작성합니다.
