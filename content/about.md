@@ -1,7 +1,7 @@
 +++
 title = "About Me"
 description = "Who is Jongseob Jeon"
-date = "2021-03-31"
+date = "2021-05-04"
 aliases = ["contact"]
 author = "Jongseob Jeon"
 comments = false
@@ -12,15 +12,10 @@ comments = false
 - linkedin: https://www.linkedin.com/in/jongseob-jeon/
 
 # Papers
-- RaPP: Novelty Detection with Reconstruction along Projection Pathway
-    - 2020 ICLR accepted
-    - [paper link](https://openreview.net/forum?id=HkgeGeBYDB)
-- Non-Invasive Prediction of Laparoscopy-Based Score System Using Preoperative CT in Advanced Ovarian Cancer Patients
-    - 2019 RSNA accepted
-    - [paper link](http://archive.rsna.org/2019/19015767.html)
-- Prediction Model for Aortic Stenosis Severity Based on Aortic Valve Calcium on Cardiac Computed Tomography: Incorporation into Radiomics and Machine Learning
-    - 2019 RSNA accepted
-    - [paper link](http://archive.rsna.org/2019/19012505.html)
+- RaPP: Novelty Detection with Reconstruction along Projection Pathway, Ki Hyun Kim, Sangwoo Shim, Yongsub Lim, **Jongseob Jeon**, Jeongwoo Choi, Byungchan Kim, Andre S. Yoon, ICLR, 2020 [paper](https://openreview.net/forum?id=HkgeGeBYDB)
+- Non-Invasive Prediction of Laparoscopy-Based Score System Using Preoperative CT in Advanced Ovarian Cancer Patients, Nayoung Kim, Dae Chul Jung, Kyunghwa Han, **Jeon Jong Seob**, Young Taik Oh, RSNA, 2019 [paper](http://archive.rsna.org/2019/19015767.html)
+- Prediction Model for Aortic Stenosis Severity Based on Aortic Valve Calcium on Cardiac Computed Tomography: Incorporation into Radiomics and Machine Learning, Nam-Kyu Kang, Young Joo Suh, Kyunghwa Han, **Jong Seub Jeon**, Young Jin Kim, Byoung Wook Choi, Sang A Lee, RSNA, 2019 [paper](http://archive.rsna.org/2019/19012505.html)
+ 
 
 # Side Projects
 - GANG 
