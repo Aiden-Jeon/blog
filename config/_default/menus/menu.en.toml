@@ -1,23 +1,27 @@
 [[main]]
   name = "Home"
   url = ""
-  weight = -110
-
+  weight = 1
 
 [[main]]
   name = "About"
   url = "about/"
-  weight = -107
+  weight = 10
 
 [[main]]
   name = "Algorithm"
   url = "post/algorithm/"
-  weight = -108
+  weight = 2
 
 [[main]]
-  name = "Tech"
+  name = "Dev"
   url = "post/tech/"
-  weight = -109
+  weight = 3
+
+[[main]]
+  name = "ML&DL"
+  url = "post/mldl/"
+  weight = 4
 
 # social menu links
 
