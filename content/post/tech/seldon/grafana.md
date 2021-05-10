@@ -1,5 +1,5 @@
 ---
-title: seldon-core와 prometheus local에서 사용해보기
+title: prometheus와 grafana 연결하기
 comment: true
 categories: [seldon]
 tags: ["seldon", "prometheus"]
