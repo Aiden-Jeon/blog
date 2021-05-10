@@ -1,7 +1,7 @@
 ---
 title: seldon-core local에서 사용해보기
 comment: true
-categories: [kubernetes]
+categories: [seldon]
 tags: ["seldon"]
 toc: true
 date: 2021-04-22
