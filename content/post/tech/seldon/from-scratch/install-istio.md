@@ -32,7 +32,7 @@ minikube version: v1.20.0
 commit: c61663e942ec43b20e8e70839dcca52e44cd85ae
 ```
 
-minikube의 default config는 memory의 경우 2048mb 입니다. 이 경우 실습 중 메모리가 부족해서 OOM이슈가 생겨서 정삭적으로 진행할 수 없을 수 도 있습니다. OOM을 방지하기 위해서 minikube의 메모리를 4096mb로 늘려둡니다.
+minikube의 default config는 memory의 경우 2048mb 입니다. 이 경우 실습 중 메모리가 부족해서 OOM이슈가 생겨서 정삭적으로 진행할 수 없을 수 도 있습니다. OOM을 방지하기 위해서 minikube의 메모리를 4096mb로 늘려줍니다.
 ```bash
 > minikube config set memory 4096
 ❗  These changes will take effect upon a minikube delete and then a minikube start
