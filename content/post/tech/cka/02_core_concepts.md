@@ -1,5 +1,5 @@
 ---
-title: (CKA) 02. Core Concepts
+title:  \[CKA\] 02. Core Concepts
 comment: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
@@ -15,7 +15,6 @@ CKA를 준비하면서 공부한 요약 내용입니다.
 # 0. Tips
 
 1. ailias `kubectl`
-
    ```bash
    > alias k="kubectl"
    > k get po
@@ -23,28 +22,21 @@ CKA를 준비하면서 공부한 요약 내용입니다.
    ```
 
 2. shortcuts
-
    - pod = po
    - service = svc
    - namespace = ns
    - replicasets = rs
 
 3. do not write all config file
-
    - use dry run
-
      `kubectl run nginx --image=nginx --dry-run=client -o yaml`
-
      `kubectl create deployment --image=nginx nginx --dry-run=client -o yaml`
-
    - export it to yaml file
-
      `kubectl create deployment --image=nginx nginx --dry-run=client -o yaml > nginx-deployment.yaml`
 
 
 ## 1. Pods
 ### 생성
-
 1. yaml
 ```yaml
 # pod.yaml
@@ -67,7 +59,6 @@ kubectl run nginx --image=nginx
 ### 상태
 
 - 기본
-
   ```bash
   > k get po
   NAME            READY   STATUS             RESTARTS   AGE
@@ -82,7 +73,6 @@ kubectl run nginx --image=nginx
     - running_containers in pod / total_containers in pod
 
 - wide
-
   ```bash
   > k get po -o wide
   NAME            READY   STATUS              RESTARTS   AGE   IP       NODE           NOMINATED NODE   READINESS GATES
@@ -95,7 +85,6 @@ kubectl run nginx --image=nginx
   - NODE
 
 - describe
-
   ```bash
   > k describe po webapp
   Name:         webapp
@@ -167,14 +156,12 @@ kubectl run nginx --image=nginx
   ```
 
 ### 삭제
-
 ```bash
 root@controlplane:~# k delete po webapp
 pod "webapp" deleted
 ```
 
 ### 수정
-
 ```bash
 > k edit po redis
 ```
@@ -187,49 +174,47 @@ What is replica and why need controller?
   - run multiple instances of a single pod in the k8s cluster
 
 **특징**
-
 1. high availability
    - multiplie pod or single pod
    - replication controller ensures that the specified number of pods are running at all times.
 2. Load Balancing & Scaling
    - balance the load
    - spans across multiple nodes
-
+ 
 - replication controller
   - old technology
 - replica set
   - recommended
 
 ### 생성
-
-```yaml
-# ReplicaSet
-apiVersion: apps/v1
-kind: ReplicaSet
-metadata:
-  name: myapp-replicaset
-  labels:
-    app: myapp
-    type: front-end
-spec:
-  template:
-    metadata: myapp-pod
-      name: myapp-pod
-      labels:
-        app: myapp
-        type: front-end
-      spec:
-        containers:
-          - name: nginx-container
-            image: nginx
-  replicas: 3
-  selector:
-    matchLabels:
+- defintion
+  ```yaml
+  # ReplicaSet
+  apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    name: myapp-replicaset
+    labels:
+      app: myapp
       type: front-end
-```
+  spec:
+    template:
+      metadata: myapp-pod
+        name: myapp-pod
+        labels:
+          app: myapp
+          type: front-end
+        spec:
+          containers:
+            - name: nginx-container
+              image: nginx
+    replicas: 3
+    selector:
+      matchLabels:
+        type: front-end
+  ```
 
 ### 상태
-
 ```bash
 > k get replicasets
 NAME              DESIRED   CURRENT   READY   AGE
@@ -237,20 +222,17 @@ new-replica-set   4         4         0       11s
 ```
 
 ### 수정
-
 ```bash
 > k edit replicaset            
 replicaset.apps/new-replica-set edited
 ```
 
-pod 삭제
-
+### 삭제
 ```bash
 > k delete po --all
 ```
 
-자동으로 다시 pod 생성 됨
-
+-> 자동으로 다시 pod 생성 됨
 ```bash
 ot@controlplane:~# k get po
 NAME                    READY   STATUS              RESTARTS   AGE
@@ -265,47 +247,36 @@ new-replica-set-vmts5   0/1     Terminating         0          4m22s
 ```
 
 ### scale
-
 1. replace w\ file
-
    ```bash
    kubectl replace -f ~~.yaml
    ```
-
 2. scale w\ file
-
    ```bash
    kubectl scale --replicas=6 -f ~~.yaml
    ```
-
 3. scale w\ resource
-
    ```bash
    kubectl scale --replicas=6 replicaset myapp-replicaset
    ```
-
 4. edit
-
    ```bash
    kubectl edit replicaset
    ```
 
 - 실습
-
   ```bash
   > k scale --replicas=5 rs new-replica-set 
   replicaset.apps/new-replica-set scaled
   ```
 
 ## 3. Deployments
-
 - rolling updates
 - rolling back
 
 ![img-1](/imgs/cka/core_concepts-1.png)
 
 ## 4. Namespaces
-
 - user의 실수부터 보호하기 위해서 처음 3개의 namespace가 생성됨
   - Default
   - kube-system
@@ -320,14 +291,12 @@ new-replica-set-vmts5   0/1     Terminating         0          4m22s
   - `{service-name}.{namespace}.{service}-{domain-name}`
 
 ### 생성
-
 ```bash
 k create ns dev-ns
 namespace/dev-ns created
 ```
 
 ### 목록
-
 ```bash
 > k get ns
 
@@ -345,15 +314,11 @@ research          Active   33s
 ```
 
 ### 상태
-
 1. `--namespace`
-
    ```bash
    kubectl get pods --namespace=kube-system
    ```
-
 2. `-n`
-
    ```bash
    kubectl get pods -n kube-system
    ```
@@ -421,10 +386,8 @@ spec:
 
 - if `targetPort` is not given
   - same as `port`
-
 - if `nodePort` is not given
   - automatically allocated
-
 - randomly distributed if same port is exists
 
 **ClusterIP**
@@ -466,11 +429,9 @@ kubectl run httpd --image=httpd:alpine --port=80 --expose
 
 - create objects
 - update objects
-
 → hard to keep track
 
 Imperative Configuration Files
-
 - create objects
   - `kubectl create -f ~.yaml`
 - update obejcts
@@ -478,7 +439,6 @@ Imperative Configuration Files
   - `kubectl replace -f ~.yaml`
 
 **Declaritve**
-
 - create objects
   - `kubectl apply -f ~.yaml`
   - `kubectl apply -f /path/to/config-files`
