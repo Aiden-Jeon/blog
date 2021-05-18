@@ -6,6 +6,7 @@ tags: ["k8s", "seldon"]
 toc: true
 date: 2021-04-23
 author: Jongseob Jeon
+draft: true
 ---
 
 이번 포스트는 seldon-core를 minikube에서 사용하는 법에 대해서 설명합니다.

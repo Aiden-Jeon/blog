@@ -6,6 +6,7 @@ tags: ["seldon", "prometheus"]
 toc: true
 date: 2021-05-10
 author: Jongseob Jeon
+draft: true
 ---
 
 이번 포스트에서는 local에서 실행한 seldon-core의 metric을 prometheus로 가져오는 방법에 대해서 설명합니다.

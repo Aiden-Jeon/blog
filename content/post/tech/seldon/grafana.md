@@ -4,6 +4,7 @@ comment: true
 categories: [seldon]
 tags: ["seldon", "prometheus"]
 toc: true
+draft: true
 date: 2021-05-10
 author: Jongseob Jeon
 ---

@@ -6,6 +6,7 @@ tags: ["seldon"]
 toc: true
 date: 2021-04-22
 author: Jongseob Jeon
+draft: true
 ---
 
 이번 포스트에서는 seldon-core를 local에서 사용하는 법에 대해서 설명합니다.
