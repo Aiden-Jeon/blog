@@ -4,7 +4,7 @@ comment: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
 toc: true
-date: 2021-05-17
+date: 2021-05-16
 author: Jongseob Jeon
 ---
 
