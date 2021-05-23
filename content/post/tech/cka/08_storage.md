@@ -68,7 +68,7 @@ CKA를 준비하면서 공부한 요약 내용입니다.
 ## Volumes
 - docker
   ![img-7](/imgs/cka/storage-7.png)
-- k8s
+- k8s  
   ![img-8](/imgs/cka/storage-8.png)
 
 ### Volumes & Mounts
