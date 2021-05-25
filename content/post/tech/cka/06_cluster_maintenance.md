@@ -180,13 +180,13 @@ Can use this node.
 
 #### ETCD
 - method 1
-  - `ExecStart= ... \\\\ --data-dir=/var/lib/etct`
+  - `ExecStart= ... \\ --data-dir=/var/lib/etct`
 - method 2
   - `ETCDCTL_API=3 etcdctl snapshot save snapshot.db`
   - `servcie kube-apiserver stop`
   - `ETCDCTL_API=3 etcdctl snapshot --data-dir /var/lib/etcd-from-backup snapshot restore snapshot.db`
   - `systemctl daemon-reload`
-  - `servce stecd restart`
+  - `service etcd restart`
   - `service kube-apiserver start`
 
 - backup practice
