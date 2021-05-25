@@ -1,5 +1,5 @@
 ---
-title: \[CKA\] 04. Logging & Monitoring
+title: \[CKA\] 03. Logging & Monitoring
 comment: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]

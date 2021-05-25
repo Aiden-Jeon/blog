@@ -1,5 +1,5 @@
 ---
-title: \[CKA\] 03. Scheduler
+title: \[CKA\] 02. Scheduler
 comment: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]

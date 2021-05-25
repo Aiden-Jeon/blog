@@ -1,5 +1,5 @@
 ---
-title: \[CKA\] 08. Storage
+title: \[CKA\] 07. Storage
 comment: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]

@@ -1,5 +1,5 @@
 ---
-title: \[CKA\] 05. Application Lifecycle Management
+title: \[CKA\] 04. Application Lifecycle Management
 comment: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]

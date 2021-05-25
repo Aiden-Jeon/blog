@@ -1,5 +1,5 @@
 ---
-title: \[CKA\] 06. Cluster Maintenance
+title: \[CKA\] 05. Cluster Maintenance
 comment: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
