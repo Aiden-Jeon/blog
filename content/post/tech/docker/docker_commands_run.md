@@ -121,7 +121,7 @@ by default, docker container does not listen to standard input, even attached.
 
 
 ### PORT Mapping
-![img-0](/imgs/docker/docker-0.png)
+![docker-port-mapping](/imgs/docker/docker-0.png)
 
 - IP of docker container
   - internal IP and is only accessible within the docker host.
@@ -132,7 +132,7 @@ by default, docker container does not listen to standard input, even attached.
 
 
 ### Volume Mapping
-![img-1](/imgs/docker/docker-1.png)
+![docker-volume-mapping](/imgs/docker/docker-1.png)
 
 - docker container has its own isolated file system.
 - if want to persist data, map a directory outside the container on the docker host to ad directory inside the container
@@ -145,4 +145,4 @@ by default, docker container does not listen to standard input, even attached.
 
 
 ### Container Logs
-- `docker logs blissful_hopper`
+- `docker logs <container id | name>`
