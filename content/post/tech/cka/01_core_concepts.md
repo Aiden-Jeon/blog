@@ -1,5 +1,5 @@
 ---
-title:  \[CKA\] 02. Core Concepts
+title:  \[CKA\] 01. Core Concepts
 comment: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
