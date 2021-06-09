@@ -8,8 +8,15 @@ date: 2021-06-06
 author: Jongseob Jeon
 ---
 
+
+## POD Networking
+### Networking Model
 CKA를 준비하면서 공부한 요약 내용입니다.
--  Every POD should have and IP Address
+- [강의](https://www.udemy.com/course/certified-kubernetes-administrator-with-practice-tests/)
+- [What is CKA?](https://www.cncf.io/certification/cka/)
+
+
+- Every POD should have and IP Address
 - Every POD should be able to communicate with every other POD in the same node
 - Every POD should be able to communicate with every other POD on other nodes without NAT
 
