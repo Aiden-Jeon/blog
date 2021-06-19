@@ -69,8 +69,8 @@ Users
   ```
 - `kube-apiserver.service`
   ```bash
-  ExecStart=/usr/local/bin/kube-apiserver \\\\
-        --basic-auth-file=user-details.csvc \\\\
+  ExecStart=/usr/local/bin/kube-apiserver \
+        --basic-auth-file=user-details.csv \
         ...
   ```
 - kubeadm
@@ -124,8 +124,8 @@ Users
   ```
 - `kube-apiserver.service`
   ```bash
-  ExecStart=/usr/local/bin/kube-apiserver \\\\
-        --token-auth-file=user-details.csvc \\\\
+  ExecStart=/usr/local/bin/kube-apiserver \
+        --token-auth-file=user-details.csv \
         ...
   ```
 - kubeadm
