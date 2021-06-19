@@ -14,25 +14,24 @@ CKA를 준비하면서 공부한 요약 내용입니다.
 
 # 0. Tips
 
-1. ailias `kubectl`
-   ```bash
-   > alias k="kubectl"
-   > k get po
-   No resources found in default namespace.
-   ```
+1. ailias `kubectl` to `k`
+```bash
+alias k="kubectl"
+k get po
+```
 
 2. shortcuts
-   - pod = po
-   - service = svc
-   - namespace = ns
-   - replicasets = rs
+- pod = po
+- service = svc
+- namespace = ns
+- replicasets = rs
 
 3. do not write all config file
-   - use dry run
-     `kubectl run nginx --image=nginx --dry-run=client -o yaml`
-     `kubectl create deployment --image=nginx nginx --dry-run=client -o yaml`
-   - export it to yaml file
-     `kubectl create deployment --image=nginx nginx --dry-run=client -o yaml > nginx-deployment.yaml`
+- use dry run
+  - `kubectl run nginx --image=nginx --dry-run=client -o yaml`
+  - `kubectl create deployment --image=nginx nginx --dry-run=client -o yaml`
+- export it to yaml file
+  - `kubectl create deployment --image=nginx nginx --dry-run=client -o yaml > nginx-deployment.yaml`
 
 
 ## 1. Pods
@@ -43,11 +42,13 @@ CKA를 준비하면서 공부한 요약 내용입니다.
 apiVersion: v1
 kind: pod
 metadata:
-	name: nginx
+  name: nginx
 spec:
-	containers:
-		- name: nginx-container
-			image: nginx
+  containers:
+    - name: nginx-container
+      image: nginx
+```
+```bash
 kubectl apply -f pod.yaml
 ```
 
@@ -157,23 +158,21 @@ kubectl run nginx --image=nginx
 
 ### 삭제
 ```bash
-root@controlplane:~# k delete po webapp
+> k delete po webapp
 pod "webapp" deleted
 ```
 
 ### 수정
 ```bash
-> k edit po redis
+k edit po redis
 ```
 
 ## 2. Replication Controller
+What is replica and why need controller?  
+-> replication controller runs multiple instances of a single pod in the k8s cluster
 
-What is replica and why need controller?
 
-- replication controller
-  - run multiple instances of a single pod in the k8s cluster
-
-**특징**
+### 특징
 1. high availability
    - multiplie pod or single pod
    - replication controller ensures that the specified number of pods are running at all times.
@@ -181,6 +180,7 @@ What is replica and why need controller?
    - balance the load
    - spans across multiple nodes
  
+### 종류
 - replication controller
   - old technology
 - replica set
@@ -375,13 +375,13 @@ allow to communicate w\ people, backend, frontend, extra data source
 apiVersion: v1
 kind: SErvice
 metadata:
-	name: myapp-service
+  name: myapp-service
 spec:
-	type: NodePort
-	ports:
-		- targetPort: 80
-			port: 80
-			nodePort: 30008
+  type: NodePort
+  ports:
+    - targetPort: 80
+      port: 80
+      nodePort: 30008
 ```
 
 - if `targetPort` is not given

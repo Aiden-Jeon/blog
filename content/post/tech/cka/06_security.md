@@ -70,8 +70,8 @@ Users
 - `kube-apiserver.service`
   ```bash
   ExecStart=/usr/local/bin/kube-apiserver \\\\
-  			--basic-auth-file=user-details.csvc \\\\
-  			...
+        --basic-auth-file=user-details.csvc \\\\
+        ...
   ```
 - kubeadm
   ```yaml
@@ -125,8 +125,8 @@ Users
 - `kube-apiserver.service`
   ```bash
   ExecStart=/usr/local/bin/kube-apiserver \\\\
-  			--token-auth-file=user-details.csvc \\\\
-  			...
+        --token-auth-file=user-details.csvc \\\\
+        ...
   ```
 - kubeadm
   - `kubectl edit`
@@ -204,28 +204,28 @@ Users
   apiVersion: v1
   clusters:
   - cluster:
-  		certificate-authority: ca.crt
-  		server: <https://kube-apiserver:6443>
-  	name: kubernetes
+      certificate-authority: ca.crt
+      server: <https://kube-apiserver:6443>
+    name: kubernetes
   kind: Config
   users:
   - name: kubernetes-admin
-  	user:
-  		client-certificate: admin.crt
-  		clinet-key: admin.key
+    user:
+      client-certificate: admin.crt
+      clinet-key: admin.key
   ```
 
 ### OpenSSL to Create Server Certification
 #### ETCD Servers
 ```yaml
 - etcd
-	--key-file=
-	--cert-file=
-	--peer-cert-file=
-	--peer-client-cert-auth=
-	--peer-key-file=
-	--peer-trusted-ca-cile
-	--trusted-ca-file= 
+  --key-file=
+  --cert-file=
+  --peer-cert-file=
+  --peer-client-cert-auth=
+  --peer-key-file=
+  --peer-trusted-ca-cile
+  --trusted-ca-file= 
 ```
 
 #### Kube-Api Server
@@ -262,13 +262,13 @@ Users
     apiVersion: kubelet.config.k8s.io/v1beta1
     kind: KubeletConfiguration
     authentication:
-    	x509:
-    		clientCAFile: "/var/lib/kubernetes/ca.pem"
+      x509:
+        clientCAFile: "/var/lib/kubernetes/ca.pem"
     authorization:
-    	mode: Webhook
+      mode: Webhook
     clusterDomain: "cluster.local"
     clusterDNS:
-    	- "10.32.0.10"
+      - "10.32.0.10"
     podCIDR: "$(POD_CIDR)"
     resolveConf: "/run/systemd/resolve/resolv.conf"
     reuntimeRequrestTimeout: "15m"
@@ -309,16 +309,16 @@ Users
   apiVersion: certificates.k8s.io/v1beta1
   kind: CeritifcateSigningRequest
   metadata:
-  	name: jane
+    name: jane
   spec:
-  	groups:
-  	- system:authenticated
-  	usage:
-  	- digital signature
-  	- key encipherment
-  	- server auth
-  	request:
-  		<cat jane.csr | base64>
+    groups:
+    - system:authenticated
+    usage:
+    - digital signature
+    - key encipherment
+    - server auth
+    request:
+      <cat jane.csr | base64>
   ```
   - `cat akshay.csr | base64 | tr -d "\\n"`
 
@@ -350,10 +350,10 @@ Users
 ### Using kubectl with crt
 ```bash
 kubectl get pods
-	--server my-kube-playground:6443
-	--client-key admin.key
-	--client-certificated admin.crt
-	--certificate-authority ca.crt
+  --server my-kube-playground:6443
+  --client-key admin.key
+  --client-certificated admin.crt
+  --certificate-authority ca.crt
 ```
 - this is tedious task
   - → move it to config file
@@ -361,10 +361,10 @@ kubectl get pods
 ### Using kubectl with config file
 - config
   ```bash
-  	--server my-kube-playground:6443
-  	--client-key admin.key
-  	--client-certificated admin.crt
-  	--certificate-authority ca.crt
+    --server my-kube-playground:6443
+    --client-key admin.key
+    --client-certificated admin.crt
+    --certificate-authority ca.crt
   ```
 - kubectl
   - `kubectl get pods --kubeconfig config`
@@ -387,9 +387,9 @@ kubectl get pods
   - dev user
   - prod user
   ```bash
-  	--client-key admin.key
-  	--client-certificated admin.crt
-  	--certificate-authority ca.crt
+    --client-key admin.key
+    --client-certificated admin.crt
+    --certificate-authority ca.crt
   ```
 - defintion
   ```yaml
@@ -398,21 +398,21 @@ kubectl get pods
   current-context: dev-user@google
   clusters:
   - name: my-kube-playground
-  	cluster:
-  		certificate-authority: ca.crt
-  		server: my-kube-playground:6443
+    cluster:
+      certificate-authority: ca.crt
+      server: my-kube-playground:6443
   - name: ...
   contexts:
   - name: my-kube-admin@my-kube-playground
-  	context:
-  		clusters: my-kube-playground
-  		user: my-kube-admin
+    context:
+      clusters: my-kube-playground
+      user: my-kube-admin
   - name: ...
   users:
   - name: my-kube-admin
-  	user:
-  		client-certificate: admin.crt
-  		client-key: admin.key
+    user:
+      client-certificate: admin.crt
+      client-key: admin.key
   - name: ...
   ```
   - `current-context`
@@ -499,12 +499,12 @@ Rule Based Authorizaion
   apiVersion: rbac.authorization.k8s.io/v1
   kind: Role
   metadata:
-  	name: developer
+    name: developer
   rules:
   - apiGroups: [""]
-  	resources: ["pods"]
-  	verbs: ["list", "get", "create", "update", "delete"]
-  	resourceNames: ["blue", "orange"]
+    resources: ["pods"]
+    verbs: ["list", "get", "create", "update", "delete"]
+    resourceNames: ["blue", "orange"]
   ```
   - rules have 3 sections
     - `apiGroups`
@@ -515,15 +515,15 @@ Rule Based Authorizaion
   apiVersion: rbac.authorization.k8s.io/v1
   kind: RoleBinding
   metadata:
-  	name: devuser-developer-binding
+    name: devuser-developer-binding
   subjects:
   - kind: User
-  	name: dev-user
-  	apiGroup: rbac.authorization.k8s.io
+    name: dev-user
+    apiGroup: rbac.authorization.k8s.io
   roleRef:
-  	kind: Role
-  	name: developer
-  	apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: developer
+    apiGroup: rbac.authorization.k8s.io
   ```
 - view
   - `kubectl get roles`
@@ -545,7 +545,7 @@ Rule Based Authorizaion
 ### Setting
 ```bash
 ExecStart = ...\\
-	--authorization-mode=AlwaysAllow
+  --authorization-mode=AlwaysAllow
 ```
 - default : `AlwaysAllow`
 - multiple mode: 
@@ -585,11 +585,11 @@ ExecStart = ...\\
   apiVersion: rbac.authorizastion.k8s.io/v1
   kind: ClusterRole
   metadata:
-  	name: cluster-administrator
+    name: cluster-administrator
   rules:
   - apiGroups: [""]
-  	resources: ["nodes"]
-  	verbs: ["list", "get", "create", "delete"]
+    resources: ["nodes"]
+    verbs: ["list", "get", "create", "delete"]
   ```
 
 ### Clusterrolebining
@@ -598,15 +598,15 @@ ExecStart = ...\\
   apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
-  	name: cluster-admin-role-binding
+    name: cluster-admin-role-binding
   subjects:
   - kind: User
-  	name: cluster-admin
-  	apiGroup: rbac.authorization.k8s.io
+    name: cluster-admin
+    apiGroup: rbac.authorization.k8s.io
   roleRef:
-  	kind: ClusterRole
-  	name: cluster-administrator
-  	apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cluster-administrator
+    apiGroup: rbac.authorization.k8s.io
   ```
 
 
@@ -619,10 +619,10 @@ ExecStart = ...\\
 #### Create secret
 ```yaml
 kubectl create secrete docker-registry regcred  \\
-	--docker-server=private-registry.io  \\
-	--docker-username=registry-user  \\
-	--docker-password=registry-password  \\
-	--docker-email=registry-user@org.com
+  --docker-server=private-registry.io  \\
+  --docker-username=registry-user  \\
+  --docker-password=registry-password  \\
+  --docker-email=registry-user@org.com
 ```
 
 #### Create pod
@@ -631,13 +631,13 @@ kubectl create secrete docker-registry regcred  \\
   apiVersion: v1
   kind: Poid
   metadata:
-  	name: nginx-pod
+    name: nginx-pod
   spec:
-  	containers:
-  	- name: nginx
-  		image: private-registry.op/apps/internal-app
-  	imagePullSecrets:
-  	- name: regcred
+    containers:
+    - name: nginx
+      image: private-registry.op/apps/internal-app
+    imagePullSecrets:
+    - name: regcred
   ```
 
 
@@ -647,30 +647,30 @@ kubectl create secrete docker-registry regcred  \\
   apiVersion: v1
   kind: Pod
   metadata:
-  	name: web-pod
+    name: web-pod
   spec:
-  	securityContext:
-  		runAsUser: 1000
-  	containers:
-  		- name: ubuntu
-  			image: ubuntu
-  			command: ["sleep", "3600"]
+    securityContext:
+      runAsUser: 1000
+    containers:
+      - name: ubuntu
+        image: ubuntu
+        command: ["sleep", "3600"]
   ```
 - definition for container
   ```yaml
   apiVersion: v1
   kind: Pod
   metadata:
-  	name: web-pod
+    name: web-pod
   spec:
-  	containers:
-  		- name: ubuntu
-  			image: ubuntu
-  			command: ["sleep", "3600"]
-  			securityContext:
-  				runAsUser: 1000
-  				capabilities:
-  					add: ["AMC_ADMIN"]
+    containers:
+      - name: ubuntu
+        image: ubuntu
+        command: ["sleep", "3600"]
+        securityContext:
+          runAsUser: 1000
+          capabilities:
+            add: ["AMC_ADMIN"]
   ```
   - `capabilities`
     - only supported at the container level
@@ -698,21 +698,21 @@ kubectl create secrete docker-registry regcred  \\
   apiVersions: networking.k8s.io/v1
   kind: NetworkPolicy
   metadata:
-  	name: db-policy
+    name: db-policy
   spec:
-  	podSelector:
-  		mathLabels:
-  			role: db
-  	policyTpes:
-  	- Ingress
-  	ingress:
-  	- from:
-  		- podSelector:
-  				matchLabels:
-  					name: api-pod
-  		ports:
-  		- protocol: TCP
-  			port: 3306
+    podSelector:
+      mathLabels:
+        role: db
+    policyTpes:
+    - Ingress
+    ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            name: api-pod
+      ports:
+      - protocol: TCP
+        port: 3306
   ```
 
 
@@ -723,11 +723,11 @@ kubectl create secrete docker-registry regcred  \\
     apiVersions: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
-    	name: db-policy
+      name: db-policy
     spec:
-    	podSelector:
-    		mathLabels:
-    			role: db
+      podSelector:
+        mathLabels:
+          role: db
     ```
 - what type of policies?
   - ingress or egress or both ?
@@ -735,83 +735,83 @@ kubectl create secrete docker-registry regcred  \\
   - if incoming request is allowed, response is allowed automatically
   - definition
     ```yaml
-    	policyTpes:
-    	- Ingress
+      policyTpes:
+      - Ingress
     ```
 - define specific rules
   ```yaml
-  	ingress:
-  	- from:
-  		- podSelector:
-  				matchLabels:
-  					name: api-pod
-  		ports:
-  		- protocol: TCP
-  			port: 3306
+    ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            name: api-pod
+      ports:
+      - protocol: TCP
+        port: 3306
   ```
 - allow only in prod namespace
   - definition (and)
     ```yaml
-    	ingress:
-    	- from:
-    		- podSelector:
-    				matchLabels:
-    					name: api-pod
-    			namespaceSelector:
-    				matchLabels:
-    					name: prod
-    		ports:
-    		- protocol: TCP
-    			port: 3306
+      ingress:
+      - from:
+        - podSelector:
+            matchLabels:
+              name: api-pod
+          namespaceSelector:
+            matchLabels:
+              name: prod
+        ports:
+        - protocol: TCP
+          port: 3306
     ```
     - if only `namespaceSelector` is defined
       - allow or request in same namespace
   - definition (or)
     ```yaml
-    	ingress:
-    	- from:
-    		- podSelector:
-    				matchLabels:
-    					name: api-pod
-    		- namespaceSelector:
-    				matchLabels:
-    					name: prod
-    		ports:
-    		- protocol: TCP
-    			port: 3306
+      ingress:
+      - from:
+        - podSelector:
+            matchLabels:
+              name: api-pod
+        - namespaceSelector:
+            matchLabels:
+              name: prod
+        ports:
+        - protocol: TCP
+          port: 3306
     ```
     - use array
 - to backup in server
   ```yaml
-  	- ipBlock:
-  		- cidr: 192.168.5.10/32
+    - ipBlock:
+      - cidr: 192.168.5.10/32
   ```
 - to push to bakcup server
   ```yaml
   apiVersions: networking.k8s.io/v1
   kind: NetworkPolicy
   metadata:
-  	name: db-policy
+    name: db-policy
   spec:
-  	podSelector:
-  		mathLabels:
-  			role: db
-  	policyTpes:
-  	- Ingress
-  	- Egress
-  	ingress:
-  	- from:
-  		- podSelector:
-  				matchLabels:
-  					name: api-pod
-  		ports:
-  		- protocol: TCP
-  			port: 3306
-  	egress:
-  	- to:
-  		- ipBlock:
-  				cidr: 192.168.5.10/32
-  		ports:
-  		- protocol: TCP
-  			port: 80
+    podSelector:
+      mathLabels:
+        role: db
+    policyTpes:
+    - Ingress
+    - Egress
+    ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            name: api-pod
+      ports:
+      - protocol: TCP
+        port: 3306
+    egress:
+    - to:
+      - ipBlock:
+          cidr: 192.168.5.10/32
+      ports:
+      - protocol: TCP
+        port: 80
   ```

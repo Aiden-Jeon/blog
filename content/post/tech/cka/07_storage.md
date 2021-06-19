@@ -79,21 +79,21 @@ CKA를 준비하면서 공부한 요약 내용입니다.
   apiVersion: v1
   kind: Pod
   metadat:
-  	name: random-number-generator
+    name: random-number-generator
   spec:
-  	containers:
-  	- image: alpine
-  		name: alpine
-  		command: ["bin/sh", "-c"]
-  		args: ["shuf -i 0-100 -n 1 >> /opt/number.out;"]
-  		volumeMounts:
-  		- mountPath: /opt
-  			name: data-volume
-  	volumes:
-  	- name: data-volume
-  		hostPath:
-  			path: /data
-  			type: Directory
+    containers:
+    - image: alpine
+      name: alpine
+      command: ["bin/sh", "-c"]
+      args: ["shuf -i 0-100 -n 1 >> /opt/number.out;"]
+      volumeMounts:
+      - mountPath: /opt
+        name: data-volume
+    volumes:
+    - name: data-volume
+      hostPath:
+        path: /data
+        type: Directory
   ```
 
   - hostPath
@@ -101,11 +101,11 @@ CKA를 준비하면서 공부한 요약 내용입니다.
     - → not recommended in multi node
   - AWS
     ```yaml
-    	volumes:
-    	- name: data-volume
-    		awsElastricBlockStore:
-    			volumeID: <volume-id>
-    			fsType: ext4
+      volumes:
+      - name: data-volume
+        awsElastricBlockStore:
+          volumeID: <volume-id>
+          fsType: ext4
     ```
 
 ## Persistent Volume
@@ -118,15 +118,15 @@ CKA를 준비하면서 공부한 요약 내용입니다.
   apiVersion: v1
   kind: PersistentVolume
   metadata:
-  	name: pv-vol1
+    name: pv-vol1
   spec:
-  	persistentVolumeReclaimPolicy: Retain
-  	accessModes:
-  		- ReadWriteOnce
-  	capacity:
-  		storage: 1Gi
-  	hostPath:
-  		path: /tmp/data
+    persistentVolumeReclaimPolicy: Retain
+    accessModes:
+      - ReadWriteOnce
+    capacity:
+      storage: 1Gi
+    hostPath:
+      path: /tmp/data
   ```
   - `accessModes`
     - `ReadOnlyMany`
@@ -154,13 +154,13 @@ CKA를 준비하면서 공부한 요약 내용입니다.
   apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-  	name: myclaim
+    name: myclaim
   spec:
-  	accessModes:
-  		- ReadWriteOnce
-  	resources:
-  		requests:
-  			storage: 500Mi
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 500Mi
   ```
 
 ### 상태

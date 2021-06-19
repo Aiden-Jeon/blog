@@ -66,13 +66,13 @@ CKA를 준비하면서 공부한 요약 내용입니다.
   apiVersion: v1
   kind: Pod
   metadata:
-  	name: ubuntu-sleeper-pod
+    name: ubuntu-sleeper-pod
   spec:
-  	containers:
-  		- name: ubuntu-sleeper
-  			image: ubuntu-sleeper
-  			command: ["sleep2.0"]
-  			args: ["10"]
+    containers:
+      - name: ubuntu-sleeper
+        image: ubuntu-sleeper
+        command: ["sleep2.0"]
+        args: ["10"]
   ```
 
 ## Environment
@@ -80,24 +80,24 @@ CKA를 준비하면서 공부한 요약 내용입니다.
 - plain Key Value
   ```yaml
   env:
-  	- name: APP_COLOR
-  		value: pink
+    - name: APP_COLOR
+      value: pink
   ```
 
 - configMap
   ```yaml
   env:
-  	- name: APP_COLOR
-  		valueFrom:
-  			configMapKeyRef:
+    - name: APP_COLOR
+      valueFrom:
+        configMapKeyRef:
   ```
 
 - Secrets
   ```yaml
   env:
-  	- name: APP_COLOR
-  		valueFrom:
-  			secretKeyRef:
+    - name: APP_COLOR
+      valueFrom:
+        secretKeyRef:
   ```
 
 ## ConfigMaps
@@ -110,8 +110,8 @@ CKA를 준비하면서 공부한 요약 내용입니다.
 - imperative
   ```bash
   kubectl create configmap\\
-  	app-config --from-literal=APP_COLOR=blue \\
-  						--from-literal=APP_MODE=prod
+    app-config --from-literal=APP_COLOR=blue \\
+              --from-literal=APP_MODE=prod
   ```
   - `kubectl create configmap app-config --from-file=<path-to-file>`
 
@@ -120,10 +120,10 @@ CKA를 준비하면서 공부한 요약 내용입니다.
   apiVersion: v1
   kind: ConfigMap
   metadata:
-  	name: app-config
+    name: app-config
   data:
-  	APP_COLOR: blue
-  	APP_MODE: prod
+    APP_COLOR: blue
+    APP_MODE: prod
   ```
 
 ### view
@@ -137,14 +137,14 @@ CKA를 준비하면서 공부한 요약 내용입니다.
 apiVersion: v1
 kind: Pod
 metadata:
-	name: simple-webapp-color
+  name: simple-webapp-color
 spec:
-	containers:
-		- name: simple-webapp-color
-			image: simple-webapp-color
-			envFrom:
-				- configMapRef:
-						name: app-config
+  containers:
+    - name: simple-webapp-color
+      image: simple-webapp-color
+      envFrom:
+        - configMapRef:
+            name: app-config
 ```
 
 ## Secrets
@@ -157,7 +157,7 @@ spec:
 - imperative
   ```bash
   kubectl create secret generic\\
-  	<secret-name> --from-literal=<key>=<value>
+    <secret-name> --from-literal=<key>=<value>
   ```
   - `kubectl create secret <secret-name> --from-file=<path-to-file>`
 
@@ -166,11 +166,11 @@ spec:
   apiVersion: v1
   kind: Secret
   metadata:
-  	name: app-secret
+    name: app-secret
   data:
-  	DB_Host: mysql
-  	DB_User: root
-  	DB_Passwird: paswrd
+    DB_Host: mysql
+    DB_User: root
+    DB_Passwird: paswrd
   ```
   - data → encoded format for safe
   - `echo -n 'mysql' | base64`
@@ -191,40 +191,40 @@ spec:
   apiVersion: v1
   kind: Pod
   metadata:
-  	name: simple-webapp-color
+    name: simple-webapp-color
   spec:
-  	containers:
-  		- name: simple-webapp-color
-  			image: simple-webapp-color
-  			envFrom:
-  				- configMapRef:
-  						name: app-secret
+    containers:
+      - name: simple-webapp-color
+        image: simple-webapp-color
+        envFrom:
+          - configMapRef:
+              name: app-secret
   ```
 
 - env
   ```yaml
   envFrom:
-  	- secretRef:
-  			name: app-config
+    - secretRef:
+        name: app-config
   ```
 
 - single env
 
   ```yaml
   env:
-  	- name: DB_Password
-  		valueFrom:
-  			secretKeyRef:
-  				name: app-secret
-  				key: DB_Password
+    - name: DB_Password
+      valueFrom:
+        secretKeyRef:
+          name: app-secret
+          key: DB_Password
   ```
 
 - volume
   ```yaml
   volumes:
   - name: app-secret-volumne
-  	secret:
-  		secretName: app-secret
+    secret:
+      secretName: app-secret
   ```
 
   - inside the container

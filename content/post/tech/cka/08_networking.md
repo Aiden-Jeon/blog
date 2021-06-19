@@ -88,9 +88,9 @@ Networking solution has a routing table which mapped what networks are on what h
 - `cat /etc/cni/net.d/net-script.conf`
   ```yaml
   "ipam": {
-  	"type": ...,
-  	"subnet": ...,
-  	"routes": ...,
+    "type": ...,
+    "subnet": ...,
+    "routes": ...,
   }
   ```
 
@@ -212,37 +212,37 @@ Networking solution has a routing table which mapped what networks are on what h
   apiVersion: extensrions/v1beta1
   kind: Deployment
   metadata:
-  	name: nginx-ingress-controller
+    name: nginx-ingress-controller
   spec:
-  	replicas: 1
-  	selector:
-  		matchLabels:
-  			name: nginx-ingress
-  	template:
-  		metadata:
-  			labels:
-  				name: nginx-ingress
-  		spec:
-  			containers:
-  					- name: nginx-ingress-controller
-  						image: ...
-  			args:
-  				- /nginx-ingress-controller
-  				- --configmap=$(POD_NAMESPACE)/nginx-configuration
-  			env:
-  				- name: POD_NAME
-  					valueFrom:
-  						fieldRef:
-  							fieldPath: metadata.name
-  				- name: POD_NAMESPACE
-  					valueFrom:
-  						fieldRef:
-  							fieldPath: metadata.namesapce
-  			ports:
-  				- name: http
-  					contrainerPort: 80
-  				- name: https
-  					contrainerPort: 443
+    replicas: 1
+    selector:
+      matchLabels:
+        name: nginx-ingress
+    template:
+      metadata:
+        labels:
+          name: nginx-ingress
+      spec:
+        containers:
+            - name: nginx-ingress-controller
+              image: ...
+        args:
+          - /nginx-ingress-controller
+          - --configmap=$(POD_NAMESPACE)/nginx-configuration
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namesapce
+        ports:
+          - name: http
+            contrainerPort: 80
+          - name: https
+            contrainerPort: 443
   ```
 - configmap
   - feed nginx configuration data
@@ -250,7 +250,7 @@ Networking solution has a routing table which mapped what networks are on what h
   kind: ConfigMap
   apiVersion: v1
   metadata:
-  	name: nginx-configuration
+    name: nginx-configuration
   ```
 - service
   - expose
@@ -258,20 +258,20 @@ Networking solution has a routing table which mapped what networks are on what h
   apiVersion: v1
   kind: Service
   metadata:
-  	name: nginx-ingress
+    name: nginx-ingress
   spec:
-  	type: NodePort
-  	ports:
-  		- port: 80
-  			targetPort: 80
-  			protocol: TCP
-  			name: http
-  		- port: 443
-  			targetPort: 443
-  			protocol: TCP
-  			name: https
-  	selector:
-  		name: nginx-ingress
+    type: NodePort
+    ports:
+      - port: 80
+        targetPort: 80
+        protocol: TCP
+        name: http
+      - port: 443
+        targetPort: 443
+        protocol: TCP
+        name: https
+    selector:
+      name: nginx-ingress
   ```
 - service account
   - right permissions to access
@@ -282,7 +282,7 @@ Networking solution has a routing table which mapped what networks are on what h
   apiVersion: v1
   kind: ServiceAccount
   metadata:
-  	name: nginx-ingress-serviceaacount
+    name: nginx-ingress-serviceaacount
   ```
 
 ### Ingress Resource
@@ -302,11 +302,11 @@ Networking solution has a routing table which mapped what networks are on what h
   apiVersion: extensrions/v1beta1
   kind: Ingress
   metadata:
-  	name: ingress -wear
+    name: ingress -wear
   spec:
-  	backend:
-  		serviceName: web-service
-  		servicePort:  80
+    backend:
+      serviceName: web-service
+      servicePort:  80
   ```
 
 #### Several rules
@@ -316,19 +316,19 @@ Networking solution has a routing table which mapped what networks are on what h
   apiVersion: extensrions/v1beta1
   kind: Ingress
   metadata:
-  	name: ingress -wear
+    name: ingress -wear
   spec:
-  	rules:
-  	- http:
-  			paths:
-  			- path: /wear
-  				backend:
-  					serviceName: wear-service
-  					servicePort: 80
-  			- path: /watch
-  				backend:
-  					serviceName: watch-service
-  					servicePort: 80
+    rules:
+    - http:
+        paths:
+        - path: /wear
+          backend:
+            serviceName: wear-service
+            servicePort: 80
+        - path: /watch
+          backend:
+            serviceName: watch-service
+            servicePort: 80
   ```
   - 상태
     - `kubectl describe ingress ingress-wear-watch`
@@ -342,19 +342,19 @@ Networking solution has a routing table which mapped what networks are on what h
   apiVersion: extensrions/v1beta1
   kind: Ingress
   metadata:
-  	name: ingress -wear
+    name: ingress -wear
   spec:
-  	rules:
-  	- host: wear.my-online-store.com
-  		http:
-  			paths:
-  			- backend:
-  					serviceName: wear-service
-  					servicePort: 80
-  	- host: watch.my-online-store.com
-  		http:
-  			paths:
-  			- backend:
-  					serviceName: watch-service
-  					servicePort: 80
+    rules:
+    - host: wear.my-online-store.com
+      http:
+        paths:
+        - backend:
+            serviceName: wear-service
+            servicePort: 80
+    - host: watch.my-online-store.com
+      http:
+        paths:
+        - backend:
+            serviceName: watch-service
+            servicePort: 80
   ```
