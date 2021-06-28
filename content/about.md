@@ -13,6 +13,10 @@ comments = false
 - github: https://github.com/Aiden-Jeon
 - linkedin: https://www.linkedin.com/in/jongseob-jeon/
 
+#### Certification
+- CKA: Certified Kubernetes Administrator (The Linux Foundation)
+  - 2021.06.27 ~ 2024.06.27
+  - LF-o1y3ucp9gb
 
 #### Papers
 - RaPP: Novelty Detection with Reconstruction along Projection Pathway, Ki Hyun Kim, Sangwoo Shim, Yongsub Lim, **Jongseob Jeon**, Jeongwoo Choi, Byungchan Kim, Andre S. Yoon, ICLR, 2020 [paper](https://openreview.net/forum?id=HkgeGeBYDB)
