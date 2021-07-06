@@ -31,7 +31,7 @@ MLOps를 성공적으로 수행하기 위해서는 아래와 같은 상황들이
 
 ### Anti Pattern 이란?
 
-> AntiPatterns provide real-world experience in recognizing recurring problems in the software industry and provide a detailed remedy for the most common predicaments. AntiPatterns highlight the most common problems that face the software industry and provide the tools to enable you to recognize these problems and to determine their underlying causes.
+> AntiPatterns provide real-world experience in recognizing recurring problems in the software industry and provide a detailed remedy for the most common predicaments. AntiPatterns highlight the most common problems that face the software industry and provide the tools to enable you to recognize these problems and to determine their underlying causes.  
 > 출처: [https://sourcemaking.com/antipatterns](https://sourcemaking.com/antipatterns)
 
 ### MLOps를 개발 및 배포할 때 발생할 수 있는 문제들
@@ -143,8 +143,8 @@ Test 데이터가 독립적이지 못한 상황입니다. 일반적으로 머신
 
 Concept drift에 대응할 수 없는 상황입니다. 일반적으로 머신러닝 파이프라인을 만들 때 데이터 샘플링이 i.i.d 한 상황에서 이루어진다고 가정합니다. 그래서 한번 모델 학습과 예측을 설정하고 나면 잊어 버리는 경우(Set & Forget)가 많습니다. 그런데 실제 상황에서는 예측해야 하는 값의 통계적 특성이 변화하는 경우(Concept Drift)가 발생합니다.
 
-> In predictive analytics and machine learning, concept drift means that the statistical properties of the target variable, which the model is trying to predict, change over time in unforeseen ways. This causes problems because the predictions become less accurate as time passes.
-출처: [https://en.wikipedia.org/wiki/Concept_drift](https://en.wikipedia.org/wiki/Concept_drift)
+> In predictive analytics and machine learning, concept drift means that the statistical properties of the target variable, which the model is trying to predict, change over time in unforeseen ways. This causes problems because the predictions become less accurate as time passes.  
+> 출처: [https://en.wikipedia.org/wiki/Concept_drift](https://en.wikipedia.org/wiki/Concept_drift)
 
 이러한 concept drift에 대처하기 위해서는 의사결정을 도와주는 보조 시스템(Decision support system)이 필요합니다. Concept drift를 대처하기 위해 의사결정나무와 같은 해석이 가능한 tree-based 를 이용할 수 있습니다.
 
