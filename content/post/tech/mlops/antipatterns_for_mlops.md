@@ -8,7 +8,11 @@ date: 2021-07-06
 author: Jongseob Jeon
 ---
 
-## TLDR;
+- 업데이트 내역:
+  - 2021.07.16 Brier Score 수식 추가
+
+
+## TL;DR
 
 MLOps를 성공적으로 수행하기 위해서는 아래와 같은 상황들이 일어나지 않도록 해야 합니다.
 
@@ -154,9 +158,23 @@ Concept drift에 대응할 수 없는 상황입니다. 일반적으로 머신러
 
 잘 보정되지 않은 모델을 배포함으로서 머신러닝 파이프라인 전체의 신뢰도 하락이 일어나는 상황입니다. 잘 보정된 모델은 *Brier score*가 잘 보정 되었다는 뜻입니다. 
 
-> The Brier Score is a strictly proper score function or strictly proper scoring rule that measures the accuracy of probabilistic predictions. For uni dimensional predictions, it is strictly equivalent to the mean squared error as applied to predicted probabilities.
-
 만약 보정되지 않는 모델을 사용한다면 파이프라인의 어디가 문제인지 정확히 진단할 수 없게 됩니다. 그래서 최근 연구에서는 모델의 설명 가능성 뿐만 아니라 모델의 불확실성을 전달하는 것도 중요하다고 합니다.
+
+- Brier Score란?
+> The Brier Score is a strictly proper score function or strictly proper scoring rule that measures the accuracy of probabilistic predictions. For uni dimensional predictions, it is strictly equivalent to the mean squared error as applied to predicted probabilities.  
+> 출처: https://en.wikipedia.org/wiki/Brier_score
+
+Brier Score 수식은 다음과 같습니다.
+
+$$BS=\frac{1}{N}\sum_{t=1}^N (f_{t}-o_{t})^2$$
+
+- $N$: the number of items you’re calculating a Brier score for
+- $f_{t}$: is the forecast probability (i.e. 25% chance)
+- $o_{t}$: is the outcome (1 if it happened, 0 if it didn’t)
+
+출처: https://www.statisticshowto.com/brier-score/
+
+Brier Score가 0에 가까울 수록 모델이 잘 보정되었다고 해석할 수 있습니다.
 
 ### 9.'Data Crisis as a Service' AntiPattern
 
