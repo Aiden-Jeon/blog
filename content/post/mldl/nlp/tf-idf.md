@@ -1,5 +1,5 @@
 ---
-title: pandas를 이용한 tf-idf 구하기
+title: Pandas를 이용한 tf-idf 구하기
 comment: true
 categories: [nlp]
 tags: ["nlp"]
@@ -8,15 +8,16 @@ date: 2021-05-05
 author: Jongseob Jeon
 ---
 
-이번 포스트는 pandas를 이용해 tf-idf를 계산하는 방법에 대해서 설명합니다.
+이번 포스트는 Pandas를 이용해 tf-idf를 계산하는 방법에 대해서 설명합니다.
 
-# TF-IDF
-- TF(Term Frequency): 한 문장에서 나타난 각 단어들의 빈도
-- IDF(Inverse Document Frequency): 문서들에 나타난 단어들의 빈도의 역수
-- TF-IDF: TF*IDF
+---
+### TF-IDF
+- **TF(Term Frequency)**: 한 문장에서 나타난 각 단어들의 빈도
+- **IDF(Inverse Document Frequency)**: 문서들에 나타난 단어들의 빈도의 역수
+- **TF-IDF**: TF*IDF
 
 
-# Data
+### Data
 데이터는 이미 빈도수가 계산되어 있다고 가정합니다.
 ```python
 data = [
@@ -42,7 +43,7 @@ sample_data = pd.DataFrame(data, columns=columns)
 |  3 |           0 |           0 |           0 |           0 |           0 |           0 |           0 |           3 |           0 |           0 |
 |  4 |           0 |           0 |           0 |           0 |           0 |           0 |           0 |           0 |           0 |           0 |
 
-# TF(Term Frequency)
+### TF(Term Frequency)
 각 문장은 하나의 row입니다.
 우선, 각 문장에서 나타난 전체 단어의 개수를 구합니다.
 ```python
@@ -93,7 +94,7 @@ tf.sum(axis=1)
 |  3 |   1 |
 |  4 |   0 |
 
-# IDF(Inverse Document Frequency)
+### IDF(Inverse Document Frequency)
 각 단어는 하나의 column입니다.
 다음으로 각 단어들이 문장들에서 나타난 개수를 구합니다.
 ```python
@@ -150,7 +151,7 @@ idf = idf.replace(np.inf, 0)
 | feature_8 | 0        |
 | feature_9 | 1.60944  |
 
-# TF-IDF
+### TF-IDF
 이제 위에서 계산한 TF와 IDF를 곱해줍니다.
 ```python
 tf_idf = tf * idf
@@ -167,5 +168,5 @@ tf_idf = tf * idf
 
 
 
-# Reference
+### Reference
 - https://ko.wikipedia.org/wiki/Tf-idf

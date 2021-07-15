@@ -13,6 +13,7 @@ author: Jongseob Jeon
 ](https://arxiv.org/abs/2010.01496?fbclid=IwAR3Y5gfxtckZR4lHpFpQgo6ba-v_O0Fj-93G0sRMtXKYTBdESeH29uN4mg8) 논문을 읽고 요약한 내용입니다.
 더 자세한 내용은 해당 논문을 참고해주세요.
 
+---
 # Types of Explanatory Methods
 
 ## 1. Post-Hoc versus Self-Explanatory

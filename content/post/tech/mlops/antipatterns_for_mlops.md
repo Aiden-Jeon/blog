@@ -11,7 +11,7 @@ author: Jongseob Jeon
 - 업데이트 내역:
   - 2021.07.16 Brier Score 수식 추가
 
-
+---
 ## TL;DR
 
 MLOps를 성공적으로 수행하기 위해서는 아래와 같은 상황들이 일어나지 않도록 해야 합니다.
