@@ -40,7 +40,7 @@ author: Jongseob Jeon
 
 ## 3. Instance-Wise versus Global
 
-모델을 설명하는 또 다른 분류 방법은 설명의 범위에 따라 나눌 수 있습니다. 이 분류 방법 또한 주로 Post-hoc explanatory methods을 세분화한 것 입니다. Self-explanatory models들은 기본적으로 Instance-wise explainers 입니다.
+모델을 설명하는 또 다른 분류 방법은 설명의 범위에 따라 나눌 수 있습니다. 이 분류 방법 또한 주로 Post-hoc explanatory methods을 세분화한 것 입니다. Self-explanatory model들은 기본적으로 Instance-wise explainers 입니다.
 
 **Instance-wise explainers**  
 모델의 단일 예측(individual instance) 결과에 대해서 설명을 제공합니다. 예를 들어 LIME은 instance 별로 linear regression을 학습해 설명합니다.  
@@ -64,7 +64,7 @@ Importance weights explanation은 입력 feature의 모델이 수행한 예측�
 **subsets of features**  
 Subset explanation은 각 instance 별로 예측에 중요한 feature의 subset을 제공합니다.
 
-예를 들어서문장 감정 분류 모델이 `“The movie was very good."`를, `"4/5점, 긍정"`이라고 분류했습니다. 이 때 subset explanation은 `{“very”, “good”}`을 중요한 feature로 제공합니다. 반면, importance weights explanation는 `{"good": 3, "very":1`(이 때 두 점수의 합은 분류 모델의 예측인 4점 입니다)을 제공합니다. 
+예를 들어서문장 감정 분류 모델이 `“The movie was very good."`를, `"4/5점, 긍정"`이라고 분류했습니다. 이 때 subset explanation은 `{“very”, “good”}`을 중요한 feature로 제공합니다. 반면, importance weights explanation는 `{"good": 3, "very":1}`(이 때 두 점수의 합은 분류 모델의 예측인 4점 입니다)을 제공합니다. 
 
 ### Natural language explanations
 자연어에 대한 설명은 예측에 대한 결과를 사람과 같은 방식으로 전달합니다. 예를 들어서 “A woman is walking her dog in the park.”라는 문장에 “A person is in the park.”를 포함시켜서 설명한다면, “A woman is a person, and walking in the park implies being in the park.”과 같이 설명할 수 있습니다.
