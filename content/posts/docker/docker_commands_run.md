@@ -1,7 +1,5 @@
 ---
 title: Docker Commands & Run
-comment:   
-    enable: true
 categories: [docker]
 tags: ["docker"]
 toc: true

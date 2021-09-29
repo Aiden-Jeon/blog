@@ -1,7 +1,5 @@
 ---
 title: (CKA) 03. Logging & Monitoring
-comment:   
-    enable: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
 toc: true

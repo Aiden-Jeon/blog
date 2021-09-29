@@ -1,7 +1,5 @@
 ---
 title: argocd를 이용한 cd
-comment:   
-    enable: true
 categories: [cicd]
 tags: ["argocd"]
 toc: true

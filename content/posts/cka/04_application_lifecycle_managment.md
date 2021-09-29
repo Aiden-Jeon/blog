@@ -1,7 +1,5 @@
 ---
 title: (CKA) 04. Application Lifecycle Management
-comment:   
-    enable: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
 toc: true

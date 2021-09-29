@@ -1,7 +1,5 @@
 ---
 title: (CKA) 05. Cluster Maintenance
-comment:   
-    enable: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
 toc: true

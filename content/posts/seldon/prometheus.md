@@ -1,7 +1,5 @@
 ---
 title: seldon-core와 prometheus local에서 사용해보기
-comment:   
-    enable: true
 categories: [seldon]
 tags: ["seldon", "prometheus"]
 toc: true

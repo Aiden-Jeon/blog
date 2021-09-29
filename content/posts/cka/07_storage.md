@@ -1,7 +1,5 @@
 ---
 title: (CKA) 07. Storage
-comment:   
-    enable: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
 toc: true

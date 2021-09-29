@@ -1,7 +1,5 @@
 ---
 title: github action을 이용한 ci
-comment:   
-    enable: true
 categories: [cicd]
 tags: ["github", "ghcr"]
 toc: true

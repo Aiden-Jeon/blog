@@ -1,7 +1,5 @@
 ---
 title: Properties of Explanations
-comment:   
-    enable: true
 categories: [xai]
 tags: ["xai"]
 toc: true

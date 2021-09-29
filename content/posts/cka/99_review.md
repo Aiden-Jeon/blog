@@ -1,7 +1,6 @@
 ---
 title: (CKA) CKA 합격 후기
-comment:   
-    enable: true
+
 categories: [kubernetes]
 tags: ["k8s", "cka"]
 toc: true

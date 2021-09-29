@@ -1,7 +1,5 @@
 ---
 title: 밑바닥부터 시작하는 Seldon-Core - 설치 [Istio Ver.]
-comment:   
-    enable: true
 categories: [seldon]
 tags: ["k8s", "seldon", "istio"]
 toc: true

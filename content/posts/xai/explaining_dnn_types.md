@@ -1,7 +1,5 @@
 ---
 title: Types of Explanatory Methods
-comment:   
-    enable: true
 categories: [xai]
 tags: ["xai"]
 toc: true

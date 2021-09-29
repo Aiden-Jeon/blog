@@ -1,7 +1,5 @@
 ---
 title: Introduction to XAI
-comment:   
-    enable: true
 categories: [XAI]
 toc: true
 date: 2021-03-31

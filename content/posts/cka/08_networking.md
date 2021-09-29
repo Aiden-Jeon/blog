@@ -1,7 +1,5 @@
 ---
 title: (CKA) 08. Networking
-comment:   
-    enable: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
 toc: true
