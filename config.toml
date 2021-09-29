@@ -3,7 +3,7 @@ baseURL = "https://aiden-jeon.github.io/"
 defaultContentLanguage = "en"
 # language code
 languageCode = "en"
-title = "Aiden's Firewoods"
+title = "Aiden's Camp"
 
 # Change the default theme to be use when building the site with Hugo
 theme = "LoveIt"
@@ -64,7 +64,7 @@ theme = "LoveIt"
   # site keywords
   keywords = ["Theme", "Hugo"]
   # site default theme ("light", "dark", "auto")
-  defaultTheme = "auto"
+  defaultTheme = "light"
   # public git repo url only then enableGitInfo is true
   gitRepo = ""
   # LoveIt NEW | 0.1.1 which hash function used for SRI, when empty, no SRI is used
