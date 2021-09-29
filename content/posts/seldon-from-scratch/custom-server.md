@@ -1,6 +1,7 @@
 ---
 title: 밑바닥부터 시작하는 Seldon-Core - Custom Server
-comment: true
+comment:   
+    enable: true
 categories: [seldon]
 tags: ["k8s", "seldon"]
 toc: true

@@ -1,6 +1,7 @@
 ---
 title: SHAP
-comment: true
+comment:   
+    enable: true
 categories: [XAI]
 toc: true
 date: 2021-03-31

@@ -1,6 +1,7 @@
 ---
 title: (CKA) 06. Security
-comment: true
+comment:   
+    enable: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
 toc: true

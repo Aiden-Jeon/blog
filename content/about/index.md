@@ -4,7 +4,8 @@ description = "Who is Jongseob Jeon"
 date = "2021-07-01"
 aliases = ["contact"]
 author = "Jongseob Jeon"
-comments = false
+comment:
+  enable: false
 +++
 
 ## Profile

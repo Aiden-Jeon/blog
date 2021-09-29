@@ -1,6 +1,7 @@
 ---
 title: Using AntiPatterns to avoid MLOps Mistakes
-comment: true
+comment:   
+    enable: true
 categories: [mlops]
 tags: ["mlops"]
 toc: true

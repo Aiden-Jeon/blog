@@ -1,6 +1,7 @@
 ---
 title: ghcr을 이용한 kubernetes deployment 만들기
-comment: true
+comment:   
+    enable: true
 categories: [cicd]
 tags: ["k8s", "ghcr"]
 toc: true

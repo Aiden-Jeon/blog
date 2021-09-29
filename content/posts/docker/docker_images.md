@@ -1,6 +1,7 @@
 ---
 title: Docker Images
-comment: true
+comment:   
+    enable: true
 categories: [docker]
 tags: ["docker"]
 toc: true

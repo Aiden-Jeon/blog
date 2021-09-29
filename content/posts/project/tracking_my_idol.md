@@ -1,6 +1,7 @@
 ---
 title: 동영상에서 원하는 인물 따라가기
-comment: true
+comment:   
+    enable: true
 categories: [project]
 toc: true
 date: 2020-10-04

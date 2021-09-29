@@ -1,6 +1,6 @@
 ---
 title: argocd를 branch에서 cd
-comment: true
+comment:   enable: true
 categories: [cicd]
 tags: ["argocd"]
 toc: true

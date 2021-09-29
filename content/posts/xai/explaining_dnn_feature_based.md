@@ -1,6 +1,7 @@
 ---
 title: Feature-Based Explanations
-comment: true
+comment:   
+    enable: true
 categories: [xai]
 tags: ["xai"]
 toc: true

@@ -1,6 +1,7 @@
 ---
 title: kubernetes에서 ghcr package pull 하기
-comment: true
+comment:   
+    enable: true
 categories: [kubernetes]
 tags: ["k8s"]
 toc: true

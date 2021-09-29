@@ -1,6 +1,7 @@
 ---
 title: helm을 이용한 deployment chart 만들기
-comment: true
+comment:   
+    enable: true
 categories: [cicd]
 tags: ["helm"]
 toc: true

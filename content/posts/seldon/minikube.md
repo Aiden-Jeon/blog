@@ -1,6 +1,7 @@
 ---
 title: seldon-core minikube에서 사용해보기
-comment: true
+comment:   
+    enable: true
 categories: [seldon]
 tags: ["k8s", "seldon"]
 toc: true

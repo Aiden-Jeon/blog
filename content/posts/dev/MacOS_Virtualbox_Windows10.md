@@ -1,6 +1,7 @@
 ---
 title: MacOS에 Virtualbox Windows10 설치하기
-comment: true
+comment:   
+    enable: true
 categories: [dev]
 toc: true
 date: 2020-07-15

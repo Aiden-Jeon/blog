@@ -1,6 +1,7 @@
 ---
 title: Pandas를 이용한 tf-idf 구하기
-comment: true
+comment:   
+    enable: true
 categories: [nlp]
 tags: ["nlp"]
 toc: true

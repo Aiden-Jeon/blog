@@ -1,6 +1,7 @@
 ---
 title: (CKA) 02. Scheduler
-comment: true
+comment:   
+    enable: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
 toc: true

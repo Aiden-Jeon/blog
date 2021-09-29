@@ -1,6 +1,7 @@
 ---
 title: setup.py 와 Makefile 설정하기
-comment: true
+comment:   
+    enable: true
 categories: [setup-module]
 toc: true
 date: 2021-03-14

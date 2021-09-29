@@ -1,6 +1,7 @@
 ---
 title: prometheus와 grafana 연결하기
-comment: true
+comment:   
+    enable: true
 categories: [seldon]
 tags: ["seldon", "prometheus"]
 toc: true

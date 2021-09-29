@@ -1,6 +1,7 @@
 ---
 title: (CKA) 09. Design and Install a k8s Cluster
-comment: true
+comment:   
+    enable: true
 categories: [kubernetes]
 tags: ["k8s", "cka"]
 toc: true
