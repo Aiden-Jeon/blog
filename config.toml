@@ -282,7 +282,7 @@ theme = "LoveIt"
       # Disqus comment config
       [params.page.comment.disqus]
         # LoveIt NEW | 0.1.1
-        enable = false
+        enable = true
         # Disqus shortname to use Disqus in posts
         shortname = "jongseob"
     # LoveIt NEW | 0.2.7 Third-party library config
