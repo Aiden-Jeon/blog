@@ -4,14 +4,20 @@ description = "Who is Jongseob Jeon"
 date = "2021-07-01"
 aliases = ["contact"]
 author = "Jongseob Jeon"
+comments = false
 +++
 
 ## Profile
-**Name**:    Jongseob Jeon (Aiden Jeon)  
-**Mail**:    ells2124@gmail.com  
-**Github**:  https://github.com/Aiden-Jeon  
-**Linkedin**:   https://www.linkedin.com/in/jongseob-jeon/  
-**Resume(KOR)**: https://www.notion.so/Aiden-Little-Fire-14df30999c5c4c4b9c05d1f9f2d14776
+|             |                                                              |
+| ----------- | ------------------------------------------------------------ |
+| **Name**        | Jongseob Jeon (Aiden Jeon)                                   |
+| **Mail**        | ells2124@gmail.com                                           |
+| **Github**      | https://github.com/Aiden-Jeon                                |
+| **LinkedIn**    | https://www.linkedin.com/in/jongseob-jeon/                   |
+| **Resume(KOR)** | https://www.notion.so/Aiden-Little-Fire-14df30999c5c4c4b9c05d1f9f2d14776 |
+
+
+
 
 
 ## Certification
