@@ -61,4 +61,4 @@ Udemy Solution에서 확인하는 방법에 대해 설명하는데 이 부분을
 다만 개념을 아는 것과 시험문제를 푸는 것은 다르다는 것을 또다시 느낄 수 있었습니다.
 자격증이 목표라면 개념보다는 Practice Test를 위주로 본다면 한 달 정도면 충분 할 것 같습니다.
 
-!(CKA)(/imgs/cka/review_02.png)
+![CKA](/imgs/cka/review_02.png)
