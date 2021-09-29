@@ -1,11 +1,13 @@
-+++
-title = "About Me"
-description = "Who is Jongseob Jeon"
-date = "2021-07-01"
-aliases = ["contact"]
-author = "Jongseob Jeon"
-comments = false
-+++
+---
+title: About Me
+description: Who is Jongseob Jeon
+date: 2021-07-01
+aliases: ["contact"]
+author: Jongseob Jeon
+toc: true
+comment: 
+  enable: false
+---
 
 ## Profile
 |             |                                                              |
@@ -15,8 +17,6 @@ comments = false
 | **Github**      | https://github.com/Aiden-Jeon                                |
 | **LinkedIn**    | https://www.linkedin.com/in/jongseob-jeon/                   |
 | **Resume(KOR)** | https://www.notion.so/Aiden-Little-Fire-14df30999c5c4c4b9c05d1f9f2d14776 |
-
-
 
 
 
