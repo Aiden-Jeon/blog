@@ -5,9 +5,14 @@ tags: ["k8s"]
 toc: true
 date: 2021-10-01
 author: Jongseob Jeon
-weight: 100
 ---
 
+**Kubeflow 설치 시리즈**
+1. [Pre-Requisites for k3s Setup]({{< relref "posts/k3s/pre_requisites" >}})
+2. [k3s Installation]({{< relref "posts/k3s/install_k3s" >}})
+3. [Kubeflow Installation]({{< relref "posts/k3s/install_kubeflow" >}})
+
+---
 이번 포스트에서는 k3s를 설정하기 전에 필요한 것들을 세팅하는 과정에 대해서 설명합니다.  
 이번 포스트에서 진행하는 과정은 서버 데스크탑, 로컬 노트북 두 대의 장비가 있다고 가정하고 있습니다.
 

@@ -5,7 +5,13 @@ tags: ["k8s"]
 toc: true
 date: 2021-10-01
 author: Jongseob Jeon
-weight: 98
+---
+
+**Kubeflow 설치 시리즈**
+1. [Pre-Requisites for k3s Setup]({{< relref "posts/k3s/pre_requisites" >}})
+2. [k3s Installation]({{< relref "posts/k3s/install_k3s" >}})
+3. [Kubeflow Installation]({{< relref "posts/k3s/install_kubeflow" >}})
+
 ---
 
 이번 포스트에서는 서버에 kubeflow를 설치하는 과정에 대해서 설명합니다.  
@@ -239,5 +245,5 @@ kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
    - ID: user@example.com
    - PW: 12341234
 
-설치가 정상적으로 되엇따면 다음과 같은 화면이 출력됩니다.
+설치가 정상적으로 되었다면 다음과 같은 화면이 출력됩니다.
 ![kubeflow_home](/imgs/k3s/kubeflow_home.png)
