@@ -1,7 +1,7 @@
 ---
 title: k3s Installation
-categories: [k3s]
-tags: ["k8s"]
+categories: [kubernetes]
+tags: ["k8s", "k3s"]
 toc: true
 date: 2021-10-01
 author: Jongseob Jeon

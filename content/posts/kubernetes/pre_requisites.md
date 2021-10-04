@@ -1,7 +1,7 @@
 ---
 title: Pre-Requisites for k3s Setup
-categories: [k3s]
-tags: ["k8s"]
+categories: [kubernetes]
+tags: ["k8s", "k3s"]
 toc: true
 date: 2021-10-01
 author: Jongseob Jeon
@@ -129,7 +129,7 @@ Docker가 gpu를 사용할 수 있도록 설정해주어야 합니다.
     nvidia-smi
     ```
 
-## WireGuard VPN (사용할 경우)
+## 3. WireGuard VPN (사용할 경우)
 저는 WireGuard VPN을 이용하고 있기 때문에 서버에 추가적인 VPN 작업을 해주었습니다.
 1. WireGuard Config 발급  
     WireGuard에서 Ubuntu OS의 config를 생성합니다.
