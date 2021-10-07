@@ -83,42 +83,42 @@ Longhorn은 k3s에서 StorageClass를 생성을 해줍니다.
     sudo sh -c "echo '<VPN_IP> longhorn.k3s.cluster.local' >> /etc/hosts"
     ```
 3. auth & ingress 생성
-    ```bash
-    USER=admin; PASSWORD=adminadmin; echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" >> auth
-    kubectl -n longhorn-system create secret generic basic-auth --from-file=auth
-    cat <<EOF | kubectl apply -f -
-    apiVersion: networking.k8s.io/v1
-    kind: Ingress
-    metadata:
-    name: longhorn-ingress
-    namespace: longhorn-system
-    annotations:
-        ingress.kubernetes.io/rewrite-target: /
-        kubernetes.io/ingress.class: "nginx"
-        # type of authentication
-        nginx.ingress.kubernetes.io/auth-type: basic
-        # prevent the controller from redirecting (308) to HTTPS
-        nginx.ingress.kubernetes.io/ssl-redirect: 'false'
-        # name of the secret that contains the user/password definitions
-        nginx.ingress.kubernetes.io/auth-secret: basic-auth
-        # message to display with an appropriate context why the authentication is required
-        nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required '
-        # custom max body size for file uploading like backing image uploading
-        nginx.ingress.kubernetes.io/proxy-body-size: 10000m
-    spec:
-    rules:
-    - host: longhorn.k3s.cluster.local
-        http:
-        paths:
-        - pathType: Prefix
-            path: "/"
-            backend:
-            service:
-                name: longhorn-frontend
-                port:
-                number: 80
-    EOF
-    ```
+```bash
+USER=admin; PASSWORD=adminadmin; echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" >> auth
+kubectl -n longhorn-system create secret generic basic-auth --from-file=auth
+cat <<EOF | kubectl apply -f -
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: longhorn-ingress
+  namespace: longhorn-system
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: "nginx"
+    # type of authentication
+    nginx.ingress.kubernetes.io/auth-type: basic
+    # prevent the controller from redirecting (308) to HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: 'false'
+    # name of the secret that contains the user/password definitions
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    # message to display with an appropriate context why the authentication is required
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required '
+    # custom max body size for file uploading like backing image uploading
+    nginx.ingress.kubernetes.io/proxy-body-size: 10000m
+spec:
+  rules:
+  - host: longhorn.k3s.cluster.local
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: longhorn-frontend
+            port:
+              number: 80
+EOF
+```
 ### On Server
 로컬에서 확인할 수 있는 reverse-proxy를 설정해주는 작업입니다.
 이 작업은 서버에서 이루어집니다.
