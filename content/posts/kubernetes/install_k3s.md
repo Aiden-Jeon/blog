@@ -5,7 +5,6 @@ tags: ["k8s", "k3s"]
 toc: true
 date: 2021-10-01
 author: Jongseob Jeon
-weight: 99
 ---
 
 **Kubeflow 설치 시리즈**
@@ -22,26 +21,26 @@ weight: 99
 
 # k3s Installation
 1. k3s 설치  
-   k3s는 gpu를 사용하기 위해서 도커를 백엔드로 사용하겠습니다.  
-   docker 백엔드는 `--docker`를 추가하면 됩니다.
-   ```bash
-   curl -sfL https://get.k3s.io | sh -s - server --disable traefik --disable servicelb --disable local-storage --docker
-   ```
+    k3s는 gpu를 사용하기 위해서 도커를 백엔드로 사용하겠습니다.  
+    docker 백엔드는 `--docker`를 추가하면 됩니다.
+    ```bash
+    curl -sfL https://get.k3s.io | sh -s - server --disable traefik --disable servicelb --disable local-storage --docker
+    ```
 2. k3s config 확인
-   k3s를 설치후 k3s config를 확인합니다
-   ```bash
-   cat /etc/rancher/k3s/k3s.yaml
-   ```
+    k3s를 설치후 k3s config를 확인합니다
+    ```bash
+    cat /etc/rancher/k3s/k3s.yaml
+    ```
 3. k3s config를 kubeconfig로 복사
-   ```bash
-   mkdir .kube
-   sudo cp /etc/rancher/k3s/k3s.yaml .kube/config
-   sudo chown mrx:mrx .kube/config
-   ```
+    ```bash
+    mkdir .kube
+    sudo cp /etc/rancher/k3s/k3s.yaml .kube/config
+    sudo chown mrx:mrx .kube/config
+    ```
 4. local로 kube config 옮기기  
-   local에서 `~/.kube/config`로 설정합니다.  
-   multi-context인 경우 multi-context에 맞게 설정합니다.  
-   multi-context는 `kubectl ctx` 를 통해 쉽게 변경할 수 있습니다.
+    local에서 `~/.kube/config`로 설정합니다.  
+    multi-context인 경우 multi-context에 맞게 설정합니다.  
+    multi-context는 `kubectl ctx` 를 통해 쉽게 변경할 수 있습니다.
 5. local에서 서버 확인하기
     ```bash
     kubectl get nodes
@@ -80,20 +79,20 @@ Longhorn은 k3s에서 StorageClass를 생성을 해줍니다.
     helm install longhorn longhorn/longhorn --namespace longhorn-system --set csi.kubeletRootDir=/var/lib/kubelet --create-namespace
     ```
 2. VPN IP 설정하기
-   ```bash
-   sudo sh -c "echo '<VPN_IP> longhorn.k3s.cluster.local' >> /etc/hosts"
-   ```
+    ```bash
+    sudo sh -c "echo '<VPN_IP> longhorn.k3s.cluster.local' >> /etc/hosts"
+    ```
 3. auth & ingress 생성
-   ```bash
+    ```bash
     USER=admin; PASSWORD=adminadmin; echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" >> auth
     kubectl -n longhorn-system create secret generic basic-auth --from-file=auth
     cat <<EOF | kubectl apply -f -
     apiVersion: networking.k8s.io/v1
     kind: Ingress
     metadata:
-      name: longhorn-ingress
-      namespace: longhorn-system
-      annotations:
+    name: longhorn-ingress
+    namespace: longhorn-system
+    annotations:
         ingress.kubernetes.io/rewrite-target: /
         kubernetes.io/ingress.class: "nginx"
         # type of authentication
@@ -107,25 +106,25 @@ Longhorn은 k3s에서 StorageClass를 생성을 해줍니다.
         # custom max body size for file uploading like backing image uploading
         nginx.ingress.kubernetes.io/proxy-body-size: 10000m
     spec:
-      rules:
-      - host: longhorn.k3s.cluster.local
+    rules:
+    - host: longhorn.k3s.cluster.local
         http:
-          paths:
-          - pathType: Prefix
+        paths:
+        - pathType: Prefix
             path: "/"
             backend:
-              service:
+            service:
                 name: longhorn-frontend
                 port:
-                  number: 80
+                number: 80
     EOF
-   ```
+    ```
 ### On Server
 로컬에서 확인할 수 있는 reverse-proxy를 설정해주는 작업입니다.
 이 작업은 서버에서 이루어집니다.
 
 1. reverse-proxy 폴더 생성
-   ```bash
+    ```bash
     mkdir reverse-proxy
     cd reverse-proxy
     ```
