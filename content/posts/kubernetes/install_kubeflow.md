@@ -240,10 +240,13 @@ port-forwarding을 통해 kubeflow 에 접속합니다.
 ```bash
 kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
 ```
+
 1. http://localhost:8080 로 접속합니다.
 2. 기본 ID/PW는 다음과 같습니다.
    - ID: user@example.com
    - PW: 12341234
+
+> 포트 포워딩후 연결이 되지 않을 경우 [포스트]({{< relref "posts/kubernetes/issue_with_auth" >}})를 참고해보시기 바랍니다.
 
 설치가 정상적으로 되었다면 다음과 같은 화면이 출력됩니다.
 ![kubeflow_home](/imgs/k3s/kubeflow_home.png)
