@@ -180,12 +180,12 @@ Networking solution has a routing table which mapped what networks are on what h
   - subdomain = namespace
   - type = svc
   - root = cluster.local
-  - eg) `curl <http://web-service.apps.svc.cluster.local`>
+  - eg) `curl http://web-service.apps.svc.cluster.local`
 - pod
   - hostname
     - 10.224.2.5 → 10-224-2-5
   - type → pod
-  - eg) `curl <http://10-224-2-5.apps.pod.cluster.local`>
+  - eg) `curl http://10-224-2-5.apps.pod.cluster.local`
 
 
 
@@ -244,44 +244,44 @@ Networking solution has a routing table which mapped what networks are on what h
   ```
 - configmap
   - feed nginx configuration data
-  ```yaml
-  kind: ConfigMap
-  apiVersion: v1
-  metadata:
-    name: nginx-configuration
-  ```
+    ```yaml
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: nginx-configuration
+    ```
 - service
   - expose
-  ```yaml
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: nginx-ingress
-  spec:
-    type: NodePort
-    ports:
-      - port: 80
-        targetPort: 80
-        protocol: TCP
-        name: http
-      - port: 443
-        targetPort: 443
-        protocol: TCP
-        name: https
-    selector:
+    ```yaml
+    apiVersion: v1
+    kind: Service
+    metadata:
       name: nginx-ingress
-  ```
+    spec:
+      type: NodePort
+      ports:
+        - port: 80
+          targetPort: 80
+          protocol: TCP
+          name: http
+        - port: 443
+          targetPort: 443
+          protocol: TCP
+          name: https
+      selector:
+        name: nginx-ingress
+    ```
 - service account
   - right permissions to access
   - Roles
   - ClusterRoles
   - RoleBindings
-  ```yaml
-  apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    name: nginx-ingress-serviceaacount
-  ```
+    ```yaml
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: nginx-ingress-serviceaacount
+    ```
 
 ### Ingress Resource
 - simple one application
@@ -340,7 +340,7 @@ Networking solution has a routing table which mapped what networks are on what h
   apiVersion: extensrions/v1beta1
   kind: Ingress
   metadata:
-    name: ingress -wear
+    name: ingress-wear
   spec:
     rules:
     - host: wear.my-online-store.com

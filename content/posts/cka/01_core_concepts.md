@@ -12,7 +12,7 @@ CKA를 준비하면서 공부한 요약 내용입니다.
 - [강의](https://www.udemy.com/course/certified-kubernetes-administrator-with-practice-tests/)
 - [What is CKA?](https://www.cncf.io/certification/cka/)
 
-# 0. Tips
+## 0. Tips
 
 1. ailias `kubectl` to `k`
 ```bash
