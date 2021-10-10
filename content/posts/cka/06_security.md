@@ -2,10 +2,16 @@
 title: (CKA) 06. Security
 categories: [kubernetes]
 tags: ["k8s", "cka"]
-toc: true
+toc:
+  auto: true
 date: 2021-05-30
 author: Jongseob Jeon
 ---
+
+CKA를 준비하면서 공부한 요약 내용입니다.
+- [강의](https://www.udemy.com/course/certified-kubernetes-administrator-with-practice-tests/)
+- [What is CKA?](https://www.cncf.io/certification/cka/)
+
 
 ## Kubernetes Security Primitives
 ### Secrure Hosts

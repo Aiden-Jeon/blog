@@ -2,7 +2,8 @@
 title: (CKA) 09. Design and Install a k8s Cluster
 categories: [kubernetes]
 tags: ["k8s", "cka"]
-toc: true
+toc:
+  auto: true
 date: 2021-06-07
 author: Jongseob Jeon
 ---

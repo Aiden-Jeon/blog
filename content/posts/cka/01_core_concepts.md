@@ -2,7 +2,8 @@
 title:  (CKA) 01. Core Concepts
 categories: [kubernetes]
 tags: ["k8s", "cka"]
-toc: true
+toc:
+  auto: true
 date: 2021-05-10
 author: Jongseob Jeon
 ---

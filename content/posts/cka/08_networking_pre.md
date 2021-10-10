@@ -2,7 +2,8 @@
 title: (CKA) 08. Networking Pre-requisites
 categories: [kubernetes]
 tags: ["k8s", "cka"]
-toc: true
+toc:
+  auto: true
 date: 2021-06-06
 author: Jongseob Jeon
 ---

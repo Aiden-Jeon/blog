@@ -2,7 +2,8 @@
 title: (CKA) 05. Cluster Maintenance
 categories: [kubernetes]
 tags: ["k8s", "cka"]
-toc: true
+toc:
+  auto: true
 date: 2021-05-22
 author: Jongseob Jeon
 ---

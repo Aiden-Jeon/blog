@@ -2,7 +2,8 @@
 title: (CKA) 04. Application Lifecycle Management
 categories: [kubernetes]
 tags: ["k8s", "cka"]
-toc: true
+toc:
+  auto: true
 date: 2021-05-18
 author: Jongseob Jeon
 ---

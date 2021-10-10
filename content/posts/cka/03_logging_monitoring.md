@@ -2,7 +2,8 @@
 title: (CKA) 03. Logging & Monitoring
 categories: [kubernetes]
 tags: ["k8s", "cka"]
-toc: true
+toc:
+  auto: true
 date: 2021-05-17
 author: Jongseob Jeon
 ---

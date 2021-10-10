@@ -2,7 +2,8 @@
 title: (CKA) 07. Storage
 categories: [kubernetes]
 tags: ["k8s", "cka"]
-toc: true
+toc:
+  auto: true
 date: 2021-05-23
 author: Jongseob Jeon
 ---
