@@ -169,7 +169,7 @@ EOF
                 proxy_set_header X-Forwarded-Proto $scheme;
                 proxy_set_header X-NginX-Proxy true;
                 proxy_set_header X-Scheme $scheme;
-                proxy_pass http://localhost:30807;
+                proxy_pass http://localhost:32455;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection "upgrade";

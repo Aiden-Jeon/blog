@@ -236,6 +236,7 @@ kubectl get pods -n kubeflow
 kubectl get pods -n kubeflow-user-example-com
 ```
 
+## Port-forwarding
 port-forwarding을 통해 kubeflow 에 접속합니다.
 ```bash
 kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
@@ -248,5 +249,31 @@ kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
 
 > 포트 포워딩후 연결이 되지 않을 경우 [포스트]({{< relref "posts/kubernetes/issue_with_auth" >}})를 참고해보시기 바랍니다.
 
+## Reverse-proxy
+[다음 글]({{< relref "posts/kubernetes/install_k3s#on-server" >}})에서 설정한 reverse-proxy 도커를 이용해 접속할 수 있습니다.
+
+우선 ingress-gateway의 연결된 포트를 확인합니다.
+```bash
+kubectl -n istio-system get service istio-ingressgateway
+```
+
+다음과 같이 포트들이 포워딩된 것을 확인할 수 있습니다.
+```bash
+NAME                   TYPE       CLUSTER-IP    EXTERNAL-IP   PORT(S)                                                                      AGE
+istio-ingressgateway   NodePort   10.43.244.7   <none>        15021:31160/TCP,80:32455/TCP,443:32293/TCP,31400:32132/TCP,15443:32123/TCP   3d21h
+```
+
+이중 80번 포트의 포워딩 포트를 확인합니다. 저는 32455 였습니다.  
+만약 다를 경우 [다음 글]({{< relref "posts/kubernetes/install_k3s#on-server" >}}) 에서 `kubeflow.conf`의 값을 수정하면 됩니다.
+
+local에 host를 추가해줍니다.
+```bash
+sudo sh -c "echo '<VPN_IP> kubeflow.k3s.cluster.local' >> /etc/hosts"
+```
+
+http://kubeflow.k3s.cluster.local/ 에 접속합니다.
+
+
+## 마무리
 설치가 정상적으로 되었다면 다음과 같은 화면이 출력됩니다.
 ![kubeflow_home](/imgs/k3s/kubeflow_home.png)
