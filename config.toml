@@ -280,11 +280,19 @@ theme = "LoveIt"
     [params.page.comment]
       enable = true
       # Disqus comment config
-      [params.page.comment.disqus]
-        # LoveIt NEW | 0.1.1
+      # [params.page.comment.disqus]
+      #   # LoveIt NEW | 0.1.1
+      #   enable = true
+      #   # Disqus shortname to use Disqus in posts
+      #   shortname = "jongseob"
+      [params.page.comment.utterances]
         enable = true
-        # Disqus shortname to use Disqus in posts
-        shortname = "jongseob"
+        # owner/repo
+        repo = "aiden-jeon/aiden-jeon.github.io"
+        issueTerm = "pathname"
+        label = ""
+        lightTheme = "github-light"
+        darkTheme = "github-dark"
     # LoveIt NEW | 0.2.7 Third-party library config
     [params.page.library]
       [params.page.library.css]
