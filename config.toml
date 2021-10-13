@@ -200,7 +200,7 @@ theme = "LoveIt"
   # Social config about the author
   [params.social]
     GitHub = "Aiden-Jeon"
-    Linkedin = "https://www.linkedin.com/in/jongseob-jeon/"
+    Linkedin = "jongseob-jeon"
     Email = "ells2124@gmail.com"
     Blogger=""
     RSS = true # LoveIt NEW | 0.2.0
