@@ -49,15 +49,15 @@ author: Jongseob Jeon
 ## 3. 접속하기
 1. 이미지를 생성할 때 다운로드 받은 key를 `~/.ssh`로 옮깁니다.
     ```bash
-    mv ssh-key-2021-10-13.key ~/.ssh
+    mv ssh-key-2021-10-13.key ~/.ssh/oracle.key
     cd ~/.ssh
     ```
 2. 400 권한을 줍니다.
     ```bash
-    chmod 400 ssh-key-2021-10-13.key
+    chmod 400 oracle.key
     ```
 3. ssh를 이용해 접속합니다.
     ```bash
-    ssh ubuntu@<PUBLIC IP> -i ssh-key-2021-10-13.key
+    ssh ubuntu@<PUBLIC IP> -i ~/.ssh/oracle.key
     ```
 
