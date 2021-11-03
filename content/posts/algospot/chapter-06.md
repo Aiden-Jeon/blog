@@ -163,3 +163,48 @@ eg) PRETTY, GIRL, REPEAT
     - 원래 문제에서 한 조각을 떼어 냈을 뿐, 형식이 같은 또 다른 문제를 푼 결과
     - 문제를 구성하는 조각들 중 한 조각을 뺏기 때문에, 이 문제들은 원래 문제의 일부
     - -> 이런 문제들을 원래의 부분문제
+
+## 6.7 최적화 문제
+- 문제의 답이 하나가 아니라 여러 개이고, 그 중에서 어떤 기준에 따라 가장 좋은 답을 찾아내는 문제
+- eg) $n$개의 원소 중 $r$개를 순서없이 골라내는 문제
+    - 최적화 문제 x
+    - 우리가 원하는 답은 딱 하나 밖에 없다 -> 더 좋은 답이나 덜 좋은 답이 없음
+- eg) $n$개 사과 중 $r$개 골라서 무게의 합을 최대화하는 문제
+    - 최적화 문제
+- 최적화 문제 해결 방법
+    - 완전 탐색
+    - 동적 계호기법
+    - 조합 탐색
+    - 최적화 문제 -> 결정 문제로 변환
+
+### 예제: 여행하는 예판원 문제 (Traveling Salssman Problem, TSP)
+어떤 나라에 $n(2 \le n \le 10)$개의 큰 도시가 있다.
+한 영업사원이 한 도시에서 출발해 다른 도시들을 전부 한 번씩 방문한 뒤 시작 도시로 돌아오려고 한다.
+각 도시들은 모두 직선도로로 연결되어 있다.
+영업사원이 여행해야 할 거리 중 가장 짧은 경로는 ?
+
+#### 무식하게 풀 수 있을까?
+시간안에 답을 구할 수 있을까?  
+-> $(n-1)!$ -> $9!$ -> $362,880$ -> 1초안에 처리할 수 있는 숫자
+
+#### 재귀 호출을 통한 답안 생성
+- $n$개의 도시로 구성된 경로를 $n$개의 조각으로 나눠 앞에서부터 도시를 하나씩 추가해 경로를 만들기
+- `shortest_path(path)=path` -> 지금까지 만든 경로, 나머지 도시를 모두 방문하는 경로들 중 가장 짧은 것을 반환한다.
+```python
+def shortest_path(path, visited, current_length):
+    # 기저 사례: 모든 도시를 다 방문했을 때는 시작도시로 돌아가고 종료
+    if len(path) == n:
+        return current_length + dist[path[0]][path[-1]]
+    ret = 987654321
+    for next_visit in range(n):
+        if visited[next_visit]:
+            continue
+        here =path[-1]
+        path.append(next_visit)
+        visited[next_visit] = True
+        cand = shorted_path(path, visited, current_length + dist[here][next_visit])
+        ret = min(ret, cand)
+        visited[next_visit] = False
+        path.pop()
+    return ret
+```
