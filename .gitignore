@@ -31,3 +31,4 @@ _site
 # hugo build
 .hugo_build.lock
 public/
+resources/

@@ -1,7 +1,7 @@
 ---
 title: github action을 이용한 ci
-categories: [cicd]
-tags: ["github", "ghcr"]
+categories: [mlops]
+tags: ["cicd", "github", "ghcr"]
 toc: true
 date: 2021-03-04
 author: Jongseob Jeon

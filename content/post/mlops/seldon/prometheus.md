@@ -1,6 +1,6 @@
 ---
 title: seldon-core와 prometheus local에서 사용해보기
-categories: [seldon]
+categories: [mlops]
 tags: ["seldon", "prometheus"]
 toc: true
 date: 2021-05-10

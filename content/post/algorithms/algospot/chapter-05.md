@@ -1,7 +1,7 @@
 ---
 title: 5. 알고리즘의 정당성 증명
-categories: [TIL]
-tags: ["algorithm"]
+categories: [algorithm]
+tags: [algospot]
 toc:
     auto: true
 date: 2021-10-22

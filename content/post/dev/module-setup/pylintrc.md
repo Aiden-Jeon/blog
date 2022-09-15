@@ -1,6 +1,7 @@
 ---
 title: 프로젝트별 pylint 설정하기
-categories: [setup-module]
+categories: [dev]
+tag: [setup-module]
 toc: true
 date: 2021-03-14
 author: Jongseob Jeon

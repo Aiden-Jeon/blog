@@ -1,6 +1,6 @@
 ---
 title: Pre-Requisites for k3s Setup
-categories: [kubernetes]
+categories: [mlops]
 tags: ["k8s", "k3s"]
 toc: true
 date: 2021-10-01

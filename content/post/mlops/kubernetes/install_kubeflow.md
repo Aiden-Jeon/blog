@@ -1,6 +1,6 @@
 ---
 title: Kubeflow Installation
-categories: [kubernetes]
+categories: [mlops]
 tags: ["k8s", "k3s"]
 toc: true
 date: 2021-10-01

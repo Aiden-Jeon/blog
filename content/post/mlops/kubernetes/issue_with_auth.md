@@ -1,6 +1,6 @@
 ---
 title: kubeflow 설치 중 auth dex 이슈 해결하기
-categories: [kubernetes]
+categories: [mlops]
 tags: ["k8s", "k3s"]
 toc: true
 date: 2021-10-08

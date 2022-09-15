@@ -1,7 +1,7 @@
 ---
 title: 6. 무식하게 풀기
-categories: [TIL]
-tags: ["algorithm"]
+categories: [algorithm]
+tags: [algospot]
 toc:
     auto: true
 date: 2021-10-26

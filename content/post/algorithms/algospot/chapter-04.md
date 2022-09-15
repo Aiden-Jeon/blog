@@ -1,7 +1,7 @@
 ---
 title: 4. 알고리즘의 시간 복잡도 분석
-categories: [TIL]
-tags: ["algorithm"]
+categories: [algorithm]
+tags: [algospot]
 toc:
     auto: true
 date: 2021-10-19

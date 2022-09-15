@@ -1,7 +1,7 @@
 ---
 title: 2. 문제 해결 개관
-categories: [TIL]
-tags: ["algorithm"]
+categories: [algorithm]
+tags: [algospot]
 toc: true
 date: 2021-09-30
 author: Jongseob Jeon

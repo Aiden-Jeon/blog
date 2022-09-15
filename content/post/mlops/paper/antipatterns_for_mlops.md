@@ -1,7 +1,7 @@
 ---
 title: Using AntiPatterns to avoid MLOps Mistakes
 categories: [mlops]
-tags: ["mlops"]
+tags: ["paper-review"]
 toc: true
 date: 2021-07-06
 author: Jongseob Jeon

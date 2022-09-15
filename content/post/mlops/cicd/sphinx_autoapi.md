@@ -1,7 +1,7 @@
 ---
 title: sphinx-autoapi 를 이용한 자동 api 문서 생성하기
-categories: [cicd]
-tags: ["sphinx"]
+categories: [mlops]
+tags: ["cicd", "sphinx"]
 toc: true
 date: 2021-03-04
 author: Jongseob Jeon

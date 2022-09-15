@@ -1,7 +1,7 @@
 ---
 title: 3. 코딩과 디버깅에 관하여
-categories: [TIL]
-tags: ["algorithm"]
+categories: [algorithm]
+tags: [algospot]
 toc:
     auto: true
 date: 2021-10-09

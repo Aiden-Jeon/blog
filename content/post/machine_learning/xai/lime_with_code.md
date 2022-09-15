@@ -1,6 +1,7 @@
 ---
 title: LIME with code
-categories: [XAI]
+categories: [machine-learning]
+tags: [xai]
 toc: true
 date: 2021-03-31
 author: Jongseob Jeon

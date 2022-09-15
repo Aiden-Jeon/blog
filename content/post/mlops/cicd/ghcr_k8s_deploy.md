@@ -1,7 +1,7 @@
 ---
 title: ghcr을 이용한 kubernetes deployment 만들기
-categories: [cicd]
-tags: ["k8s", "ghcr"]
+categories: [mlops]
+tags: ["cicd", "k8s", "ghcr"]
 toc: true
 date: 2021-03-04
 author: Jongseob Jeon
@@ -16,8 +16,7 @@ author: Jongseob Jeon
 
 ---
 
-
-이번 포스트에서는 minikube를 이용해 [이전 포스트](https://aiden-jeon.github.io/cicd/github-cicd-2)에서 만든 ghcr package를 이용해 deployment를 만드는 법에 대해서 알아보겠습니다.
+이번 포스트에서는 minikube를 이용해 이전 포스트에서 만든 ghcr package를 이용해 deployment를 만드는 법에 대해서 알아보겠습니다.
 
 ## 0. requirements
 본 포스트에서는 local환경에서 minikube를 사용하고 있습니다.

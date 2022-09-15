@@ -1,6 +1,6 @@
 ---
 title: 밑바닥부터 시작하는 Seldon-Core - 설치 [Istio Ver.]
-categories: [seldon]
+categories: [mlops]
 tags: ["k8s", "seldon", "istio"]
 toc: true
 date: 2021-05-14

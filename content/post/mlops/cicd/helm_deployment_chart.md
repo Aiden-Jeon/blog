@@ -1,24 +1,23 @@
 ---
 title: helm을 이용한 deployment chart 만들기
-categories: [cicd]
-tags: ["helm"]
+categories: [mlops]
+tags: ["cicd", "cicd"]
 toc: true
 date: 2021-03-04
 author: Jongseob Jeon
 ---
 
 **CI/CD Contents 순서**
-1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기]({{< relref "post/mlops/cicd/sphinx_autoapi" >}})
-2. [github action을 이용한 ci]({{< relref "post/mlops/cicd/github_action_ci" >}})
+1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기]({{< relref "post/mlops/cicd/sphinx_autoapi/index" >}})
+2. [github action을 이용한 ci]({{< relref "post/mlops/cicd/github_action_ci/index" >}})
 3. [ghcr을 이용한 kubernetes deployment 만들기]({{< relref "post/mlops/cicd/ghcr_k8s_deploy" >}})
 4. [helm을 이용한 deployment chart 만들기]({{< relref "post/mlops/cicd/helm_deployment_chart" >}})
-5. [argocd를 이용한 cd]({{< relref "post/mlops/cicd/argocd_cd" >}})
+5. [argocd를 이용한 cd]({{< relref "post/mlops/cicd/argocd_cd/index" >}})
+6. [argocd를 branch에서 cd]({{< relref "post/mlops/cicd/argocd_branch/index" >}})
 
 ---
 
-
-
-이번 포스트에서는 helm 을 이용해 [이전 포스트](https://aiden-jeon.github.io/cicd/github-cicd-2) 에서 작성한 파일들을 자동화 하는 법에 대해서 알아 보겠습니다.
+이번 포스트에서는 helm 을 이용해 이전 포스트에서 작성한 파일들을 자동화 하는 법에 대해서 알아 보겠습니다.
 
 ## 1. helm start
 helm 을 시작하려는 repo 최상단에서 다음과 같이 입력해줍니다.

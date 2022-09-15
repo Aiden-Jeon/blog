@@ -1,6 +1,6 @@
 ---
 title: prometheus와 grafana 연결하기
-categories: [seldon]
+categories: [mlops]
 tags: ["seldon", "prometheus"]
 toc: true
 draft: true

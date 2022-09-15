@@ -1,6 +1,6 @@
 ---
 title: 밑바닥부터 시작하는 Seldon-Core - Custom Server
-categories: [seldon]
+categories: [mlops]
 tags: ["k8s", "seldon"]
 toc: true
 date: 2021-06-28

@@ -9,7 +9,7 @@ links:
     image: https://brand.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg
 menu:
     main: 
-        weight: -50
+        weight: -89
         params:
             icon: link
 

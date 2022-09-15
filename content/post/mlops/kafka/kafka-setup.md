@@ -1,6 +1,6 @@
 ---
 title: Kafka Setup
-categories: [kafka]
+categories: [mlops]
 tags: ["kafka"]
 toc: true
 date: 2022-01-02

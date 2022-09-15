@@ -1,6 +1,6 @@
 ---
 title: seldon-core local에서 사용해보기
-categories: [seldon]
+categories: [mlops]
 tags: ["seldon"]
 toc: true
 date: 2021-04-22

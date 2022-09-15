@@ -1,7 +1,7 @@
 ---
 title: Types of Explanatory Methods
-categories: [xai]
-tags: ["xai"]
+categories: [machine-learning]
+tags: [xai]
 toc: true
 date: 2021-07-14
 author: Jongseob Jeon

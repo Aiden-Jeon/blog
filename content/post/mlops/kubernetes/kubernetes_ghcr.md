@@ -1,6 +1,6 @@
 ---
 title: kubernetes에서 ghcr package pull 하기
-categories: [kubernetes]
+categories: [mlops]
 tags: ["k8s"]
 toc: true
 date: 2021-03-03

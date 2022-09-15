@@ -165,6 +165,13 @@ menu:
           params:
             icon: home
             newTab: false
+        - identifier: categories
+          name: Categories
+          url: /categories
+          weight: -60
+          params:
+            icon: categories
+            newTab: false
     social: []
 
 related:
@@ -184,7 +191,7 @@ markup:
             unsafe: false
     tableOfContents:
         endLevel: 6
-        ordered: true
+        ordered: false
         startLevel: 2
     highlight:
         noClasses: false

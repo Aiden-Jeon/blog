@@ -1,7 +1,7 @@
 ---
 title: Feature-Based Explanations
-categories: [xai]
-tags: ["xai"]
+categories: [machine-learning]
+tags: [xai]
 toc: true
 date: 2021-07-18
 author: Jongseob Jeon

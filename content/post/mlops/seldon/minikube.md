@@ -1,6 +1,6 @@
 ---
 title: seldon-core minikube에서 사용해보기
-categories: [seldon]
+categories: [mlops]
 tags: ["k8s", "seldon"]
 toc: true
 date: 2021-04-23

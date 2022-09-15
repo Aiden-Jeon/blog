@@ -1,7 +1,7 @@
 ---
 title: argocd를 이용한 cd
-categories: [cicd]
-tags: ["argocd"]
+categories: [mlops]
+tags: ["cicd", "argocd"]
 toc: true
 date: 2021-03-04
 author: Jongseob Jeon

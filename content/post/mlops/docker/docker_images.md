@@ -1,6 +1,6 @@
 ---
 title: Docker Images
-categories: [docker]
+categories: [mlops]
 tags: ["docker"]
 toc: true
 date: 2021-05-27

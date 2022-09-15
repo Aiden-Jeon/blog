@@ -1,7 +1,7 @@
 ---
 title: argocd를 branch에서 cd
-categories: [cicd]
-tags: ["argocd"]
+categories: [mlops]
+tags: ["cicd", "argocd"]
 toc: true
 date: 2021-04-09
 author: Jongseob Jeon
@@ -16,8 +16,6 @@ author: Jongseob Jeon
 6. [argocd를 branch에서 cd]({{< relref "post/mlops/cicd/argocd_branch" >}})
 
 ---
-
-
 
 이번 포스트에서는 argocd를 이용해 github branch 에서 cd(continuous delivery) 하는 법에 대해서 알아보겠습니다.
 
