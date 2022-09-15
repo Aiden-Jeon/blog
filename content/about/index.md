@@ -13,7 +13,7 @@ comment:
 |             |                                                              |
 | ----------- | ------------------------------------------------------------ |
 | **Name**        | Jongseob Jeon (Aiden Jeon)                                   |
-| **Mail**        | ells2124@gmail.com                                           |
+| **Mail**        | aiden.jongseob@gmail.com                                     |
 | **Github**      | https://github.com/Aiden-Jeon                                |
 | **LinkedIn**    | https://www.linkedin.com/in/jongseob-jeon/                   |
 | **Resume(KOR)** | https://www.notion.so/Aiden-Little-Fire-14df30999c5c4c4b9c05d1f9f2d14776 |
@@ -71,3 +71,4 @@ NLP의 SOTA모델인 BERT를 수능영어 문제 풀이에 적용한 프로젝�
 *DJ Bamboo, 2017.04 ~ 2017.07*  
 라디오에서 사연을 읽어주고 노래를 틀어주는 것처럼 대나무숲 사연과 어울리는 노래를 추천해주는 프로젝트  
 [project link](http://www.datamarket.kr/xe/index.php?mid=board_pdzw77&page=2&document_srl=29247)
+
