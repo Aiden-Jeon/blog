@@ -8,11 +8,11 @@ author: Jongseob Jeon
 ---
 
 **CI/CD Contents 순서**
-1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기]({{< relref "posts/cicd/sphinx_autoapi" >}})
-2. [github action을 이용한 ci]({{< relref "posts/cicd/github_action_ci" >}})
-3. [ghcr을 이용한 kubernetes deployment 만들기]({{< relref "posts/cicd/ghcr_k8s_deploy" >}})
-4. [helm을 이용한 deployment chart 만들기]({{< relref "posts/cicd/helm_deployment_chart" >}})
-5. [argocd를 이용한 cd]({{< relref "posts/cicd/argocd_cd" >}})
+1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기]({{< relref "posts/mlops/cicd/sphinx_autoapi" >}})
+2. [github action을 이용한 ci]({{< relref "posts/mlops/cicd/github_action_ci" >}})
+3. [ghcr을 이용한 kubernetes deployment 만들기]({{< relref "posts/mlops/cicd/ghcr_k8s_deploy" >}})
+4. [helm을 이용한 deployment chart 만들기]({{< relref "posts/mlops/cicd/helm_deployment_chart" >}})
+5. [argocd를 이용한 cd]({{< relref "posts/mlops/cicd/argocd_cd" >}})
 
 ---
 
@@ -51,7 +51,7 @@ spec:
 ```
 
 이전 포스트에서 작성한 sphinx-api를 띄우는 deployment 입니다.
-apply하기에 앞서 secrets를 설정해주어야 합니다. 자세한 방법은 [포스트]({{< relref "posts/kubernetes/kubernetes_ghcr" >}})를 참고해주세요.
+apply하기에 앞서 secrets를 설정해주어야 합니다. 자세한 방법은 [포스트]({{< relref "posts/mlops/kubernetes/kubernetes_ghcr" >}})를 참고해주세요.
 
 secrets를 설정했다면 deployment.yaml 파일을 apply 해줍니다.
 ```bash

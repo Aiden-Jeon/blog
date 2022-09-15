@@ -135,7 +135,7 @@ class MLFlowServer(SeldonComponent):
 ```
 
 다음 명령어를 이용해 seldon-core를 실행시킵니다.
-사용되는 모델은 [이전 포스트]({{< relref "posts/seldon/local" >}})를 참고하면 됩니다.
+사용되는 모델은 [이전 포스트]({{< relref "posts/mlops/seldon/local" >}})를 참고하면 됩니다.
 ```bash
 seldon-core-microservice MLFlowServer --parameters '[{"name": "model_uri", "type":"STRING", "value": "file://mlruns/0/d96ad56315364063901ace2df62dfbc2/artifacts/iris_model/"}]'
 ```

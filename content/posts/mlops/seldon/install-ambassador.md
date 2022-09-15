@@ -10,7 +10,7 @@ author: Jongseob Jeon
 
 
 이번 포스트에서는 Ambassador를 사용하는 Seldon Core를 설치하는 방법에 대해서 설명합니다.  
- Istio를 사용해 설치하려면 [다음 글]({{< relref "posts/seldon/install-istio" >}})을 확인해 주세요.
+ Istio를 사용해 설치하려면 [다음 글]({{< relref "posts/mlops/seldon/install-istio" >}})을 확인해 주세요.
 
 ---
 
