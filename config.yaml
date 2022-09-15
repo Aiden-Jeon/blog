@@ -26,9 +26,9 @@ params:
         emoji: 🍥
         subtitle: "Welcome to Aiden's Camp"
         avatar:
-            enabled: false
+            enabled: true
             local: false
-            src: imgs/avatar.png
+            src: /imgs/avatar.png
 
     article:
         math: true
