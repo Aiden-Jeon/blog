@@ -8,16 +8,16 @@ author: Jongseob Jeon
 ---
 
 **Kubeflow 설치 시리즈**
-1. [Pre-Requisites for k3s Setup]({{< relref "posts/mlops/kubernetes/k3s_prerequisite" >}})
-2. [k3s Installation]({{< relref "posts/mlops/kubernetes/install_k3s" >}})
-3. [Kubeflow Installation]({{< relref "posts/mlops/kubernetes/install_kubeflow" >}})
+1. [Pre-Requisites for k3s Setup]({{< relref "post/mlops/kubernetes/k3s_prerequisite" >}})
+2. [k3s Installation]({{< relref "post/mlops/kubernetes/install_k3s" >}})
+3. [Kubeflow Installation]({{< relref "post/mlops/kubernetes/install_kubeflow" >}})
 
 ---
 
 이번 포스트에서는 서버에 kubeflow를 설치하는 과정에 대해서 설명합니다.  
 필요한 준비 과정을 확인 후 진행해 주세요.  
-1. [Pre-Requisites for k3s Setup]({{< relref "posts/mlops/kubernetes/k3s_prerequisite" >}})
-2. [k3s Installation]({{< relref "posts/mlops/kubernetes/install_k3s" >}})
+1. [Pre-Requisites for k3s Setup]({{< relref "post/mlops/kubernetes/k3s_prerequisite" >}})
+2. [k3s Installation]({{< relref "post/mlops/kubernetes/install_k3s" >}})
 
 ---
 
@@ -247,10 +247,10 @@ kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
    - ID: user@example.com
    - PW: 12341234
 
-> 포트 포워딩후 연결이 되지 않을 경우 [포스트]({{< relref "posts/mlops/kubernetes/issue_with_auth" >}})를 참고해보시기 바랍니다.
+> 포트 포워딩후 연결이 되지 않을 경우 [포스트]({{< relref "post/mlops/kubernetes/issue_with_auth" >}})를 참고해보시기 바랍니다.
 
 ## Reverse-proxy
-[다음 글]({{< relref "posts/mlops/kubernetes/install_k3s#on-server" >}})에서 설정한 reverse-proxy 도커를 이용해 접속할 수 있습니다.
+[다음 글]({{< relref "post/mlops/kubernetes/install_k3s#on-server" >}})에서 설정한 reverse-proxy 도커를 이용해 접속할 수 있습니다.
 
 우선 ingress-gateway의 연결된 포트를 확인합니다.
 ```bash
@@ -264,7 +264,7 @@ istio-ingressgateway   NodePort   10.43.244.7   <none>        15021:31160/TCP,80
 ```
 
 이중 80번 포트의 포워딩 포트를 확인합니다. 저는 32455 였습니다.  
-만약 다를 경우 [다음 글]({{< relref "posts/mlops/kubernetes/install_k3s#on-server" >}}) 에서 `kubeflow.conf`의 값을 수정하면 됩니다.
+만약 다를 경우 [다음 글]({{< relref "post/mlops/kubernetes/install_k3s#on-server" >}}) 에서 `kubeflow.conf`의 값을 수정하면 됩니다.
 
 local에 host를 추가해줍니다.
 ```bash

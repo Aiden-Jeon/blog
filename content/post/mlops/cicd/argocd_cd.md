@@ -8,11 +8,11 @@ author: Jongseob Jeon
 ---
 
 **CI/CD Contents 순서**
-1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기]({{< relref "posts/mlops/cicd/sphinx_autoapi" >}})
-2. [github action을 이용한 ci]({{< relref "posts/mlops/cicd/github_action_ci" >}})
-3. [ghcr을 이용한 kubernetes deployment 만들기]({{< relref "posts/mlops/cicd/ghcr_k8s_deploy" >}})
-4. [helm을 이용한 deployment chart 만들기]({{< relref "posts/mlops/cicd/helm_deployment_chart" >}})
-5. [argocd를 이용한 cd]({{< relref "posts/mlops/cicd/argocd_cd" >}})
+1. [sphinx-autoapi 를 이용한 자동 api 문서 생성하기]({{< relref "post/mlops/cicd/sphinx_autoapi" >}})
+2. [github action을 이용한 ci]({{< relref "post/mlops/cicd/github_action_ci" >}})
+3. [ghcr을 이용한 kubernetes deployment 만들기]({{< relref "post/mlops/cicd/ghcr_k8s_deploy" >}})
+4. [helm을 이용한 deployment chart 만들기]({{< relref "post/mlops/cicd/helm_deployment_chart" >}})
+5. [argocd를 이용한 cd]({{< relref "post/mlops/cicd/argocd_cd" >}})
 
 ---
 

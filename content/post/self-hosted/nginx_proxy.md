@@ -90,7 +90,7 @@ sudo netfilter-persistent reload
     ```bash
     docker ps
     ```
-    - 실행이 안될 경우 [포스트]({{< relref "posts/mlops/kubernetes/k3s_prerequisite###1.3 권한 문제 해결" >}})를 참고하세요.
+    - 실행이 안될 경우 [포스트]({{< relref "post/mlops/kubernetes/k3s_prerequisite###1.3 권한 문제 해결" >}})를 참고하세요.
 
 ### 3. docker-compose 설치
 [공식 홈페이지](https://docs.docker.com/compose/install/)를 참고해 docker-compose를 설치합니다.

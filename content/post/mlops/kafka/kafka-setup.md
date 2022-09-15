@@ -8,16 +8,13 @@ author: Jongseob Jeon
 ---
 
 ## Kafka CLI
-카프카 명령어를 사용할 수 있는 CLI를 설정하는 과정에 대해서 설명합니다.
-
+카프카 명령어를 사용할 수 있는 CLI를 설정하는 과정에 대해서 설명합니다.  
 kafka_2.13-2.8.1 를 다운로드 받습니다. (버전은 작성일 기준 도커로 이용할 수 있는 최신 버전입니다.)
-
 ```bash
 wget https://dlcdn.apache.org/kafka/2.8.1/kafka_2.13-2.8.1.tgz
 ```
 
 압축을 풉니다.
-
 ```bash
 tar -xzf kafka_2.13-2.8.1.tgz
 ```
@@ -38,7 +35,7 @@ bin/kafka-topics.sh
 
 kafka는 백엔드로 java를 사용하는데 자바가 설치되어 있지 않다면 다음 에러 메세지가 나옵니다.
 
-```bash
+```
 The operation couldn’t be completed. Unable to locate a Java Runtime.
 Please visit http://www.java.com for information on installing Java.
 ```

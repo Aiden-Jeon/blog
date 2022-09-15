@@ -8,14 +8,14 @@ author: Jongseob Jeon
 ---
 
 **Kubeflow 설치 시리즈**
-1. [Pre-Requisites for k3s Setup]({{< relref "posts/mlops/kubernetes/k3s_prerequisite" >}})
-2. [k3s Installation]({{< relref "posts/mlops/kubernetes/install_k3s" >}})
-3. [Kubeflow Installation]({{< relref "posts/mlops/kubernetes/install_kubeflow" >}})
+1. [Pre-Requisites for k3s Setup]({{< relref "post/mlops/kubernetes/k3s_prerequisite" >}})
+2. [k3s Installation]({{< relref "post/mlops/kubernetes/install_k3s" >}})
+3. [Kubeflow Installation]({{< relref "post/mlops/kubernetes/install_kubeflow" >}})
 
 ---
 
 이번 포스트에서는 서버에 k3s를 설치하는 과정에 대해서 설명합니다.  
-필요한 [준비 과정]({{< relref "posts/mlops/kubernetes/k3s_prerequisite" >}})을 확인 후 진행해 주세요.  
+필요한 [준비 과정]({{< relref "post/mlops/kubernetes/k3s_prerequisite" >}})을 확인 후 진행해 주세요.  
 
 ---
 
