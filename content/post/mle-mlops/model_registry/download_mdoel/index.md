@@ -119,7 +119,7 @@ pred = model.predict(sample)
    sepal_width  sepal_length  petal_width  petal_length
 2          4.7           3.2          1.3           0.2
 
->>> sample
+>>> pred
 [0]
 ```
 
