@@ -3,7 +3,7 @@ title: DB-3) Insert Row Loop
 categories: [mle-mlops]
 tags: ["postgres", "db"]
 toc: true
-date: 2022-09-19 14:30:00+08:00
+date: 2022-09-19 14:30:00+09:00
 author: Jongseob Jeon
 ---
 
@@ -86,7 +86,7 @@ def insert_row_loop(db_connect, df):
 if __name__ == "__main__":
     db_connect = psycopg2.connect(host="localhost", database="postgres", user="postgres", password="mypassword")
     df = get_data()
-    insert_row_loop(db_connect, df.sample(1))
+    insert_row_loop(db_connect, df)
 ```
 
 ## Run

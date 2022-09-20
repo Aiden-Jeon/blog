@@ -3,7 +3,7 @@ title: DB-4) Insert Row Loop Dockerfile
 categories: [mle-mlops]
 tags: ["postgres", "docker", "db"]
 toc: true
-date: 2022-09-19 14:50:00+08:00
+date: 2022-09-19 14:50:00+09:00
 author: Jongseob Jeon
 ---
 
