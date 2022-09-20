@@ -1,5 +1,5 @@
 ---
-title: Model Registry-2) Get Data from DB
+title: "[ Chapter 2. Model Registry ] 2) Get Data from DB"
 categories: [mle-mlops]
 tags: ["model-registry", "db"]
 toc: true

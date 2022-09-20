@@ -1,5 +1,5 @@
 ---
-title: Model Registry-1) Run Mlflow Server
+title: "[ Chapter 2. Model Registry ] 1) Run Mlflow Server"
 categories: [mle-mlops]
 tags: ["mlflow", "model-registry"]
 toc: true

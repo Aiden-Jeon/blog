@@ -1,5 +1,5 @@
 ---
-title: DB-1) Run Postgresql Server
+title: "[ Chapter 1. Database ] 1) Run Postgresql Server"
 categories: [mle-mlops]
 tags: ["postgres", "docker", "db"]
 toc: true

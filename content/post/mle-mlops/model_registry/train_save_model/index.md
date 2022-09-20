@@ -1,5 +1,5 @@
 ---
-title: Model Registry-3) Train Model and Save to MLFlow
+title: "[ Chapter 2. Model Registry ] 3) Train Model and Save to MLFlow"
 categories: [mle-mlops]
 tags: ["model-registry", "mlflow"]
 toc: true

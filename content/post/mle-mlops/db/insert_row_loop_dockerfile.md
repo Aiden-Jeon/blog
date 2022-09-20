@@ -1,5 +1,5 @@
 ---
-title: DB-4) Insert Row Loop Dockerfile
+title: "[ Chapter 1. Database ] 4) Insert Row Loop Dockerfile"
 categories: [mle-mlops]
 tags: ["postgres", "docker", "db"]
 toc: true

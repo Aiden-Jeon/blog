@@ -1,5 +1,5 @@
 ---
-title: DB-2) Create Table and Insert Row
+title: "[ Chapter 1. Database ] 2) Create Table and Insert Row"
 categories: [mle-mlops]
 tags: ["postgres", "docker", "db"]
 toc: true

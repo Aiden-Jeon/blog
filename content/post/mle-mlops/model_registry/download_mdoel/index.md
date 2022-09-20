@@ -1,5 +1,5 @@
 ---
-title: Model Registry-4) Download Model from MLFlow
+title: "[ Chapter 2. Model Registry ] 4) Download Model from MLFlow"
 categories: [mle-mlops]
 tags: ["model-registry", "mlflow"]
 toc: true
@@ -101,6 +101,7 @@ load된 모델이 iris 데이터를 predict 할 수 있는지 확인합니다.
 
 ```python
 from sklearn.datasets import load_iris
+
 df, _ = load_iris(return_X_y=True, as_frame=True)
 rename_rule = {
     "sepal length (cm)": "sepal_width",

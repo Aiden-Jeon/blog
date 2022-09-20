@@ -1,5 +1,5 @@
 ---
-title: DB-3) Insert Row Loop
+title: "[ Chapter 1. Database ] 3) Insert Row Loop"
 categories: [mle-mlops]
 tags: ["postgres", "db"]
 toc: true
