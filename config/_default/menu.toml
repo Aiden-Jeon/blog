@@ -1,0 +1,43 @@
+# Configure main menu and social menu
+[[main]]
+identifier = "home"
+name = "Home"
+url = "/"
+weight = -200
+[main.params]
+icon = "home"
+newtab = false
+
+[[main]]
+identifier = "categories"
+name = "Categories"
+url = "/categories"
+weight = -100
+[main.params]
+icon = "categories"
+newtab = false
+
+[[main]]
+identifier = "tags"
+name = "Tags"
+url = "/tags"
+weight = -100
+[main.params]
+icon = "tag"
+newtab = false
+
+[[social]]
+identifier = "github"
+name = "GitHub"
+url = "https://github.com/Aiden-Jeon"
+
+[social.params]
+icon = "brand-github"
+
+[[social]]
+identifier = "linkedin"
+name = "Linkedin"
+url = "https://www.linkedin.com/in/jongseob-jeon/"
+
+[social.params]
+icon = "brand-linkedin"
