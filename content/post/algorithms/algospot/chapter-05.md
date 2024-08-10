@@ -44,7 +44,7 @@ eg) 100개의 도미노가 있고 다음 두가지 사실을 안다고 가정
 
 #### 사다리 게임
 맨 위와 맨 아래가 1:1 대응이다.
-![imgs](/imgs/algospot/chapter-05-1.jpeg)
+{{<figure src=https://private-user-images.githubusercontent.com/33924485/356815718-20c2e6f1-f4e9-4422-a5e3-e36ec86eb5ed.jpeg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjMyOTg0NzMsIm5iZiI6MTcyMzI5ODE3MywicGF0aCI6Ii8zMzkyNDQ4NS8zNTY4MTU3MTgtMjBjMmU2ZjEtZjRlOS00NDIyLWE1ZTMtZTM2ZWM4NmViNWVkLmpwZWc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwODEwJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDgxMFQxMzU2MTNaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT01ZjkzNDdiNGNjOGQxZmYwNThmNDg3NWRiNDhhYjJiMjIyNjkyYTA0YjJlYTJiNjVkMGJjM2FlNjYzOTAyYjQ2JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.R0hzV-v4RtrWNZO9t7PQ_jECvU-vXMH5TWRLaotCkkc width="80%" >}}
 
 1. 단계 나누기
     - 텅 빈 $N$개의 세로줄에서부터 시작해서 원하는 사다리가 될 때까지 하나씩 가로줄을 그어 간다. 이때, 가로즐을 하나 긋는 것을 한 단계라고 정의
@@ -186,7 +186,7 @@ eg) 이해를 위한 example
 - (b) 유지 조건: while 문 내용이 실행되었다는 말은 $A[j-1]>A[j]$ 라는 의미. 이 둘을 교체하고 $j$를 1 줄이면 (b)는 여전히 참
 - (c) 초기 조건: 불변식 (a)에 의해 구간 $A[0, ..., i-1]]$은 항상 정렬되어 있으니 while문 진입 초기시에는 (c)는 항상 참
 - (c) 유지 조건: 그림 (c)에 $A[j]$ 와 이전 원소를 교체한다고 해도 회색 원소들 간의 상대적 순서는 변하지 않기에 (c)는 항상 참  
-    ![imgs](/imgs/algospot/chapter-05-2.jpeg)
+    {{<figure src=https://private-user-images.githubusercontent.com/33924485/356815719-bd6eb87b-956c-4602-8509-cbc00726de7f.jpeg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjMyOTg0NzMsIm5iZiI6MTcyMzI5ODE3MywicGF0aCI6Ii8zMzkyNDQ4NS8zNTY4MTU3MTktYmQ2ZWI4N2ItOTU2Yy00NjAyLTg1MDktY2JjMDA3MjZkZTdmLmpwZWc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwODEwJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDgxMFQxMzU2MTNaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT05NWM4ZDEyMjFmMTAzODgwNmI5NDZkMzIwNmZhZDIxODJiZWZhMjA5OWE1ZWNmYTMzMGM3N2M4MjAyNjc1MGE0JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.uWHhXA53DIK41P2HQqHEFYaG7aT7zruSwD1dMdiQmf4 width="80%" >}}
 
 
 ### 단정문을 이용해 반복문 불변식 강제하기

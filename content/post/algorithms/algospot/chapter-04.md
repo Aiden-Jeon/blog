@@ -130,12 +130,12 @@ author: Jongseob Jeon
 - 반복문의 수행 횟수를 입력 크기의 다항식으로 표현할 수 있는 알고리즘
 - eg) 알러지가 심한 친구들
     - 집들이에 $N$명의 친구를 초대 / 할 줄 아는 $M$가지 음식 중 무엇을 대접해야 할까?
-    ![img](/imgs/algospot/chapter-04-1.jpeg)
+    {{<figure src=https://private-user-images.githubusercontent.com/33924485/356815713-002ccf83-c07d-4bd2-8f57-41f2aa30144a.jpeg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjMyOTg0NzMsIm5iZiI6MTcyMzI5ODE3MywicGF0aCI6Ii8zMzkyNDQ4NS8zNTY4MTU3MTMtMDAyY2NmODMtYzA3ZC00YmQyLThmNTctNDFmMmFhMzAxNDRhLmpwZWc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwODEwJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDgxMFQxMzU2MTNaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1kYjFhMjVjMzdlMDdlZDBkZjliYWViMTI1MTVmMDBhMjQxYTRmZmVjZGE1N2Y5NWNhMjk5ODM4YmJkNjE2MWVkJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.B_u8qiHdDhwPNx_65HpKk7qOZLyRZScTbT-ECkih59U width="80%" >}}
     - 모든 답 후보 평가하기
         - 이 문제는 여러 개의 답이 있을 수 있다.
         - 만들 수 있는 모든 음식을 다 만들면 된다 -> **더 적은 종류의 음식만을 준비하고 싶다.**
         - 여러개의 답이 있고 그 중 가장 좋은 답을 찾을 때, 가장 간단한 방법은 모든 답을 일일이 고려해 보는 것
-        ![img](/imgs/algospot/chapter-04-2.jpeg)
+        {{<figure src=https://private-user-images.githubusercontent.com/33924485/356815716-dbe669cd-e1aa-42f5-8811-e13fac61c9f0.jpeg?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MjMyOTg0NzMsIm5iZiI6MTcyMzI5ODE3MywicGF0aCI6Ii8zMzkyNDQ4NS8zNTY4MTU3MTYtZGJlNjY5Y2QtZTFhYS00MmY1LTg4MTEtZTEzZmFjNjFjOWYwLmpwZWc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwODEwJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDgxMFQxMzU2MTNaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT02YmRiYTQ0NTYzYTgxYjU1OTdkNTI2ZGQ3OGYwZGQ1YzhlMzIxMGU4YThiZmM3NGNmODA0NzZlZTE5ZDUwYTRhJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.50Fw1e6UnYl0INjAoLG2Vw_VLtkF0AvuDvzXjmN53aA width="80%" >}}
         ```python
         INF = 987654321
         def can_everybody_eat(menu):
