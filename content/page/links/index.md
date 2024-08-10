@@ -15,3 +15,6 @@ menu:
 
 comments: false
 ---
+
+
+Welcome to Aiden's Camp!
