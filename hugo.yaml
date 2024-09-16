@@ -1,0 +1,5 @@
+services:
+  # GA Tracking ID
+  googleAnalytics:
+    ID: "G-419F58RW9W"
+  
