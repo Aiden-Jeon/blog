@@ -1,0 +1,588 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nlp on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/nlp/</link><description>Recent content in Nlp on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 05 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/nlp/index.xml" rel="self" type="application/rss+xml"/><item><title>Pandas를 이용한 tf-idf 구하기</title><link>https://aiden-jeon.github.io/blog/p/pandas%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-tf-idf-%EA%B5%AC%ED%95%98%EA%B8%B0/</link><pubDate>Wed, 05 May 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/pandas%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-tf-idf-%EA%B5%AC%ED%95%98%EA%B8%B0/</guid><description>&lt;p>이번 포스트는 Pandas를 이용해 tf-idf를 계산하는 방법에 대해서 설명합니다.&lt;/p>
+&lt;hr>
+&lt;h3 id="tf-idf">&lt;a href="#tf-idf" class="header-anchor">&lt;/a>TF-IDF
+&lt;/h3>&lt;ul>
+&lt;li>&lt;strong>TF(Term Frequency)&lt;/strong>: 한 문장에서 나타난 각 단어들의 빈도&lt;/li>
+&lt;li>&lt;strong>IDF(Inverse Document Frequency)&lt;/strong>: 문서들에 나타난 단어들의 빈도의 역수&lt;/li>
+&lt;li>&lt;strong>TF-IDF&lt;/strong>: TF*IDF&lt;/li>
+&lt;/ul>
+&lt;h3 id="data">&lt;a href="#data" class="header-anchor">&lt;/a>Data
+&lt;/h3>&lt;p>데이터는 이미 빈도수가 계산되어 있다고 가정합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">columns&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="sa">f&lt;/span>&lt;span class="s2">&amp;#34;feature_&lt;/span>&lt;span class="si">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">10&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sample_data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pd&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">DataFrame&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">columns&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">columns&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>데이터는 다음과 같습니다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: right">&lt;/th>
+&lt;th style="text-align: right">feature_0&lt;/th>
+&lt;th style="text-align: right">feature_1&lt;/th>
+&lt;th style="text-align: right">feature_2&lt;/th>
+&lt;th style="text-align: right">feature_3&lt;/th>
+&lt;th style="text-align: right">feature_4&lt;/th>
+&lt;th style="text-align: right">feature_5&lt;/th>
+&lt;th style="text-align: right">feature_6&lt;/th>
+&lt;th style="text-align: right">feature_7&lt;/th>
+&lt;th style="text-align: right">feature_8&lt;/th>
+&lt;th style="text-align: right">feature_9&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">2&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">2&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">2&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">3&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">3&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">4&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="tfterm-frequency">&lt;a href="#tfterm-frequency" class="header-anchor">&lt;/a>TF(Term Frequency)
+&lt;/h3>&lt;p>각 문장은 하나의 row입니다.
+우선, 각 문장에서 나타난 전체 단어의 개수를 구합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">sample_df&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>계산하면 다음과 같습니다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: right">&lt;/th>
+&lt;th style="text-align: right">0&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">2&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;td style="text-align: right">3&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">2&lt;/td>
+&lt;td style="text-align: right">2&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">3&lt;/td>
+&lt;td style="text-align: right">3&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">4&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>이 값을 각 row에 나눠줍니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">tf&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">sample_df&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">div&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sample_df&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>계산하면 다음과 같습니다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: right">&lt;/th>
+&lt;th style="text-align: right">feature_0&lt;/th>
+&lt;th style="text-align: right">feature_1&lt;/th>
+&lt;th style="text-align: right">feature_2&lt;/th>
+&lt;th style="text-align: right">feature_3&lt;/th>
+&lt;th style="text-align: right">feature_4&lt;/th>
+&lt;th style="text-align: right">feature_5&lt;/th>
+&lt;th style="text-align: right">feature_6&lt;/th>
+&lt;th style="text-align: right">feature_7&lt;/th>
+&lt;th style="text-align: right">feature_8&lt;/th>
+&lt;th style="text-align: right">feature_9&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0.5&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0.5&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0.666667&lt;/td>
+&lt;td style="text-align: right">0.333333&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">2&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">3&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">4&lt;/td>
+&lt;td style="text-align: right">nan&lt;/td>
+&lt;td style="text-align: right">nan&lt;/td>
+&lt;td style="text-align: right">nan&lt;/td>
+&lt;td style="text-align: right">nan&lt;/td>
+&lt;td style="text-align: right">nan&lt;/td>
+&lt;td style="text-align: right">nan&lt;/td>
+&lt;td style="text-align: right">nan&lt;/td>
+&lt;td style="text-align: right">nan&lt;/td>
+&lt;td style="text-align: right">nan&lt;/td>
+&lt;td style="text-align: right">nan&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>5번째 문장의 경우 단어의 합이 0 이기 때문에 nan값이 생겼습니다.
+이를 처리하기 위해 na 값에 0을 채워줍니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">tf&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">tf&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fillna&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>전체 단어의 빈도수로 나누었기 때문에 tf의 각 row의 합은 1과 같아야 합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">tf&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: right">&lt;/th>
+&lt;th style="text-align: right">0&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">2&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">3&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">4&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="idfinverse-document-frequency">&lt;a href="#idfinverse-document-frequency" class="header-anchor">&lt;/a>IDF(Inverse Document Frequency)
+&lt;/h3>&lt;p>각 단어는 하나의 column입니다.
+다음으로 각 단어들이 문장들에서 나타난 개수를 구합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="n">sample_df&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">&lt;/th>
+&lt;th style="text-align: right">0&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">feature_0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_1&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_2&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_3&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_4&lt;/td>
+&lt;td style="text-align: right">2&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_5&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_6&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_7&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_8&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_9&lt;/td>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>이제 이 값을 각 column에 나눠준 후 log를 취합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">idf&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sample_df&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">sample_df&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sum&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>idf값은 다음과 같습니다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">&lt;/th>
+&lt;th style="text-align: right">0&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">feature_0&lt;/td>
+&lt;td style="text-align: right">inf&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_1&lt;/td>
+&lt;td style="text-align: right">inf&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_2&lt;/td>
+&lt;td style="text-align: right">1.60944&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_3&lt;/td>
+&lt;td style="text-align: right">inf&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_4&lt;/td>
+&lt;td style="text-align: right">0.916291&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_5&lt;/td>
+&lt;td style="text-align: right">1.60944&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_6&lt;/td>
+&lt;td style="text-align: right">inf&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_7&lt;/td>
+&lt;td style="text-align: right">1.60944&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_8&lt;/td>
+&lt;td style="text-align: right">inf&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_9&lt;/td>
+&lt;td style="text-align: right">1.60944&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>0으로 나눠서 inf값이 생긴 곳에 0을 채워줍니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">idf&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">idf&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">replace&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">inf&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">&lt;/th>
+&lt;th style="text-align: right">0&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">feature_0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_1&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_2&lt;/td>
+&lt;td style="text-align: right">1.60944&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_3&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_4&lt;/td>
+&lt;td style="text-align: right">0.916291&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_5&lt;/td>
+&lt;td style="text-align: right">1.60944&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_6&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_7&lt;/td>
+&lt;td style="text-align: right">1.60944&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_8&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">feature_9&lt;/td>
+&lt;td style="text-align: right">1.60944&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="tf-idf-1">&lt;a href="#tf-idf-1" class="header-anchor">&lt;/a>TF-IDF
+&lt;/h3>&lt;p>이제 위에서 계산한 TF와 IDF를 곱해줍니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">tf_idf&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">tf&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">idf&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>다음과 같이 tf-idf를 구할 수 있습니다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: right">&lt;/th>
+&lt;th style="text-align: right">feature_0&lt;/th>
+&lt;th style="text-align: right">feature_1&lt;/th>
+&lt;th style="text-align: right">feature_2&lt;/th>
+&lt;th style="text-align: right">feature_3&lt;/th>
+&lt;th style="text-align: right">feature_4&lt;/th>
+&lt;th style="text-align: right">feature_5&lt;/th>
+&lt;th style="text-align: right">feature_6&lt;/th>
+&lt;th style="text-align: right">feature_7&lt;/th>
+&lt;th style="text-align: right">feature_8&lt;/th>
+&lt;th style="text-align: right">feature_9&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0.804719&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0.458145&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">1&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0.61086&lt;/td>
+&lt;td style="text-align: right">0.536479&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">2&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">1.60944&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">3&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">1.60944&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: right">4&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;td style="text-align: right">0&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="reference">&lt;a href="#reference" class="header-anchor">&lt;/a>Reference
+&lt;/h3>&lt;ul>
+&lt;li>&lt;a class="link" href="https://ko.wikipedia.org/wiki/Tf-idf" target="_blank" rel="noopener"
+>https://ko.wikipedia.org/wiki/Tf-idf&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

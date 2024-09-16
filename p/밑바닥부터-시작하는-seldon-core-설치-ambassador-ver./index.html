@@ -1,0 +1,221 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="이번 포스트에서는 Ambassador를 사용하는 Seldon Core를 설치하는 방법에 대해서 설명합니다.\nIstio를 사용해 설치하려면 다음 글을 확인해 주세요.\nPre-requisites 이번 실습에서는 Local에서 Seldon Core를 설치후 사용해보기 위한 k8s Tool로 minikube를 사용합니다.\nMinikube Helm Ingress Istio 1. Minikube 사용한 minikube version은 다음과 같습니다.\n1 2 3 > minikube version minikube version: v1.20.0 commit: c61663e942ec43b20e8e70839dcca52e44cd85ae minikube의 default config는 memory의 경우 2048mb 입니다. 이 경우 실습 중 메모리가 부족해서 OOM이슈가 생겨서 정상적으로 진행이 어려울 수 있습니다.\nOOM을 방지하기 위해서 minikube의 메모리를 4096mb로 늘린 후 진행하도록 하겠습니다.\n"><title>밑바닥부터 시작하는 Seldon-Core - 설치 [Ambassador Ver.]</title>
+<link rel=canonical href=https://aiden-jeon.github.io/blog/p/%EB%B0%91%EB%B0%94%EB%8B%A5%EB%B6%80%ED%84%B0-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-seldon-core-%EC%84%A4%EC%B9%98-ambassador-ver./><link rel=stylesheet href=/blog/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="밑바닥부터 시작하는 Seldon-Core - 설치 [Ambassador Ver.]"><meta property='og:description' content="이번 포스트에서는 Ambassador를 사용하는 Seldon Core를 설치하는 방법에 대해서 설명합니다.\nIstio를 사용해 설치하려면 다음 글을 확인해 주세요.\nPre-requisites 이번 실습에서는 Local에서 Seldon Core를 설치후 사용해보기 위한 k8s Tool로 minikube를 사용합니다.\nMinikube Helm Ingress Istio 1. Minikube 사용한 minikube version은 다음과 같습니다.\n1 2 3 > minikube version minikube version: v1.20.0 commit: c61663e942ec43b20e8e70839dcca52e44cd85ae minikube의 default config는 memory의 경우 2048mb 입니다. 이 경우 실습 중 메모리가 부족해서 OOM이슈가 생겨서 정상적으로 진행이 어려울 수 있습니다.\nOOM을 방지하기 위해서 minikube의 메모리를 4096mb로 늘린 후 진행하도록 하겠습니다.\n"><meta property='og:url' content='https://aiden-jeon.github.io/blog/p/%EB%B0%91%EB%B0%94%EB%8B%A5%EB%B6%80%ED%84%B0-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-seldon-core-%EC%84%A4%EC%B9%98-ambassador-ver./'><meta property='og:site_name' content="Aiden's Camp"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='k8s'><meta property='article:tag' content='seldon'><meta property='article:tag' content='ambassador'><meta property='article:published_time' content='2021-05-14T00:00:00+00:00'><meta property='article:modified_time' content='2021-10-01T00:00:00+00:00'><meta name=twitter:title content="밑바닥부터 시작하는 Seldon-Core - 설치 [Ambassador Ver.]"><meta name=twitter:description content="이번 포스트에서는 Ambassador를 사용하는 Seldon Core를 설치하는 방법에 대해서 설명합니다.\nIstio를 사용해 설치하려면 다음 글을 확인해 주세요.\nPre-requisites 이번 실습에서는 Local에서 Seldon Core를 설치후 사용해보기 위한 k8s Tool로 minikube를 사용합니다.\nMinikube Helm Ingress Istio 1. Minikube 사용한 minikube version은 다음과 같습니다.\n1 2 3 > minikube version minikube version: v1.20.0 commit: c61663e942ec43b20e8e70839dcca52e44cd85ae minikube의 default config는 memory의 경우 2048mb 입니다. 이 경우 실습 중 메모리가 부족해서 OOM이슈가 생겨서 정상적으로 진행이 어려울 수 있습니다.\nOOM을 방지하기 위해서 minikube의 메모리를 4096mb로 늘린 후 진행하도록 하겠습니다.\n"><link rel="shortcut icon" href=/blog/icons/favicon.ico><script async src="https://www.googletagmanager.com/gtag/js?id=G-419F58RW9W"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-419F58RW9W")}</script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/blog/><img src=/blog/imgs/avatar_hu6933059792947527008.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🔥</span></figure><div class=site-meta><h1 class=site-name><a href=/blog>Aiden's Camp</a></h1><h2 class=site-description>Welcome to Aiden's Camp</h2></div></header><ol class=menu-social><li><a href=https://github.com/Aiden-Jeon target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://www.linkedin.com/in/jongseob-jeon/ target=_blank title=Linkedin rel=me><svg fill="#000" height="800" width="800" id="Layer_1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 310 310"><g id="XMLID_801_"><path id="XMLID_802_" d="M72.16 99.73H9.927c-2.762.0-5 2.239-5 5v199.928c0 2.762 2.238 5 5 5H72.16c2.762.0 5-2.238 5-5V104.73c0-2.76100000000001-2.238-5-5-5z"/><path id="XMLID_803_" d="M41.066.341C18.422.341.0 18.743.0 41.362.0 63.991 18.422 82.4 41.066 82.4c22.626.0 41.033-18.41 41.033-41.038C82.1 18.743 63.692.341 41.066.341z"/><path id="XMLID_804_" d="M230.454 94.761c-24.995.0-43.472 10.745-54.679 22.954V104.73c0-2.761-2.238-5-5-5h-59.599c-2.762.0-5 2.239-5 5v199.928c0 2.762 2.238 5 5 5h62.097c2.762.0 5-2.238 5-5V205.74c0-33.333 9.054-46.319 32.29-46.319 25.306.0 27.317 20.818 27.317 48.034v97.204c0 2.762 2.238 5 5 5H305c2.762.0 5-2.238 5-5V194.995C310 145.43 300.549 94.761 230.454 94.761z"/></g></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/blog/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/blog/categories><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg>
+<span>Categories</span></a></li><li><a href=/blog/tags><svg class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11 3l9 9a1.5 1.5.0 010 2l-6 6a1.5 1.5.0 01-2 0L3 11V7a4 4 0 014-4h4"/><circle cx="9" cy="9" r="2"/></svg>
+<span>Tags</span></a></li><li><a href=/blog/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/blog/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/blog/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ul><li><a href=#pre-requisites>Pre-requisites</a></li><li><a href=#1-minikube>1. Minikube</a></li><li><a href=#2-helm>2. Helm</a></li><li><a href=#3-ambassador>3. Ambassador</a></li></ul><ul><li><a href=#1-install-seldon-core>1. Install seldon-core</a></li><li><a href=#2-sample-deploy>2. Sample deploy</a></li></ul><ul><li><a href=#1-install>1. Install</a></li><li><a href=#2usage>2.Usage</a></li></ul></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/blog/categories/mlops/>Mlops</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/blog/p/%EB%B0%91%EB%B0%94%EB%8B%A5%EB%B6%80%ED%84%B0-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-seldon-core-%EC%84%A4%EC%B9%98-ambassador-ver./>밑바닥부터 시작하는 Seldon-Core - 설치 [Ambassador Ver.]</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>May 14, 2021</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>3 minute read</time></div></footer></div></header><section class=article-content><p>이번 포스트에서는 Ambassador를 사용하는 Seldon Core를 설치하는 방법에 대해서 설명합니다.<br>Istio를 사용해 설치하려면 <a class=link href=/blog/p/%EB%B0%91%EB%B0%94%EB%8B%A5%EB%B6%80%ED%84%B0-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-seldon-core-%EC%84%A4%EC%B9%98-istio-ver./>다음 글</a>을 확인해 주세요.</p><hr><h2 id=pre-requisites><a href=#pre-requisites class=header-anchor></a>Pre-requisites</h2><p>이번 실습에서는 Local에서 Seldon Core를 설치후 사용해보기 위한 k8s Tool로 minikube를 사용합니다.</p><ol><li>Minikube</li><li>Helm</li><li>Ingress</li><li>Istio</li></ol><h2 id=1-minikube><a href=#1-minikube class=header-anchor></a>1. Minikube</h2><p>사용한 minikube version은 다음과 같습니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>&gt; minikube version
+</span></span><span class=line><span class=cl>minikube version: v1.20.0
+</span></span><span class=line><span class=cl>commit: c61663e942ec43b20e8e70839dcca52e44cd85ae
+</span></span></code></pre></td></tr></table></div></div><p>minikube의 default config는 memory의 경우 2048mb 입니다.
+이 경우 실습 중 메모리가 부족해서 OOM이슈가 생겨서 정상적으로 진행이 어려울 수 있습니다.<br>OOM을 방지하기 위해서 minikube의 메모리를 4096mb로 늘린 후 진행하도록 하겠습니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>minikube config <span class=nb>set</span> memory <span class=m>4096</span>
+</span></span></code></pre></td></tr></table></div></div><p>minikube를 실행합니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>minikube start
+</span></span></code></pre></td></tr></table></div></div><h2 id=2-helm><a href=#2-helm class=header-anchor></a>2. Helm</h2><p><a class=link href=https://helm.sh/docs/intro/install/ target=_blank rel=noopener>helm 공식 홈페이지</a>의 방법을 따라 합니다.
+이 때 설치해야 하는 버전은 3.x.x 입니다.</p><p>스크립트 방법을 이용해 설치하겠습니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>curl -fsSL -o get_helm.sh &lt;https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3&gt;
+</span></span><span class=line><span class=cl>chmod <span class=m>700</span> get_helm.sh
+</span></span><span class=line><span class=cl>./get_helm.sh
+</span></span></code></pre></td></tr></table></div></div><h2 id=3-ambassador><a href=#3-ambassador class=header-anchor></a>3. Ambassador</h2><p>helm chart를 이용해 설치합니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl create namespace ambassador <span class=o>||</span> <span class=nb>echo</span> <span class=s2>&#34;namespace ambassador exists&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>helm repo add datawire &lt;https://www.getambassador.io&gt;
+</span></span><span class=line><span class=cl>helm install ambassador datawire/ambassador <span class=se>\\</span>
+</span></span><span class=line><span class=cl> --set image.repository<span class=o>=</span>quay.io/datawire/ambassador <span class=se>\\</span>
+</span></span><span class=line><span class=cl> --set <span class=nv>enableAES</span><span class=o>=</span><span class=nb>false</span> <span class=se>\\</span>
+</span></span><span class=line><span class=cl> --set crds.keep<span class=o>=</span><span class=nb>false</span> <span class=se>\\</span>
+</span></span><span class=line><span class=cl> --namespace ambassador
+</span></span></code></pre></td></tr></table></div></div><p>상태를 확인합니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl get all -n ambassador
+</span></span></code></pre></td></tr></table></div></div><p>다음과 같이 ambassador와 관련된 리소스들이 생성되었습니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>NAME                                    READY   STATUS    RESTARTS   AGE
+</span></span><span class=line><span class=cl>pod/ambassador-5bf7689fc6-9hlrd         1/1     Running   <span class=m>0</span>          116s
+</span></span><span class=line><span class=cl>pod/ambassador-5bf7689fc6-bk86c         1/1     Running   <span class=m>0</span>          116s
+</span></span><span class=line><span class=cl>pod/ambassador-5bf7689fc6-r6v9q         1/1     Running   <span class=m>0</span>          116s
+</span></span><span class=line><span class=cl>pod/ambassador-agent-8585f84d86-vbczf   1/1     Running   <span class=m>0</span>          116s
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>NAME                       TYPE           CLUSTER-IP       EXTERNAL-IP   PORT<span class=o>(</span>S<span class=o>)</span>                      AGE
+</span></span><span class=line><span class=cl>service/ambassador         LoadBalancer   10.102.231.216   &lt;pending&gt;     80:30904/TCP,443:32156/TCP   116s
+</span></span><span class=line><span class=cl>service/ambassador-admin   ClusterIP      10.99.228.85     &lt;none&gt;        8877/TCP,8005/TCP            116s
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span class=line><span class=cl>deployment.apps/ambassador         3/3     <span class=m>3</span>            <span class=m>3</span>           116s
+</span></span><span class=line><span class=cl>deployment.apps/ambassador-agent   1/1     <span class=m>1</span>            <span class=m>1</span>           116s
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>NAME                                          DESIRED   CURRENT   READY   AGE
+</span></span><span class=line><span class=cl>replicaset.apps/ambassador-5bf7689fc6         <span class=m>3</span>         <span class=m>3</span>         <span class=m>3</span>       116s
+</span></span><span class=line><span class=cl>replicaset.apps/ambassador-agent-8585f84d86   <span class=m>1</span>         <span class=m>1</span>         <span class=m>1</span>       116s
+</span></span></code></pre></td></tr></table></div></div><h1 id=seldon-core><a href=#seldon-core class=header-anchor></a>Seldon-core</h1><h2 id=1-install-seldon-core><a href=#1-install-seldon-core class=header-anchor></a>1. Install seldon-core</h2><ol><li><p>namespace 생성</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl create namespace seldon-system
+</span></span></code></pre></td></tr></table></div></div></li><li><p>helm chart 생성</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>helm install seldon-core seldon-core-operator <span class=se>\\</span>
+</span></span><span class=line><span class=cl>  --repo &lt;https://storage.googleapis.com/seldon-charts&gt; <span class=se>\\</span>
+</span></span><span class=line><span class=cl>  --set usageMetrics.enabled<span class=o>=</span><span class=nb>true</span> <span class=se>\\</span>
+</span></span><span class=line><span class=cl>  --namespace seldon-system <span class=se>\\</span>
+</span></span><span class=line><span class=cl>  --set istio.enabled<span class=o>=</span><span class=nb>true</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>상태 확인</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl get po -n seldon-system
+</span></span></code></pre></td></tr></table></div></div><p>다음과 같이 출력됩니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>NAME                                        READY   STATUS    RESTARTS   AGE
+</span></span><span class=line><span class=cl>seldon-controller-manager-559c567c9-pjtpl   1/1     Running   <span class=m>0</span>          11s
+</span></span></code></pre></td></tr></table></div></div></li></ol><h2 id=2-sample-deploy><a href=#2-sample-deploy class=header-anchor></a>2. Sample deploy</h2><ol><li><p>namespace 생성</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl create namespace seldon
+</span></span></code></pre></td></tr></table></div></div></li><li><p>pod 생성</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl apply -f - <span class=s>&lt;&lt; END
+</span></span></span><span class=line><span class=cl><span class=s>apiVersion: machinelearning.seldon.io/v1
+</span></span></span><span class=line><span class=cl><span class=s>kind: SeldonDeployment
+</span></span></span><span class=line><span class=cl><span class=s>metadata:
+</span></span></span><span class=line><span class=cl><span class=s>  name: iris-model
+</span></span></span><span class=line><span class=cl><span class=s>  namespace: seldon
+</span></span></span><span class=line><span class=cl><span class=s>spec:
+</span></span></span><span class=line><span class=cl><span class=s>  name: iris
+</span></span></span><span class=line><span class=cl><span class=s>  predictors:
+</span></span></span><span class=line><span class=cl><span class=s>  - graph:
+</span></span></span><span class=line><span class=cl><span class=s>      implementation: SKLEARN_SERVER
+</span></span></span><span class=line><span class=cl><span class=s>      modelUri: gs://seldon-models/sklearn/iris
+</span></span></span><span class=line><span class=cl><span class=s>      name: classifier
+</span></span></span><span class=line><span class=cl><span class=s>    name: default
+</span></span></span><span class=line><span class=cl><span class=s>    replicas: 1
+</span></span></span><span class=line><span class=cl><span class=s>END</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>pod 생성 확인</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl get all -n seldon
+</span></span></code></pre></td></tr></table></div></div><p>다음과 같이 출력됩니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>NAME                                                   READY   STATUS    RESTARTS   AGE
+</span></span><span class=line><span class=cl>pod/iris-model-default-0-classifier-546fb8bfff-cd5gm   2/2     Running   <span class=m>0</span>          5m47s
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>NAME                                    TYPE        CLUSTER-IP       EXTERNAL-IP   PORT<span class=o>(</span>S<span class=o>)</span>             AGE
+</span></span><span class=line><span class=cl>service/iris-model-default              ClusterIP   10.98.254.42     &lt;none&gt;        8000/TCP,5001/TCP   71s
+</span></span><span class=line><span class=cl>service/iris-model-default-classifier   ClusterIP   10.101.118.187   &lt;none&gt;        9000/TCP,9500/TCP   5m47s
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>NAME                                              READY   UP-TO-DATE   AVAILABLE   AGE
+</span></span><span class=line><span class=cl>deployment.apps/iris-model-default-0-classifier   1/1     <span class=m>1</span>            <span class=m>1</span>           5m47s
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>NAME                                                         DESIRED   CURRENT   READY   AGE
+</span></span><span class=line><span class=cl>replicaset.apps/iris-model-default-0-classifier-546fb8bfff   <span class=m>1</span>         <span class=m>1</span>         <span class=m>1</span>       5m47s
+</span></span></code></pre></td></tr></table></div></div></li><li><p>minikube tunnel</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>minikube tunnel
+</span></span></code></pre></td></tr></table></div></div><p>다음과 같은 출력을 얻습니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>Status</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>machine</span><span class=p>:</span> <span class=n>minikube</span>
+</span></span><span class=line><span class=cl>        <span class=n>pid</span><span class=p>:</span> <span class=mi>117019</span>
+</span></span><span class=line><span class=cl>        <span class=n>route</span><span class=p>:</span> <span class=mf>10.96</span><span class=o>.</span><span class=mf>0.0</span><span class=o>/</span><span class=mi>12</span> <span class=o>-&gt;</span> <span class=mf>192.168</span><span class=o>.</span><span class=mf>49.2</span>
+</span></span><span class=line><span class=cl>        <span class=n>minikube</span><span class=p>:</span> <span class=n>Running</span>
+</span></span><span class=line><span class=cl>        <span class=n>services</span><span class=p>:</span> <span class=p>[</span><span class=n>istio</span><span class=o>-</span><span class=n>ingressgateway</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=n>errors</span><span class=p>:</span> 
+</span></span><span class=line><span class=cl>        <span class=n>minikube</span><span class=p>:</span> <span class=n>no</span> <span class=n>errors</span>
+</span></span><span class=line><span class=cl>        <span class=n>router</span><span class=p>:</span> <span class=n>no</span> <span class=n>errors</span>
+</span></span><span class=line><span class=cl>        <span class=n>loadbalancer</span> <span class=n>emulator</span><span class=p>:</span> <span class=n>no</span> <span class=n>errors</span>
+</span></span></code></pre></td></tr></table></div></div></li><li><p>ambassador external ip 확인하기</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>k get svc -n ambassador
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>NAME               TYPE           CLUSTER-IP       EXTERNAL-IP      PORT(S)                      AGE
+</span></span><span class=line><span class=cl>ambassador         LoadBalancer   10.102.231.216   10.102.231.216   80:30904/TCP,443:32156/TCP   5m6s
+</span></span><span class=line><span class=cl>ambassador-admin   ClusterIP      10.99.228.85     &lt;none&gt;           8877/TCP,8005/TCP            5m6s
+</span></span></code></pre></td></tr></table></div></div><p>→ 이 경우 10.102.231.216</p></li><li><p>predict 요청하기</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>curl -X POST &lt;http://10.102.231.216/seldon/seldon/iris-model/api/v1.0/predictions&gt; <span class=se>\\</span>
+</span></span><span class=line><span class=cl>    -H <span class=s1>&#39;Content-Type: application/json&#39;</span> <span class=se>\\</span>
+</span></span><span class=line><span class=cl>    -d <span class=s1>&#39;{ &#34;data&#34;: { &#34;ndarray&#34;: [[1,2,3,4]] } }&#39;</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>predict 요청을 하는 format은 다음과 같습니다.<ul><li><code>http://&lt;AMBASSADOR_URL>/seldon/&lt;NAMESPACE>/&lt;MODEL-NAME>/api/v1.0/doc/</code></li></ul></li></ul></li></ol><ul><li>다음과 같은 결과를 얻을 수 있습니다.<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=o>{</span><span class=s2>&#34;data&#34;</span>:<span class=o>{</span><span class=s2>&#34;names&#34;</span>:<span class=o>[</span><span class=s2>&#34;t:0&#34;</span>,<span class=s2>&#34;t:1&#34;</span>,<span class=s2>&#34;t:2&#34;</span><span class=o>]</span>,<span class=s2>&#34;ndarray&#34;</span>:<span class=o>[[</span>0.0006985194531162841,0.003668039039435755,0.9956334415074478<span class=o>]]}</span>,<span class=s2>&#34;meta&#34;</span>:<span class=o>{</span><span class=s2>&#34;requestPath&#34;</span>:<span class=o>{</span><span class=s2>&#34;classifier&#34;</span>:<span class=s2>&#34;seldonio/sklearnserver:1.7.0&#34;</span><span class=o>}}}</span>
+</span></span></code></pre></td></tr></table></div></div></li></ul><h1 id=seldon-analytics><a href=#seldon-analytics class=header-anchor></a>Seldon-analytics</h1><h2 id=1-install><a href=#1-install class=header-anchor></a>1. Install</h2><p>helm chart를 이용해 설치합니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>helm install seldon-core-analytics seldon-core-analytics <span class=se>\\</span>
+</span></span><span class=line><span class=cl>   --repo &lt;https://storage.googleapis.com/seldon-charts&gt; <span class=se>\\</span>
+</span></span><span class=line><span class=cl>   --namespace seldon-system
+</span></span></code></pre></td></tr></table></div></div><h2 id=2usage><a href=#2usage class=header-anchor></a>2.Usage</h2><p>설치된 seldon-core-analytics port-forward 합니다.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl port-forward svc/seldon-core-analytics-grafana 3000:80 -n seldon-system
+</span></span></code></pre></td></tr></table></div></div><p>http://localhost:3000 에 접속합니다.</p><ul><li>기본 ID/PW는 다음과 같습니다.<ul><li>ID: admin</li><li>PW: password</li></ul></li><li>dashboard에서 prediction analytics를 클릭합니다
+<img src=/imgs/seldon/from-scratch-install-istio-0.png loading=lazy alt=img-0></li><li>다음과 같은 dashboard를 볼 수 있습니다.
+<img src=/imgs/seldon/from-scratch-install-istio-1.png loading=lazy alt=img-1></li></ul></section><footer class=article-footer><section class=article-tags><a href=/blog/tags/k8s/>K8s</a>
+<a href=/blog/tags/seldon/>Seldon</a>
+<a href=/blog/tags/ambassador/>Ambassador</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section><section class=article-lastmod><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<span>Last updated on Oct 01, 2021</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/blog/p/%EB%B0%91%EB%B0%94%EB%8B%A5%EB%B6%80%ED%84%B0-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-seldon-core-custom-server/><div class=article-details><h2 class=article-title>밑바닥부터 시작하는 Seldon-Core - Custom Server</h2></div></a></article><article><a href=/blog/p/%EB%B0%91%EB%B0%94%EB%8B%A5%EB%B6%80%ED%84%B0-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-seldon-core-%EC%84%A4%EC%B9%98-istio-ver./><div class=article-details><h2 class=article-title>밑바닥부터 시작하는 Seldon-Core - 설치 [Istio Ver.]</h2></div></a></article><article><a href=/blog/p/kubeflow-%EC%84%A4%EC%B9%98-%EC%A4%91-auth-dex-%EC%9D%B4%EC%8A%88-%ED%95%B4%EA%B2%B0%ED%95%98%EA%B8%B0/><div class=article-details><h2 class=article-title>kubeflow 설치 중 auth dex 이슈 해결하기</h2></div></a></article><article><a href=/blog/p/kubeflow-installation/><div class=article-details><h2 class=article-title>Kubeflow Installation</h2></div></a></article><article><a href=/blog/p/pre-requisites-for-k3s-setup/><div class=article-details><h2 class=article-title>Pre-Requisites for k3s Setup</h2></div></a></article></div></div></aside><script src=https://utteranc.es/client.js repo=aiden-jeon/aiden-jeon.github.io issue-term=pathname label=comment crossorigin=anonymous async></script><style>.utterances{max-width:unset}</style><script>let utterancesLoaded=!1;function setUtterancesTheme(e){let t=document.querySelector(".utterances iframe");t&&t.contentWindow.postMessage({type:"set-theme",theme:`github-${e}`},"https://utteranc.es")}addEventListener("message",e=>{if(e.origin!=="https://utteranc.es")return;utterancesLoaded=!0,setUtterancesTheme(document.documentElement.dataset.scheme)}),window.addEventListener("onColorSchemeChange",e=>{if(!utterancesLoaded)return;setUtterancesTheme(e.detail)})</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2024 Aiden's Camp</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.27.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/blog/ts/main.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

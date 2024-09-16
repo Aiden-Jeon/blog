@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Mlflow on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/mlflow/</link><description>Recent content in Mlflow on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Sep 2022 13:45:00 +0900</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/mlflow/index.xml" rel="self" type="application/rss+xml"/><item><title>[ Chapter 2. Model Registry ] 4) Download Model from MLFlow</title><link>https://aiden-jeon.github.io/blog/p/chapter-2.-model-registry-4-download-model-from-mlflow/</link><pubDate>Tue, 20 Sep 2022 13:45:00 +0900</pubDate><guid>https://aiden-jeon.github.io/blog/p/chapter-2.-model-registry-4-download-model-from-mlflow/</guid><description>&lt;p>&lt;a class="link" href="https://github.com/Aiden-Jeon/mle-mlops/tree/main/02_model_registry" target="_blank" rel="noopener"
+>Github&lt;/a> 에서 해당 내용에 대해서 확인할 수 있습니다.&lt;/p>
+&lt;h2 id="overview">&lt;a href="#overview" class="header-anchor">&lt;/a>Overview
+&lt;/h2>&lt;h3 id="목표">&lt;a href="#%eb%aa%a9%ed%91%9c" class="header-anchor">&lt;/a>목표
+&lt;/h3>&lt;ul>
+&lt;li>mlflow에 저장된 모델을 다운로드 받을 수 있는 스크립트를 작성합니다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="요구사항">&lt;a href="#%ec%9a%94%ea%b5%ac%ec%82%ac%ed%95%ad" class="header-anchor">&lt;/a>요구사항
+&lt;/h3>&lt;ol>
+&lt;li>run id를 입력하면 mlflow에 저장된 모델을 다운로드 받을 수 있는 스크립트를 작성합니다.
+&lt;ul>
+&lt;li>python sdk: &lt;code>mlflow.MlflowClient&lt;/code>&lt;/li>
+&lt;li>bash: &lt;code>rclone&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>앞선 챕터에서 로깅된 run_id를 이용해 모델을 다운로드 합니다.&lt;/li>
+&lt;li>다운로드 받은 모델을 &lt;code>mlflow.pyfunc.load_model&lt;/code> 을 이용해 load 합니다.&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h2 id="download-model">&lt;a href="#download-model" class="header-anchor">&lt;/a>Download Model
+&lt;/h2>&lt;h3 id="run-list">&lt;a href="#run-list" class="header-anchor">&lt;/a>Run List
+&lt;/h3>&lt;p>mlfow에 저장되어 있는 run list를 확인합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">mlflow&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">client&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">mlflow&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">MlflowClient&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;http://localhost:5000&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">runs&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">client&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">list_run_infos&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">experiment_id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">run_ids&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run_id&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">run&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">runs&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>해당 스크립트를 실행하면 &lt;code>run_ids&lt;/code> 에 다음과 같이 저장되어 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">run_ids&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;1e3a1e8a345d4365a971dded8693938b&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>이 run_id는 mlflow web 에서 표시되는 것 과 동일한 것을 확인할 수 있습니다.
+&lt;img src="https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-4-download-model-from-mlflow/run_id.png"
+width="3232"
+height="1482"
+srcset="https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-4-download-model-from-mlflow/run_id_hu17091436629149967169.png 480w, https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-4-download-model-from-mlflow/run_id_hu1331324192862984011.png 1024w"
+loading="lazy"
+alt="run id"
+class="gallery-image"
+data-flex-grow="218"
+data-flex-basis="523px"
+>&lt;/p>
+&lt;h3 id="download-artifact">&lt;a href="#download-artifact" class="header-anchor">&lt;/a>Download Artifact
+&lt;/h3>&lt;p>다음으로 run_id 의 모델을 다운로드 받을 수 있는 코드를 작성합니다. 이 때 주의해야 할 점은 run_id의 정보로 얻을 수 있는 artifact_path는 전체 artifact 들의 root 주소입니다. 그래서 필요한 모델만을 받기 위해서 &lt;code>list_artifacts&lt;/code>로 전체 파일 및 폴더 목록을 확인하고 모델이 저장되어 있는 폴더만을 다운로드 받도록 합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">os&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">mlflow&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">makedirs&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;download&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">exist_ok&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">run_id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;1e3a1e8a345d4365a971dded8693938b&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">client&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">mlflow&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">MlflowClient&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;http://localhost:5000&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">artifact&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">client&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">list_artifacts&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">run_id&lt;/span>&lt;span class="p">)[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">path&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">client&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">download_artifacts&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">run_id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">run_id&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">artifact&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dst_path&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">download&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>위 코드를 실행시키면 아래와 같이 &lt;code>download&lt;/code> 폴더 밑에 &lt;code>iris_model&lt;/code> 이 있음을 확인할 수 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-zsh" data-lang="zsh">&lt;span class="line">&lt;span class="cl">.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── download
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   └── iris_model
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   ├── MLmodel
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   ├── conda.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   ├── model.pkl
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   ├── python_env.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   └── requirements.txt
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="load-model">&lt;a href="#load-model" class="header-anchor">&lt;/a>Load Model
+&lt;/h3>&lt;p>이제 다운로드 받은 모델을 load 하는 코드를 작성합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">mlflow&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">dst_path&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;download/iris_model&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">model&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">mlflow&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">pyfunc&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">load_model&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dst_path&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>load된 모델을 확인하면 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">model&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">mlflow&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">pyfunc&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">load_model&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;download/iris_model&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">mlflow&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">pyfunc&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">loaded_model&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">artifact_path&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">iris_model&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">flavor&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">mlflow&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sklearn&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">run_id&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">1e3&lt;/span>&lt;span class="n">a1e8a345d4365a971dded8693938b&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>load된 모델이 iris 데이터를 predict 할 수 있는지 확인합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sklearn.datasets&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">load_iris&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">df&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">_&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">load_iris&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">return_X_y&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">as_frame&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">rename_rule&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;sepal length (cm)&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;sepal_width&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;sepal width (cm)&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;sepal_length&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;petal length (cm)&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;petal_width&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;petal width (cm)&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;petal_length&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">df&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">df&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">rename&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">columns&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">rename_rule&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sample&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">df&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sample&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">pred&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">predict&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sample&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>데이터와 예측값을 확인하면 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">sample&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sepal_width&lt;/span> &lt;span class="n">sepal_length&lt;/span> &lt;span class="n">petal_width&lt;/span> &lt;span class="n">petal_length&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">2&lt;/span> &lt;span class="mf">4.7&lt;/span> &lt;span class="mf">3.2&lt;/span> &lt;span class="mf">1.3&lt;/span> &lt;span class="mf">0.2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&amp;gt;&amp;gt;&lt;/span> &lt;span class="n">pred&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>이렇게 load된 모델이 정상적으로 predict 할 수 있음을 확인했습니다.&lt;/p></description></item><item><title>[ Chapter 2. Model Registry ] 3) Train Model and Save to MLFlow</title><link>https://aiden-jeon.github.io/blog/p/chapter-2.-model-registry-3-train-model-and-save-to-mlflow/</link><pubDate>Tue, 20 Sep 2022 13:30:00 +0900</pubDate><guid>https://aiden-jeon.github.io/blog/p/chapter-2.-model-registry-3-train-model-and-save-to-mlflow/</guid><description>&lt;img src="https://aiden-jeon.github.io/blog/p/chapter-2.-model-registry-3-train-model-and-save-to-mlflow/run.png" alt="Featured image of post [ Chapter 2. Model Registry ] 3) Train Model and Save to MLFlow" />&lt;p>&lt;a class="link" href="https://github.com/Aiden-Jeon/mle-mlops/tree/main/02_model_registry" target="_blank" rel="noopener"
+>Github&lt;/a> 에서 해당 내용에 대해서 확인할 수 있습니다.&lt;/p>
+&lt;h2 id="overview">&lt;a href="#overview" class="header-anchor">&lt;/a>Overview
+&lt;/h2>&lt;h3 id="목표">&lt;a href="#%eb%aa%a9%ed%91%9c" class="header-anchor">&lt;/a>목표
+&lt;/h3>&lt;ul>
+&lt;li>모델을 학습하고 mlflow server에 저장합니다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="요구사항">&lt;a href="#%ec%9a%94%ea%b5%ac%ec%82%ac%ed%95%ad" class="header-anchor">&lt;/a>요구사항
+&lt;/h3>&lt;ol>
+&lt;li>
+&lt;p>앞선 챕터에서 추출한 데이터를 이용해 모델을 학습합니다.&lt;/p>
+&lt;ul>
+&lt;li>eg) &lt;code>from sklearn.svm import SVC&lt;/code>&lt;/li>
+&lt;li>모델을 학습하는 스크립트의 위치는 mlflow server 가 띄어진 위치와 같아야 합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── mlruns
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   └── 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   └── meta.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└── train.py
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>학습이 끝난 모델을 built-in method를 사용해 mlflow server에 저장합니다.&lt;/p>
+&lt;ul>
+&lt;li>Python의 &lt;code>mlflow&lt;/code> 패키지를 이용합니다.
+&lt;ul>
+&lt;li>&lt;code>pip install mlflow&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>mlflow를 이용해 logging 하는 방법은 두 가지가 있습니다.
+&lt;ol>
+&lt;li>fluent&lt;/li>
+&lt;li>client [&lt;a class="link" href="https://www.mlflow.org/docs/latest/python_api/mlflow.client.html" target="_blank" rel="noopener"
+>MLFlow Client&lt;/a>]&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>mlflow에는 모델을 저장하는 방법은 두 가지가 있습니다.
+&lt;ul>
+&lt;li>artifact 처럼 다루기 [&lt;a class="link" href="https://mlflow.org/docs/latest/python_api/mlflow.html#mlflow.log_artifact" target="_blank" rel="noopener"
+>MLFLow log_artifact&lt;/a>]&lt;/li>
+&lt;li>built-in method 사용하기
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.mlflow.org/docs/latest/models.html#built-in-model-flavors" target="_blank" rel="noopener"
+>MLFlow built-in Model Flavors&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model" target="_blank" rel="noopener"
+>MLFLow pyfunc log_model&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>저장된 모델을 mlflow website에서 확인합니다.&lt;/p>
+&lt;ul>
+&lt;li>모델이 어떻게 저장되어 있는지 확인합니다. [&lt;a class="link" href="https://www.mlflow.org/docs/latest/models.html#storage-format" target="_blank" rel="noopener"
+>MLFlow Storage Format&lt;/a>]&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h2 id="train">&lt;a href="#train" class="header-anchor">&lt;/a>Train
+&lt;/h2>&lt;p>모델을 학습하는 스크립트를 작성합니다. 이 때 데이터는 이 전 챕터에서 사용한 데이터를 이용합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sklearn.svm&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">SVC&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">X&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">df&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">drop&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s2">&amp;#34;id&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;target&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">axis&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;columns&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">y&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">df&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;target&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">classifier&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">SVC&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">classifier&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">X&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">y&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="save-model">&lt;a href="#save-model" class="header-anchor">&lt;/a>Save Model
+&lt;/h2>&lt;p>mlflow를 사용할 수 있는 방법중 fluent 와 built-in method를 사용해 모델을 저장하겠습니다.&lt;/p>
+&lt;h3 id="set-tracking-uri">&lt;a href="#set-tracking-uri" class="header-anchor">&lt;/a>Set Tracking URI
+&lt;/h3>&lt;p>우선 앞선 챕터에서 띄운 mlflow server에 로깅할 수 있도록 &lt;code>set_tracking_uri&lt;/code>를 이용해 mlflow 의 주소를 지정합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">mlflow&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">mlflow&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">set_tracking_uri&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;http://localhost:5000&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="log-model">&lt;a href="#log-model" class="header-anchor">&lt;/a>Log Model
+&lt;/h3>&lt;p>다음으로 built-in method 중 학습한 모델이 scikit-learn 모델이기 때문에 &lt;code>mlflow.sklearn&lt;/code> 를 이용해 모델을 저장합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">mlflow&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sklearn&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">log_model&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">model&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;iris_model&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>위 명령어를 실행하면 다음과 같이 mlruns에 run_id 폴더가 생성되고 밑에 필요한 정보들이 추가됩니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-zsh" data-lang="zsh">&lt;span class="line">&lt;span class="cl">.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── mlruns
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   └── &lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   ├── 8893c67cc1a44a29bc38bdde4559508c
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   ├── artifacts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   │   └── iris_model
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   │   ├── MLmodel
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   │   ├── conda.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   │   ├── model.pkl
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   │   ├── python_env.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   │   └── requirements.txt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   ├── meta.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   ├── metrics
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   ├── params
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   └── tags
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   ├── mlflow.log-model.history
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   ├── mlflow.source.git.commit
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   ├── mlflow.source.name
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   ├── mlflow.source.type
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   │   └── mlflow.user
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   └── meta.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└── train.py
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="web">&lt;a href="#web" class="header-anchor">&lt;/a>Web
+&lt;/h2>&lt;p>&lt;a class="link" href="http://localhost:5000" target="_blank" rel="noopener"
+>http://localhost:5000&lt;/a> 에 접속하면 다음과 같이 나옵니다.
+&lt;img src="https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-3-train-model-and-save-to-mlflow/mlflow-ui-log.png"
+width="3232"
+height="2084"
+srcset="https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-3-train-model-and-save-to-mlflow/mlflow-ui-log_hu1299556402982155703.png 480w, https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-3-train-model-and-save-to-mlflow/mlflow-ui-log_hu2616474449796902896.png 1024w"
+loading="lazy"
+alt="mlflow ui"
+class="gallery-image"
+data-flex-grow="155"
+data-flex-basis="372px"
+>&lt;/p>
+&lt;p>생성된 run을 클릭합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-3-train-model-and-save-to-mlflow/run.png"
+width="3232"
+height="2866"
+srcset="https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-3-train-model-and-save-to-mlflow/run_hu10378475997330783816.png 480w, https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-3-train-model-and-save-to-mlflow/run_hu9596182981015561132.png 1024w"
+loading="lazy"
+alt="run"
+class="gallery-image"
+data-flex-grow="112"
+data-flex-basis="270px"
+>&lt;/p>
+&lt;p>위와 같이 artifacts에 &lt;code>iris_model&lt;/code> 폴더 밑에 모델과 메타 정보들이 저장된 것을 확인할 수 있습니다.&lt;/p></description></item><item><title>[ Chapter 2. Model Registry ] 1) Run Mlflow Server</title><link>https://aiden-jeon.github.io/blog/p/chapter-2.-model-registry-1-run-mlflow-server/</link><pubDate>Mon, 19 Sep 2022 17:50:00 +0900</pubDate><guid>https://aiden-jeon.github.io/blog/p/chapter-2.-model-registry-1-run-mlflow-server/</guid><description>&lt;img src="https://aiden-jeon.github.io/blog/p/chapter-2.-model-registry-1-run-mlflow-server/mlflow-ui.png" alt="Featured image of post [ Chapter 2. Model Registry ] 1) Run Mlflow Server" />&lt;p>&lt;a class="link" href="https://github.com/Aiden-Jeon/mle-mlops/tree/main/02_model_registry" target="_blank" rel="noopener"
+>Github&lt;/a> 에서 해당 내용에 대해서 확인할 수 있습니다.&lt;/p>
+&lt;h2 id="overview">&lt;a href="#overview" class="header-anchor">&lt;/a>Overview
+&lt;/h2>&lt;h3 id="목표">&lt;a href="#%eb%aa%a9%ed%91%9c" class="header-anchor">&lt;/a>목표
+&lt;/h3>&lt;ul>
+&lt;li>로컬에서 MLFLow Server를 띄어봅시다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="요구사항">&lt;a href="#%ec%9a%94%ea%b5%ac%ec%82%ac%ed%95%ad" class="header-anchor">&lt;/a>요구사항
+&lt;/h3>&lt;ol>
+&lt;li>로컬에 mlflow server를 띄웁니다.
+&lt;ul>
+&lt;li>&lt;code>mlflow server&lt;/code> 를 사용해 서버를 띄웁니다.&lt;/li>
+&lt;li>mlflow server는 &amp;ldquo;3.모델 학습 및 저장&amp;rdquo; 와 작성할 스크립트와 같은 디렉토리에서 실행되어야 합니다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>mlflow ui website를 확인합니다.&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h2 id="script">&lt;a href="#script" class="header-anchor">&lt;/a>Script
+&lt;/h2>&lt;h3 id="install">&lt;a href="#install" class="header-anchor">&lt;/a>Install
+&lt;/h3>&lt;p>mlflow 를 설치합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pip install mlflow
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="run">&lt;a href="#run" class="header-anchor">&lt;/a>Run
+&lt;/h3>&lt;p>다음 명령어로 mlflow를 실행합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mlflow server
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>실행되면 다음과 같이 출력됩니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-zsh" data-lang="zsh">&lt;span class="line">&lt;span class="cl">&amp;gt; mlflow server
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>2022-09-20 11:55:20 +0900&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>23908&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>INFO&lt;span class="o">]&lt;/span> Starting gunicorn 20.1.0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>2022-09-20 11:55:20 +0900&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>23908&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>INFO&lt;span class="o">]&lt;/span> Listening at: http://127.0.0.1:5000 &lt;span class="o">(&lt;/span>23908&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>2022-09-20 11:55:20 +0900&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>23908&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>INFO&lt;span class="o">]&lt;/span> Using worker: sync
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>2022-09-20 11:55:20 +0900&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>23909&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>INFO&lt;span class="o">]&lt;/span> Booting worker with pid: &lt;span class="m">23909&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>2022-09-20 11:55:21 +0900&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>23910&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>INFO&lt;span class="o">]&lt;/span> Booting worker with pid: &lt;span class="m">23910&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>2022-09-20 11:55:21 +0900&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>23911&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>INFO&lt;span class="o">]&lt;/span> Booting worker with pid: &lt;span class="m">23911&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>2022-09-20 11:55:21 +0900&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>23912&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>INFO&lt;span class="o">]&lt;/span> Booting worker with pid: &lt;span class="m">23912&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>실행된 후에는 디렉토리에 &lt;code>mlruns&lt;/code> 폴더가 생성됩니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-zsh" data-lang="zsh">&lt;span class="line">&lt;span class="cl">.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└── mlruns
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> └── &lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> └── meta.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="web">&lt;a href="#web" class="header-anchor">&lt;/a>Web
+&lt;/h2>&lt;p>&lt;a class="link" href="http://localhost:5000" target="_blank" rel="noopener"
+>http://localhost:5000&lt;/a> 에 접속합니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-1-run-mlflow-server/mlflow-ui.png"
+width="3232"
+height="2084"
+srcset="https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-1-run-mlflow-server/mlflow-ui_hu13606821848652196628.png 480w, https://aiden-jeon.github.io/blog/blog/p/chapter-2.-model-registry-1-run-mlflow-server/mlflow-ui_hu11550857252817074921.png 1024w"
+loading="lazy"
+alt="mlflow ui"
+class="gallery-image"
+data-flex-grow="155"
+data-flex-basis="372px"
+>&lt;/p></description></item></channel></rss>

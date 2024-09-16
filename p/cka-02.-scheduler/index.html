@@ -1,0 +1,412 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="CKA를 준비하면서 공부한 요약 내용입니다.\n강의 What is CKA? Node name default: kubectl-scheduler 위 작업이 기본적으로 pod을 node에 할당해 줌 상태 확인 kubectl get node\nnode = no\n1 2 3 4 > k get no NAME STATUS ROLES AGE VERSION controlplane Ready control-plane,master 11m v1.20.0 node01 Ready <none> 9m48s v1.20.0 수동 배정 To schedule node manually NodeName 1 2 3 4 5 6 7 8 9 10 --- apiVersion: v1 kind: Pod metadata: name: nginx spec: containers: - image: nginx name: nginx nodeName: node01 Label & Selectors Label definition\n"><title>(CKA) 02. Scheduler</title>
+<link rel=canonical href=https://aiden-jeon.github.io/blog/p/cka-02.-scheduler/><link rel=stylesheet href=/blog/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="(CKA) 02. Scheduler"><meta property='og:description' content="CKA를 준비하면서 공부한 요약 내용입니다.\n강의 What is CKA? Node name default: kubectl-scheduler 위 작업이 기본적으로 pod을 node에 할당해 줌 상태 확인 kubectl get node\nnode = no\n1 2 3 4 > k get no NAME STATUS ROLES AGE VERSION controlplane Ready control-plane,master 11m v1.20.0 node01 Ready <none> 9m48s v1.20.0 수동 배정 To schedule node manually NodeName 1 2 3 4 5 6 7 8 9 10 --- apiVersion: v1 kind: Pod metadata: name: nginx spec: containers: - image: nginx name: nginx nodeName: node01 Label & Selectors Label definition\n"><meta property='og:url' content='https://aiden-jeon.github.io/blog/p/cka-02.-scheduler/'><meta property='og:site_name' content="Aiden's Camp"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='k8s'><meta property='article:tag' content='cka'><meta property='article:published_time' content='2021-05-16T00:00:00+00:00'><meta property='article:modified_time' content='2021-05-16T00:00:00+00:00'><meta name=twitter:title content="(CKA) 02. Scheduler"><meta name=twitter:description content="CKA를 준비하면서 공부한 요약 내용입니다.\n강의 What is CKA? Node name default: kubectl-scheduler 위 작업이 기본적으로 pod을 node에 할당해 줌 상태 확인 kubectl get node\nnode = no\n1 2 3 4 > k get no NAME STATUS ROLES AGE VERSION controlplane Ready control-plane,master 11m v1.20.0 node01 Ready <none> 9m48s v1.20.0 수동 배정 To schedule node manually NodeName 1 2 3 4 5 6 7 8 9 10 --- apiVersion: v1 kind: Pod metadata: name: nginx spec: containers: - image: nginx name: nginx nodeName: node01 Label & Selectors Label definition\n"><link rel="shortcut icon" href=/blog/icons/favicon.ico><script async src="https://www.googletagmanager.com/gtag/js?id=G-419F58RW9W"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-419F58RW9W")}</script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/blog/><img src=/blog/imgs/avatar_hu6933059792947527008.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🔥</span></figure><div class=site-meta><h1 class=site-name><a href=/blog>Aiden's Camp</a></h1><h2 class=site-description>Welcome to Aiden's Camp</h2></div></header><ol class=menu-social><li><a href=https://github.com/Aiden-Jeon target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://www.linkedin.com/in/jongseob-jeon/ target=_blank title=Linkedin rel=me><svg fill="#000" height="800" width="800" id="Layer_1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 310 310"><g id="XMLID_801_"><path id="XMLID_802_" d="M72.16 99.73H9.927c-2.762.0-5 2.239-5 5v199.928c0 2.762 2.238 5 5 5H72.16c2.762.0 5-2.238 5-5V104.73c0-2.76100000000001-2.238-5-5-5z"/><path id="XMLID_803_" d="M41.066.341C18.422.341.0 18.743.0 41.362.0 63.991 18.422 82.4 41.066 82.4c22.626.0 41.033-18.41 41.033-41.038C82.1 18.743 63.692.341 41.066.341z"/><path id="XMLID_804_" d="M230.454 94.761c-24.995.0-43.472 10.745-54.679 22.954V104.73c0-2.761-2.238-5-5-5h-59.599c-2.762.0-5 2.239-5 5v199.928c0 2.762 2.238 5 5 5h62.097c2.762.0 5-2.238 5-5V205.74c0-33.333 9.054-46.319 32.29-46.319 25.306.0 27.317 20.818 27.317 48.034v97.204c0 2.762 2.238 5 5 5H305c2.762.0 5-2.238 5-5V194.995C310 145.43 300.549 94.761 230.454 94.761z"/></g></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/blog/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/blog/categories><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg>
+<span>Categories</span></a></li><li><a href=/blog/tags><svg class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11 3l9 9a1.5 1.5.0 010 2l-6 6a1.5 1.5.0 01-2 0L3 11V7a4 4 0 014-4h4"/><circle cx="9" cy="9" r="2"/></svg>
+<span>Tags</span></a></li><li><a href=/blog/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/blog/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/blog/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ul><li><a href=#node-name>Node name</a><ul><li><a href=#상태-확인>상태 확인</a></li><li><a href=#수동-배정>수동 배정</a></li></ul></li><li><a href=#label--selectors>Label & Selectors</a><ul><li><a href=#label>Label</a></li><li><a href=#select>Select</a></li><li><a href=#replicaset>Replicaset</a></li><li><a href=#annotations>Annotations</a></li></ul></li><li><a href=#taints-tolerations>Taints, Tolerations</a><ul><li><a href=#taints>Taints</a><ul><li><a href=#설정>설정</a></li><li><a href=#확인>확인</a></li><li><a href=#제거>제거</a></li></ul></li><li><a href=#tolerations>Tolerations</a><ul><li><a href=#설정-1>설정</a></li></ul></li></ul></li><li><a href=#pods-to-node>PODs to Node</a><ul><li><a href=#node-selector>Node Selector</a></li><li><a href=#node-affinity>Node Affinity</a><ul><li><a href=#설정-2>설정</a></li><li><a href=#node-affinity-types>Node Affinity Types</a></li></ul></li></ul></li><li><a href=#resource-limits>Resource Limits</a><ul><li><a href=#resource-requests>Resource Requests</a><ul><li><a href=#설정-3>설정</a></li></ul></li><li><a href=#resources-limits>Resources Limits</a><ul><li><a href=#설정-4>설정</a></li></ul></li></ul></li><li><a href=#daemon-sets>Daemon Sets</a><ul><li><a href=#use-case>use case</a></li><li><a href=#생성>생성</a></li><li><a href=#상태>상태</a></li></ul></li><li><a href=#static-pods>Static PODs</a><ul><li><a href=#static-pods-vs-daemonsets>Static PODs vs DaemonSets</a></li><li><a href=#config>Config</a><ul><li><a href=#파일-위치>파일 위치</a></li></ul></li><li><a href=#상태-1>상태</a></li><li><a href=#삭제>삭제</a></li></ul></li><li><a href=#multiple-schedulers>Multiple Schedulers</a><ul><li><a href=#생성-1>생성</a></li><li><a href=#사용>사용</a></li><li><a href=#상태-2>상태</a></li></ul></li></ul></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/blog/categories/kubernetes/>Kubernetes</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/blog/p/cka-02.-scheduler/>(CKA) 02. Scheduler</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>May 16, 2021</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>6 minute read</time></div></footer></div></header><section class=article-content><p>CKA를 준비하면서 공부한 요약 내용입니다.</p><ul><li><a class=link href=https://www.udemy.com/course/certified-kubernetes-administrator-with-practice-tests/ target=_blank rel=noopener>강의</a></li><li><a class=link href=https://www.cncf.io/certification/cka/ target=_blank rel=noopener>What is CKA?</a></li></ul><h2 id=node-name><a href=#node-name class=header-anchor></a>Node name</h2><ul><li>default: <code>kubectl-scheduler</code></li><li>위 작업이 기본적으로 pod을 node에 할당해 줌</li></ul><h3 id=상태-확인><a href=#%ec%83%81%ed%83%9c-%ed%99%95%ec%9d%b8 class=header-anchor></a>상태 확인</h3><ul><li><p><code>kubectl get node</code></p></li><li><p><code>node</code> = <code>no</code></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=l>&gt; k get no</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>NAME           STATUS   ROLES                  AGE     VERSION</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>controlplane   Ready    control-plane,master   11m     v1.20.0</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>node01         Ready    &lt;none&gt;                 9m48s   v1.20.0</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h3 id=수동-배정><a href=#%ec%88%98%eb%8f%99-%eb%b0%b0%ec%a0%95 class=header-anchor></a>수동 배정</h3><ul><li>To schedule node manually</li><li><code>NodeName</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nn>---</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>nginx</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=w> </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>nginx</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>     </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>nginx</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>nodeName</span><span class=p>:</span><span class=w> </span><span class=l>node01</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h2 id=label--selectors><a href=#label--selectors class=header-anchor></a>Label & Selectors</h2><h3 id=label><a href=#label class=header-anchor></a>Label</h3><ul><li><p>definition</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>~~</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>~~</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>~~</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>App1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>function</span><span class=p>:</span><span class=w> </span><span class=l>Front-end</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>sepc</span><span class=p>:</span><span class=w> </span><span class=l>~~</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p>→ on <code>metadata: labels</code></p></li><li><p>imperative</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=l>kubectl label node node01 key=value</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h3 id=select><a href=#select class=header-anchor></a>Select</h3><ul><li><code>kubectl get pods --selector app=App1</code></li><li>several selector field<ul><li><code>kubectl get pods --selector app=App1,env=dev</code></li></ul></li></ul><h3 id=replicaset><a href=#replicaset class=header-anchor></a>Replicaset</h3><ul><li><code>replica-definition.yaml</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>apps/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Replcaset</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>simple-webapp</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>App1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>function</span><span class=p>:</span><span class=w> </span><span class=l>Front-end</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>replicas</span><span class=p>:</span><span class=w> </span><span class=m>3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>App1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>template</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>App1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>function</span><span class=p>:</span><span class=w> </span><span class=l>Front-end</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>simple-webapp</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>simple-webapp</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li><li>labels at the top are the labels of the replicaset itself.<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>apps/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Replcaset</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>simple-webapp</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>App1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>function</span><span class=p>:</span><span class=w> </span><span class=l>Front-end</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li><li>in order to connect the replicaset to the pod, configure the selector field<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=w>    </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>App1</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h3 id=annotations><a href=#annotations class=header-anchor></a>Annotations</h3><ul><li>used to record other detail for informatively purpose</li><li>eg) tool details</li></ul><h2 id=taints-tolerations><a href=#taints-tolerations class=header-anchor></a>Taints, Tolerations</h2><ul><li>taints<ul><li>set on the nodes</li></ul></li><li>toleartions<ul><li>set on the pods</li></ul></li><li>taints and toleration does not tell the pod to go to a particular node</li><li>node to only accept pod with certain tolerations</li></ul><h3 id=taints><a href=#taints class=header-anchor></a>Taints</h3><h4 id=설정><a href=#%ec%84%a4%ec%a0%95 class=header-anchor></a>설정</h4><ul><li><code>kubectl taint nodes node-name key=value:taint-effect</code></li><li><code>taint-effect</code> :<ul><li><code>NoSchedule</code><ul><li>not to be scheduled, if they do not tolerate the taint</li></ul></li><li><code>PreferNoSchedule</code><ul><li>system will be try to avoid placing a pod on the node, not guaranteed</li></ul></li><li><code>NoExecute</code><ul><li>new pods will not be scheduled on the node</li><li>existing pods on the node will be evicted if the do not tolertae the taint</li></ul></li></ul></li></ul><h4 id=확인><a href=#%ed%99%95%ec%9d%b8 class=header-anchor></a>확인</h4><ul><li>describe & grep<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=l>k describe node node01 |grep -i taints</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Taints</span><span class=p>:</span><span class=w>             </span><span class=l>&lt;none&gt;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h4 id=제거><a href=#%ec%a0%9c%ea%b1%b0 class=header-anchor></a>제거</h4><ul><li><code>kubectl taint nodes node-name key=value:taint-effect-</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl taint nodes master/controlplane node-role.kubernetes.io/master:NoSchedule-
+</span></span></code></pre></td></tr></table></div></div></li></ul><h3 id=tolerations><a href=#tolerations class=header-anchor></a>Tolerations</h3><h4 id=설정-1><a href=#%ec%84%a4%ec%a0%95-1 class=header-anchor></a>설정</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>myapp-pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>nginx-container</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>nginx</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>tolerations</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>key</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;app&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>operator</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Equal&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>value</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;blue&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>effect</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;NoSchedule&#34;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=pods-to-node><a href=#pods-to-node class=header-anchor></a>PODs to Node</h2><ol><li>Node Selector</li><li>Node Affinity</li></ol><h3 id=node-selector><a href=#node-selector class=header-anchor></a>Node Selector</h3><ul><li><p>Label nodes</p></li><li><p>use <code>nodeSelector</code> with label</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>image</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>nodeSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>size</span><span class=p>:</span><span class=w> </span><span class=l>Large</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li><li><p>limitations</p><ul><li>only use single label</li><li>there should be complex constraints</li></ul></li></ul><h3 id=node-affinity><a href=#node-affinity class=header-anchor></a>Node Affinity</h3><ul><li><code>nodeSelector</code> vs <code>affinity</code><ul><li>two are working equally, schedule pods to <code>Large</code> node.
+<img src=/imgs/cka/scheduler-0.png loading=lazy alt=img-0></li></ul></li></ul><h4 id=설정-2><a href=#%ec%84%a4%ec%a0%95-2 class=header-anchor></a>설정</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>image</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>affinity</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>nodeAffinity</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>requireDuringSchedulingIgnoredDuringExecution</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>nodeSelectorTerms</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span>- <span class=nt>matchExpressions</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span>- <span class=nt>key</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>operator</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>values</span><span class=p>:</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li><code>operator</code><ul><li><code>In</code><ul><li>guarantee to schedule in values</li></ul></li><li><code>NotIn</code><ul><li>guarantee not to schedule in values</li></ul></li><li><code>Exists</code><ul><li>given key exists or not</li></ul></li></ul></li></ul><h4 id=node-affinity-types><a href=#node-affinity-types class=header-anchor></a>Node Affinity Types</h4><ul><li>available<ul><li><code>requireDuringSchedulingIgnoredDuringExecution</code></li><li><code>preferredDuringSchedulingIgnoredDuringExecution</code></li></ul></li><li>planned<ul><li><code>requireDuringSchedulingRequiredDuringExecution</code></li></ul></li><li>two states in the life cycle of pod<ul><li><code>DuringScheduling</code><ul><li><code>Required</code><ul><li>must be</li></ul></li><li><code>Preferred</code><ul><li>best to</li></ul></li></ul></li><li><code>DuringExecution</code><ul><li><code>Ignored</code><ul><li>if they are scheduled, will not impact them.</li></ul></li><li><code>Required</code><ul><li>pod will be evicted</li></ul></li></ul></li></ul></li></ul><h2 id=resource-limits><a href=#resource-limits class=header-anchor></a>Resource Limits</h2><h3 id=resource-requests><a href=#resource-requests class=header-anchor></a>Resource Requests</h3><h4 id=설정-3><a href=#%ec%84%a4%ec%a0%95-3 class=header-anchor></a>설정</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>image</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>memory</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;1Gi&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>cpu</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li>cpu:<ul><li>0.1 == 100mi</li><li>lower: 1mi</li></ul></li><li>memory
+<img src=/imgs/cka/scheduler-.1png loading=lazy alt=img-1></li></ul><h3 id=resources-limits><a href=#resources-limits class=header-anchor></a>Resources Limits</h3><h4 id=설정-4><a href=#%ec%84%a4%ec%a0%95-4 class=header-anchor></a>설정</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>image</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>requests</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>memory</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;1Gi&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>cpu</span><span class=p>:</span><span class=w> </span><span class=m>1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>limits</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>memory</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;2Gi&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>cpu</span><span class=p>:</span><span class=w> </span><span class=m>2</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li>default<ul><li>1v CPU</li><li>512Mi</li></ul></li></ul><h2 id=daemon-sets><a href=#daemon-sets class=header-anchor></a>Daemon Sets</h2><p><img src=/imgs/cka/scheduler-2.png loading=lazy alt=img-2></p><ul><li>one copy of the pod is always present in all nodes in the cluster</li></ul><h3 id=use-case><a href=#use-case class=header-anchor></a>use case</h3><ul><li>monitoring
+<img src=/imgs/cka/scheduler-3.png loading=lazy alt=img-3></li><li>kube-proxy
+<img src=/imgs/cka/scheduler-4.png loading=lazy alt=img-4></li><li>networking
+<img src=/imgs/cka/scheduler-5.png loading=lazy alt=img-5></li></ul><h3 id=생성><a href=#%ec%83%9d%ec%84%b1 class=header-anchor></a>생성</h3><ul><li><p><code>DaemonSet</code> vs <code>ReplicaSet</code>
+<img src=/imgs/cka/scheduler-6.png loading=lazy alt=img-6></p></li><li><p>definition</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>apps/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>DaemonSet</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>monitoring-daemon</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>selector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>monitoring-daemon</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>template</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>labels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>monitoring-daemon</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span><span class=nt>contaiers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>            </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>monitoring-agent</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>                </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>monitoring-agent</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h3 id=상태><a href=#%ec%83%81%ed%83%9c class=header-anchor></a>상태</h3><ul><li><code>kubectl get daemonsets</code></li></ul><h2 id=static-pods><a href=#static-pods class=header-anchor></a>Static PODs</h2><h3 id=static-pods-vs-daemonsets><a href=#static-pods-vs-daemonsets class=header-anchor></a>Static PODs vs DaemonSets</h3><p><img src=/imgs/cka/scheduler-7.png loading=lazy alt=img-7></p><ul><li>static pod<ul><li>created directly by kubelet</li></ul></li></ul><h3 id=config><a href=#config class=header-anchor></a>Config</h3><ol><li><code>--pod-manifeset-path=/etc/Kubernetes/manifest</code></li><li><code>--config=kubeconfig.yaml</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># kubeconfig.yaml</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>staticPodPath</span><span class=p>:</span><span class=w> </span><span class=l>/etc/Kubernetes/manifest</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ol><h4 id=파일-위치><a href=#%ed%8c%8c%ec%9d%bc-%ec%9c%84%ec%b9%98 class=header-anchor></a>파일 위치</h4><p>First idenity the kubelet config file:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>root</span><span class=err>@</span><span class=n>controlplane</span><span class=p>:</span><span class=o>~</span><span class=c1># ps -aux | grep /usr/bin/kubelet</span>
+</span></span><span class=line><span class=cl><span class=n>root</span>      <span class=mi>3668</span>  <span class=mf>0.0</span>  <span class=mf>1.5</span> <span class=mi>1933476</span> <span class=mi>63076</span> <span class=err>?</span>       <span class=n>Ssl</span>  <span class=n>Mar13</span>  <span class=mi>16</span><span class=p>:</span><span class=mi>18</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>kubelet</span> <span class=o>--</span><span class=n>bootstrap</span><span class=o>-</span><span class=n>kubeconfig</span><span class=o>=/</span><span class=n>etc</span><span class=o>/</span><span class=n>kubernetes</span><span class=o>/</span><span class=n>bootstrap</span><span class=o>-</span><span class=n>kubelet</span><span class=o>.</span><span class=n>conf</span> <span class=o>--</span><span class=n>kubeconfig</span><span class=o>=/</span><span class=n>etc</span><span class=o>/</span><span class=n>kubernetes</span><span class=o>/</span><span class=n>kubelet</span><span class=o>.</span><span class=n>conf</span> <span class=o>--</span><span class=n>config</span><span class=o>=/</span><span class=k>var</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>kubelet</span><span class=o>/</span><span class=n>config</span><span class=o>.</span><span class=n>yaml</span> <span class=o>--</span><span class=n>network</span><span class=o>-</span><span class=n>plugin</span><span class=o>=</span><span class=n>cni</span> <span class=o>--</span><span class=n>pod</span><span class=o>-</span><span class=n>infra</span><span class=o>-</span><span class=n>container</span><span class=o>-</span><span class=n>image</span><span class=o>=</span><span class=n>k8s</span><span class=o>.</span><span class=n>gcr</span><span class=o>.</span><span class=n>io</span><span class=o>/</span><span class=n>pause</span><span class=p>:</span><span class=mf>3.2</span>
+</span></span><span class=line><span class=cl><span class=n>root</span>      <span class=mi>4879</span>  <span class=mf>0.0</span>  <span class=mf>0.0</span>  <span class=mi>11468</span>  <span class=mi>1040</span> <span class=n>pts</span><span class=o>/</span><span class=mi>0</span>    <span class=n>S</span><span class=o>+</span>   <span class=mi>00</span><span class=p>:</span><span class=mi>06</span>   <span class=mi>0</span><span class=p>:</span><span class=mi>00</span> <span class=n>grep</span> <span class=o>--</span><span class=n>color</span><span class=o>=</span><span class=n>auto</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>kubelet</span>
+</span></span><span class=line><span class=cl><span class=n>root</span><span class=err>@</span><span class=n>controlplane</span><span class=p>:</span><span class=o>~</span><span class=c1>#</span>
+</span></span></code></pre></td></tr></table></div></div><p>From the output we can see that the kubelet config file used is <code>/var/lib/kubelet/config.yaml</code></p><p>Next, lookup the value assigned for <code>staticPodPath</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>root</span><span class=err>@</span><span class=n>controlplane</span><span class=p>:</span><span class=o>~</span><span class=c1># grep -i staticpod /var/lib/kubelet/config.yaml</span>
+</span></span><span class=line><span class=cl><span class=n>staticPodPath</span><span class=p>:</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>kubernetes</span><span class=o>/</span><span class=n>manifests</span>
+</span></span><span class=line><span class=cl><span class=n>root</span><span class=err>@</span><span class=n>controlplane</span><span class=p>:</span><span class=o>~</span><span class=c1>#</span>
+</span></span></code></pre></td></tr></table></div></div><p>As you can see, the path configured is the <code>/etc/kubernetes/manifests</code> directory.</p><h3 id=상태-1><a href=#%ec%83%81%ed%83%9c-1 class=header-anchor></a>상태</h3><ul><li><code>kubectl get po -A</code><ul><li><code>-controlplane</code> appended pods</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=l>&gt; k get po -A</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>NAMESPACE     NAME                                   READY   STATUS    RESTARTS   AGE</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   coredns-74ff55c5b-578df                1/1     Running   0          25m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   coredns-74ff55c5b-nnjdp                1/1     Running   0          25m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   etcd-controlplane                      1/1     Running   0          25m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   kube-apiserver-controlplane            1/1     Running   0          25m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   kube-controller-manager-controlplane   1/1     Running   0          25m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   kube-flannel-ds-q7plw                  1/1     Running   0          24m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   kube-flannel-ds-w5rnm                  1/1     Running   0          25m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   kube-proxy-5dg8f                       1/1     Running   0          24m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   kube-proxy-ld2qq                       1/1     Running   0          25m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   kube-scheduler-controlplane            1/1     Running   0          25m</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li><code>grep -i controlplane</code></li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=l>&gt; k get po -A |grep -i controlplane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   etcd-controlplane                      1/1     Running   0          27m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   kube-apiserver-controlplane            1/1     Running   0          27m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   kube-controller-manager-controlplane   1/1     Running   0          27m</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=l>kube-system   kube-scheduler-controlplane            1/1     Running   0          27m</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h3 id=삭제><a href=#%ec%82%ad%ec%a0%9c class=header-anchor></a>삭제</h3><p>First, let&rsquo;s identify the node in which the pod called <strong>static-greenbox</strong> is created. To do this, run:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>root@controlplane:~# kubectlget pods --all-namespaces -o wide  | grep static-greenbox
+</span></span><span class=line><span class=cl>defaultstatic-greenbox-node01                 1/1Running   0          19s     10.244.1.2   node01       &lt;none&gt;           &lt;none&gt;
+</span></span><span class=line><span class=cl>root@controlplane:~#
+</span></span></code></pre></td></tr></table></div></div><p>From the result of this command, we can see that the pod is running on node01.</p><p>Next, SSH to node01 and identify the path configured for static pods in this node.</p><p><code>Important</code>: The path need not be <code>/etc/kubernetes/manifests</code>.</p><p>Make sure to check the path configured in the kubelet configuration file.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-gdscript3 data-lang=gdscript3><span class=line><span class=cl><span class=n>root</span><span class=err>@</span><span class=n>controlplane</span><span class=p>:</span><span class=o>~</span><span class=c1># ssh node01</span>
+</span></span><span class=line><span class=cl><span class=n>root</span><span class=err>@</span><span class=n>node01</span><span class=p>:</span><span class=o>~</span><span class=c1># ps -ef |  grep /usr/bin/kubelet</span>
+</span></span><span class=line><span class=cl><span class=n>root</span>       <span class=mi>752</span>   <span class=mi>654</span>  <span class=mi>0</span> <span class=mi>00</span><span class=p>:</span><span class=mi>30</span> <span class=n>pts</span><span class=o>/</span><span class=mi>0</span>    <span class=mi>00</span><span class=p>:</span><span class=mi>00</span><span class=p>:</span><span class=mi>00</span> <span class=n>grep</span> <span class=o>--</span><span class=n>color</span><span class=o>=</span><span class=n>auto</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>kubelet</span>
+</span></span><span class=line><span class=cl><span class=n>root</span>     <span class=mi>28567</span>     <span class=mi>1</span>  <span class=mi>0</span> <span class=mi>00</span><span class=p>:</span><span class=mi>22</span> <span class=err>?</span>        <span class=mi>00</span><span class=p>:</span><span class=mi>00</span><span class=p>:</span><span class=mi>11</span> <span class=o>/</span><span class=n>usr</span><span class=o>/</span><span class=n>bin</span><span class=o>/</span><span class=n>kubelet</span> <span class=o>--</span><span class=n>bootstrap</span><span class=o>-</span><span class=n>kubeconfig</span><span class=o>=/</span><span class=n>etc</span><span class=o>/</span><span class=n>kubernetes</span><span class=o>/</span><span class=n>bootstrap</span><span class=o>-</span><span class=n>kubelet</span><span class=o>.</span><span class=n>conf</span> <span class=o>--</span><span class=n>kubeconfig</span><span class=o>=/</span><span class=n>etc</span><span class=o>/</span><span class=n>kubernetes</span><span class=o>/</span><span class=n>kubelet</span><span class=o>.</span><span class=n>conf</span> <span class=o>--</span><span class=n>config</span><span class=o>=/</span><span class=k>var</span><span class=o>/</span><span class=n>lib</span><span class=o>/</span><span class=n>kubelet</span><span class=o>/</span><span class=n>config</span><span class=o>.</span><span class=n>yaml</span> <span class=o>--</span><span class=n>network</span><span class=o>-</span><span class=n>plugin</span><span class=o>=</span><span class=n>cni</span> <span class=o>--</span><span class=n>pod</span><span class=o>-</span><span class=n>infra</span><span class=o>-</span><span class=n>container</span><span class=o>-</span><span class=n>image</span><span class=o>=</span><span class=n>k8s</span><span class=o>.</span><span class=n>gcr</span><span class=o>.</span><span class=n>io</span><span class=o>/</span><span class=n>pause</span><span class=p>:</span><span class=mf>3.2</span>
+</span></span><span class=line><span class=cl><span class=n>root</span><span class=err>@</span><span class=n>node01</span><span class=p>:</span><span class=o>~</span><span class=c1># grep -i staticpod /var/lib/kubelet/config.yaml</span>
+</span></span><span class=line><span class=cl><span class=n>staticPodPath</span><span class=p>:</span> <span class=o>/</span><span class=n>etc</span><span class=o>/</span><span class=n>just</span><span class=o>-</span><span class=n>to</span><span class=o>-</span><span class=n>mess</span><span class=o>-</span><span class=n>with</span><span class=o>-</span><span class=n>you</span>
+</span></span><span class=line><span class=cl><span class=n>root</span><span class=err>@</span><span class=n>node01</span><span class=p>:</span><span class=o>~</span><span class=c1>#</span>
+</span></span></code></pre></td></tr></table></div></div><p>Here the staticPodPath is <code>/etc/just-to-mess-with-you</code></p><p>Navigate to this directory and delete the YAML file:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>root@node01:/etc/just-to-mess-with-you# ls
+</span></span><span class=line><span class=cl>greenbox.yaml
+</span></span><span class=line><span class=cl>root@node01:/etc/just-to-mess-with-you# rm -rf greenbox.yaml
+</span></span><span class=line><span class=cl>root@node01:/etc/just-to-mess-with-you#
+</span></span></code></pre></td></tr></table></div></div><p>Exit out of node01 using <code>CTRL + D</code> or type <code>exit</code>. You should return to the <code>controlplane</code> node. Check if the <code>static-greenbox</code> pod has been deleted:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>root@controlplane:~# kubectl get pods --all-namespaces -o wide  | grep static-greenbox
+</span></span><span class=line><span class=cl>root@controlplane:~#
+</span></span></code></pre></td></tr></table></div></div><h2 id=multiple-schedulers><a href=#multiple-schedulers class=header-anchor></a>Multiple Schedulers</h2><h3 id=생성-1><a href=#%ec%83%9d%ec%84%b1-1 class=header-anchor></a>생성</h3><ul><li>cli
+<img src=/imgs/cka/scheduler-8.png loading=lazy alt=img-8></li><li>kubeadm
+<img src=/imgs/cka/scheduler-9.png loading=lazy alt=img-9><ul><li><code>--leader-elect</code><ul><li>used when multiple copies of the scheduler running on different master nodes</li><li>who will lead activity</li></ul></li><li><code>--scheduler-name</code><ul><li>name of scheduler
+<img src=/imgs/cka/scheduler-10.png loading=lazy alt=img-10></li></ul></li><li><code>--lock-object-name</code></li></ul></li></ul><h3 id=사용><a href=#%ec%82%ac%ec%9a%a9 class=header-anchor></a>사용</h3><ul><li>definition<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>nginx</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>nginx</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>nginx</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>schedulerName</span><span class=p>:</span><span class=w> </span><span class=l>my-custom-scheduler</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h3 id=상태-2><a href=#%ec%83%81%ed%83%9c-2 class=header-anchor></a>상태</h3><ul><li><code>kubectl get events</code></li><li><code>kubectl logs my-custom-scheduler --n kube-system</code></li></ul></section><footer class=article-footer><section class=article-tags><a href=/blog/tags/k8s/>K8s</a>
+<a href=/blog/tags/cka/>Cka</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/blog/p/cka-cka-%ED%95%A9%EA%B2%A9-%ED%9B%84%EA%B8%B0/><div class=article-details><h2 class=article-title>(CKA) CKA 합격 후기</h2></div></a></article><article><a href=/blog/p/cka-09.-design-and-install-a-k8s-cluster/><div class=article-details><h2 class=article-title>(CKA) 09. Design and Install a k8s Cluster</h2></div></a></article><article><a href=/blog/p/cka-08.-networking/><div class=article-details><h2 class=article-title>(CKA) 08. Networking</h2></div></a></article><article><a href=/blog/p/cka-08.-networking-pre-requisites/><div class=article-details><h2 class=article-title>(CKA) 08. Networking Pre-requisites</h2></div></a></article><article><a href=/blog/p/cka-07.-storage/><div class=article-details><h2 class=article-title>(CKA) 07. Storage</h2></div></a></article></div></div></aside><script src=https://utteranc.es/client.js repo=aiden-jeon/aiden-jeon.github.io issue-term=pathname label=comment crossorigin=anonymous async></script><style>.utterances{max-width:unset}</style><script>let utterancesLoaded=!1;function setUtterancesTheme(e){let t=document.querySelector(".utterances iframe");t&&t.contentWindow.postMessage({type:"set-theme",theme:`github-${e}`},"https://utteranc.es")}addEventListener("message",e=>{if(e.origin!=="https://utteranc.es")return;utterancesLoaded=!0,setUtterancesTheme(document.documentElement.dataset.scheme)}),window.addEventListener("onColorSchemeChange",e=>{if(!utterancesLoaded)return;setUtterancesTheme(e.detail)})</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2024 Aiden's Camp</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.27.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/blog/ts/main.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

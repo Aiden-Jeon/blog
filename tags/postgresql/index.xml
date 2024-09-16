@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Postgresql on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/postgresql/</link><description>Recent content in Postgresql on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 23 Sep 2022 20:50:00 +0900</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/postgresql/index.xml" rel="self" type="application/rss+xml"/><item><title>[ Chapter 3. API ] 5) Build FastAPI Docker</title><link>https://aiden-jeon.github.io/blog/p/chapter-3.-api-5-build-fastapi-docker/</link><pubDate>Fri, 23 Sep 2022 20:50:00 +0900</pubDate><guid>https://aiden-jeon.github.io/blog/p/chapter-3.-api-5-build-fastapi-docker/</guid><description>&lt;p>&lt;a class="link" href="https://github.com/Aiden-Jeon/mle-mlops/tree/main/03_api" target="_blank" rel="noopener"
+>Github&lt;/a> 에서 해당 내용에 대해서 확인할 수 있습니다.&lt;/p>
+&lt;h2 id="overview">&lt;a href="#overview" class="header-anchor">&lt;/a>Overview
+&lt;/h2>&lt;h3 id="목표">&lt;a href="#%eb%aa%a9%ed%91%9c" class="header-anchor">&lt;/a>목표
+&lt;/h3>&lt;ul>
+&lt;li>앞서 작성한 스크립트를 실행할 수 있는 Dockerfile을 작성하고 이미지를 빌드합니다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="요구사항">&lt;a href="#%ec%9a%94%ea%b5%ac%ec%82%ac%ed%95%ad" class="header-anchor">&lt;/a>요구사항
+&lt;/h3>&lt;ol>
+&lt;li>작성한 script를 build할 수 있는 dockerfile을 작성합니다.&lt;/li>
+&lt;li>작성한 dockerfile을 이용해 이미지를 build 합니다.&lt;/li>
+&lt;li>빌드된 이미지를 실행합니다.&lt;/li>
+&lt;li>api가 정상적으로 동작하는지 확인합니다.&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h2 id="dockerfile">&lt;a href="#dockerfile" class="header-anchor">&lt;/a>Dockerfile
+&lt;/h2>&lt;p>작성한 app을 실행할 수 있는 &lt;code>Dockerfile&lt;/code>을 작성합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Dockerfile" data-lang="Dockerfile">&lt;span class="line">&lt;span class="cl">&lt;span class="k">FROM&lt;/span>&lt;span class="s"> python:3.9-slim&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">WORKDIR&lt;/span>&lt;span class="s"> /app&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">RUN&lt;/span> apt-get update &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> apt-get install -y &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> build-essential &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> software-properties-common &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> git &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> rm -rf /var/lib/apt/lists/*&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">RUN&lt;/span> pip install -U pip &lt;span class="o">&amp;amp;&amp;amp;&lt;/span>&lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> pip install &lt;span class="s2">&amp;#34;fastapi[all]&amp;#34;&lt;/span> sqlalchemy psycopg2-binary&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">COPY&lt;/span> app/ .&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">ENTRYPOINT&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;uvicorn&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;crud:app&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;--host&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;0.0.0.0&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;--reload&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="docker-compose">&lt;a href="#docker-compose" class="header-anchor">&lt;/a>docker-compose
+&lt;/h2>&lt;p>db 와 app 이 함께 실행될 수 있도록 &lt;code>docker-compose&lt;/code> 를 이용하도록 하겠습니다.&lt;br>
+우선 다음과 같은 &lt;code>docker-compose.yaml&lt;/code>을 &lt;code>Dockerfile&lt;/code>과 &lt;code>app&lt;/code>과 같은 위치에 있도록 작성합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-zsh" data-lang="zsh">&lt;span class="line">&lt;span class="cl">.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── Dockerfile
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── app
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   ├── crud.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   ├── database.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   ├── models.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">│   └── schemas.py
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└── docker-compose.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Dockerfile" data-lang="Dockerfile">&lt;span class="line">&lt;span class="cl">services:&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> db:&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> image: postgres:latest&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> ports:&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> - &lt;span class="s2">&amp;#34;5432:5432&amp;#34;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> environment:&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> POSTGRES_PASSWORD: &lt;span class="s2">&amp;#34;mypassword&amp;#34;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> app:&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> platform: linux/amd64&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> build: ./&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> depends_on:&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> - db&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> ports:&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> - &lt;span class="s2">&amp;#34;8000:8000&amp;#34;&lt;/span>&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> environment:&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> - &lt;span class="nv">SQLALCHEMY_DATABASE_URL&lt;/span>&lt;span class="o">=&lt;/span>postgresql://postgres:mypassword@db:5432/postgres&lt;span class="err">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>db 이름으로 database 관련된 정보를 작성합니다.&lt;/p>
+&lt;p>app 이름으로 fastapi 관련된 정보를 작성합니다.&lt;br>
+이 때 build 옵션을 통해 docker 이미지를 빌드하고 실행할 수 있습니다. 같은 위치에 app과 dockerfile을 두었으므로 &lt;code>./&lt;/code> 를 입력합니다.&lt;br>
+&lt;code>depends_on&lt;/code> 옵션을 통해 app 이 db가 실행된 뒤에 실행되도록 합니다.&lt;br>
+&lt;code>database.py&lt;/code> 에서 docker-compose가 띄운 db 정보를 알 수 있도록 &lt;code>SQLALCHEMY_DATABASE_URL&lt;/code> 을 환경변수로 입력합니다.&lt;br>
+db의 주소는 service name을 통해 접근할 수 있습니다.&lt;/p></description></item><item><title>[ Chapter 3. API ] 4) FastAPI with Postgresql</title><link>https://aiden-jeon.github.io/blog/p/chapter-3.-api-4-fastapi-with-postgresql/</link><pubDate>Fri, 23 Sep 2022 20:40:00 +0900</pubDate><guid>https://aiden-jeon.github.io/blog/p/chapter-3.-api-4-fastapi-with-postgresql/</guid><description>&lt;p>&lt;a class="link" href="https://github.com/Aiden-Jeon/mle-mlops/tree/main/03_api" target="_blank" rel="noopener"
+>Github&lt;/a> 에서 해당 내용에 대해서 확인할 수 있습니다.&lt;/p>
+&lt;h2 id="overview">&lt;a href="#overview" class="header-anchor">&lt;/a>Overview
+&lt;/h2>&lt;h3 id="목표">&lt;a href="#%eb%aa%a9%ed%91%9c" class="header-anchor">&lt;/a>목표
+&lt;/h3>&lt;ul>
+&lt;li>앞서 작성한 fastapi의 정보를 postgesql db에 작성합니다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="요구사항">&lt;a href="#%ec%9a%94%ea%b5%ac%ec%82%ac%ed%95%ad" class="header-anchor">&lt;/a>요구사항
+&lt;/h3>&lt;ol>
+&lt;li>Postgresql 서버를 실행합니다.
+&lt;ul>
+&lt;li>데이터가 저장되고 있는 도커와는 다른 서버를 실행해주세요.&lt;/li>
+&lt;li>포트가 사용중이라면 5433 으로 포워딩합니다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>다음 과정에 따라 create 함수로 입력 받는 값을 postgresql 에 저장하게 합니다.
+&lt;ol>
+&lt;li>ORM(Object Relational Mapping) 에 대해서 알아봅니다. [&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/sql-databases/?h=pydantic#orms" target="_blank" rel="noopener"
+>ORMs&lt;/a>]&lt;/li>
+&lt;li>&lt;code>database.py&lt;/code> 파일을 생성합니다.[&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/sql-databases/?h=pydantic#file-structure" target="_blank" rel="noopener"
+>File Structure&lt;/a>]
+&lt;ul>
+&lt;li>튜토리얼을 따라 postgresql 과 연결할 수 있는 session_maker를 작성합니다. [&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/sql-databases/?h=pydantic#create-the-sqlalchemy-parts" target="_blank" rel="noopener"
+>Create the SQLAlchemy parts&lt;/a>]&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>models.py&lt;/code> 파일을 생성합니다.
+&lt;ul>
+&lt;li>tablename은 users로 합니다.&lt;/li>
+&lt;li>튜토리얼을 따라 postgresql 에서 사용하는 모델을 생성합니다. [&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/sql-databases/?h=pydantic#create-the-database-models" target="_blank" rel="noopener"
+>Create the database model&lt;/a>]&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">Column&lt;/th>
+&lt;th style="text-align: left">Type&lt;/th>
+&lt;th style="text-align: left">Key&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">id&lt;/td>
+&lt;td style="text-align: left">Integer&lt;/td>
+&lt;td style="text-align: left">Primary, Index&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">name&lt;/td>
+&lt;td style="text-align: left">String&lt;/td>
+&lt;td style="text-align: left">Unique, Index&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">nickname&lt;/td>
+&lt;td style="text-align: left">String&lt;/td>
+&lt;td style="text-align: left">&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;/li>
+&lt;li>&lt;code>schemas.py&lt;/code> 파일을 생성합니다. [&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/sql-databases/?h=pydantic#create-pydantic-models-schemas-for-reading-returning" target="_blank" rel="noopener"
+>create-pydantic-models-schemas-for-reading-returning&lt;/a>]&lt;/li>
+&lt;li>&lt;code>crud.py&lt;/code> 파일을 생성 후 아래 함수를 작성합니다. [&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/sql-databases/?h=pydantic#crud-utils" target="_blank" rel="noopener"
+>Crud Utils&lt;/a>]
+&lt;ul>
+&lt;li>&lt;code>get_user&lt;/code>&lt;/li>
+&lt;li>&lt;code>creat_user&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h2 id="구현">&lt;a href="#%ea%b5%ac%ed%98%84" class="header-anchor">&lt;/a>구현
+&lt;/h2>&lt;h3 id="database">&lt;a href="#database" class="header-anchor">&lt;/a>database
+&lt;/h3>&lt;p>[&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/sql-databases/?h=pydantic#create-the-sqlalchemy-parts" target="_blank" rel="noopener"
+>Create the SQLAlchemy parts&lt;/a>]을 따라서 &lt;code>database.py&lt;/code> 파일을 작성합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># database.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">os&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sqlalchemy&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">create_engine&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sqlalchemy.ext.declarative&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">declarative_base&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sqlalchemy.orm&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">sessionmaker&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">SQLALCHEMY_DATABASE_URL&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">getenv&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;SQLALCHEMY_DATABASE_URL&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;postgresql://postgres:mypassword@localhost:5432/postgres&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">engine&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">create_engine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">SQLALCHEMY_DATABASE_URL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">SessionLocal&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">sessionmaker&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">autocommit&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">autoflush&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">bind&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">engine&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Base&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">declarative_base&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>이 중 &lt;code>SQLALCHEMY_DATABASE_URL&lt;/code> 값은 나중에 docker에서 값을 변경해서 전달 할 수 있도록 &lt;code>os.getenv&lt;/code>를 통해 가져오도록 합니다.&lt;br>
+로컬에서 진행하는 튜토리얼에서는 기본 값으로 사용하도록 합니다.&lt;/p>
+&lt;h3 id="models">&lt;a href="#models" class="header-anchor">&lt;/a>models
+&lt;/h3>&lt;p>[&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/sql-databases/?h=pydantic#create-the-database-models" target="_blank" rel="noopener"
+>Create the database model&lt;/a>]을 따라서 &lt;code>models.py&lt;/code> 파일을 작성합니다.&lt;/p>
+&lt;p>tablename은 요구사항에 맞춰 &lt;code>users&lt;/code>로 정합니다.
+나머지 column들도 주어진 요구사항에 맞춰서 작성합니다.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th style="text-align: left">Column&lt;/th>
+&lt;th style="text-align: left">Type&lt;/th>
+&lt;th style="text-align: left">Key&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td style="text-align: left">id&lt;/td>
+&lt;td style="text-align: left">Integer&lt;/td>
+&lt;td style="text-align: left">Primary, Index&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">name&lt;/td>
+&lt;td style="text-align: left">String&lt;/td>
+&lt;td style="text-align: left">Unique, Index&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td style="text-align: left">nickname&lt;/td>
+&lt;td style="text-align: left">String&lt;/td>
+&lt;td style="text-align: left">&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>&lt;code>id&lt;/code> : &lt;code>Column(Integer, primary_key=True, index=True)&lt;/code>&lt;/li>
+&lt;li>&lt;code>name&lt;/code>: &lt;code>Column(String, unique=True, index=True)&lt;/code>&lt;/li>
+&lt;li>&lt;code>nickname&lt;/code>: &lt;code>Column(String)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># models.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sqlalchemy&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">Column&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Integer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">String&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">database&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">Base&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">User&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Base&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">__tablename__&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;users&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Column&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Integer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">primary_key&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">index&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Column&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">unique&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">index&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">nickname&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Column&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="schemas">&lt;a href="#schemas" class="header-anchor">&lt;/a>schemas
+&lt;/h3>&lt;p>[&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/sql-databases/?h=pydantic#create-pydantic-models-schemas-for-reading-returning" target="_blank" rel="noopener"
+>create-pydantic-models-schemas-for-reading-returning&lt;/a>]을 따라서 &lt;code>schemas.py&lt;/code> 파일을 작성합니다.&lt;/p>
+&lt;p>이 전 포스트에서 작성한 pydantic model을 활용합니다.&lt;br>
+우선 &lt;code>UseCreateIn&lt;/code>, &lt;code>UserCreateOut&lt;/code> 모두에서 사용할 &lt;code>UserBase&lt;/code>를 작성합니다.&lt;br>
+&lt;code>UseCreateIn&lt;/code>, &lt;code>UserCreateOut&lt;/code>는 작성한 &lt;code>UserBase&lt;/code> 를 상속받습니다&lt;br>
+&lt;code>UserCreateOut&lt;/code> 는 추가로 &lt;code>status&lt;/code> 와 &lt;code>id&lt;/code>를 입력합니다.&lt;br>
+마지막으로 database 에서 사용할 &lt;code>User&lt;/code> class를 작성합니다. db에서 사용해야 하니 &lt;code>orm_mode&lt;/code> 를 &lt;code>True&lt;/code> 로 입력합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># schemas.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">pydantic&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">BaseModel&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">UserBase&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">BaseModel&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">nickname&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">UserCreateIn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">UserBase&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">pass&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">UserCreateOut&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">UserBase&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">status&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">id&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">int&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">User&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">UserBase&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">id&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">int&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">class&lt;/span> &lt;span class="nc">Config&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">orm_mode&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="kc">True&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="crud">&lt;a href="#crud" class="header-anchor">&lt;/a>crud
+&lt;/h3>&lt;p>[&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/sql-databases/?h=pydantic#crud-utils" target="_blank" rel="noopener"
+>Crud Utils&lt;/a>]을 따라서 &lt;code>crud.py&lt;/code> 를 작성합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># crud.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">fastapi&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">Depends&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FastAPI&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sqlalchemy.orm&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">Session&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">models&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">User&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Base&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">schemas&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">UserCreateIn&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">UserCreateOut&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">database&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">SessionLocal&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">engine&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Base&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">metadata&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">create_all&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">bind&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">engine&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">app&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FastAPI&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Dependency&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">get_db&lt;/span>&lt;span class="p">():&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">db&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">SessionLocal&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">try&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">yield&lt;/span> &lt;span class="n">db&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">finally&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">db&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;/user&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">get_user&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user_id&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">int&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">db&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Session&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Depends&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">get_db&lt;/span>&lt;span class="p">)):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">db&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">query&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">User&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">filter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">User&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">id&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">user_id&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">first&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.post&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;/user&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">response_model&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">UserCreateOut&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">create_user&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">UserCreateIn&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">db&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Session&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Depends&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">get_db&lt;/span>&lt;span class="p">)):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">db_user&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">User&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">nickname&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">user&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">nickname&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">db&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">db_user&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">db&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">commit&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">db&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">refresh&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">db_user&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">UserCreateOut&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">db_user&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">nickname&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">db_user&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">nickname&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">status&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;success&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">db_user&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">id&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="실행">&lt;a href="#%ec%8b%a4%ed%96%89" class="header-anchor">&lt;/a>실행
+&lt;/h2>&lt;p>작성한 app을 실행하고 databse에 저장되는지 확인합니다.&lt;/p>
+&lt;p>우선 database 가 실행되지 않았다면 실행합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker run -p 5432:5432 -e &lt;span class="nv">POSTGRES_PASSWORD&lt;/span>&lt;span class="o">=&lt;/span>mypassword -d postgres
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>다음으로 uvicorn을 이용해 app을 실행합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">uvicorn crud:app --reload
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>POST /user&lt;/code> 을 통해 유저를 생성합니다.&lt;br>
+생성 후 &lt;code>psql&lt;/code> 로 생성되었는지 확인합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">psql -h localhost -p &lt;span class="m">5432&lt;/span> -U postgres postgres
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>정상적으로 추가가 된 것을 확인할 수 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">postgres=# SELECT * FROM users;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> id | name | nickname
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">----+--------+----------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> 1 | string | string
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">(1 row)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

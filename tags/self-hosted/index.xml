@@ -1,0 +1,968 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Self-Hosted on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/self-hosted/</link><description>Recent content in Self-Hosted on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 15 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/self-hosted/index.xml" rel="self" type="application/rss+xml"/><item><title>Wireguard 설치하기</title><link>https://aiden-jeon.github.io/blog/p/wireguard-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0/</link><pubDate>Fri, 15 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/wireguard-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0/</guid><description>&lt;h2 id="on-orcale-cloud">&lt;a href="#on-orcale-cloud" class="header-anchor">&lt;/a>On Orcale Cloud
+&lt;/h2>&lt;p>이제 네트워크에 ingress 를 추가해주어야 합니다.&lt;/p>
+&lt;ol>
+&lt;li>Instance 메뉴를 선택합니다.&lt;br>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-0.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>Instance를 선택합니다.&lt;br>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-1.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>Subnet을 선택합니다.&lt;br>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-2.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>Security를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-3.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>Add Ingress Rules를 눌러 WireGuard를 위한 포트를 추가하겠습니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-4.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>다음 빨간 칸의 내용들을 입력한 후 추가합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-5.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;/ol>
+&lt;h2 id="prxoy-manager">&lt;a href="#prxoy-manager" class="header-anchor">&lt;/a>Prxoy-Manager
+&lt;/h2>&lt;ol>
+&lt;li>Proxy Hosts를 추가합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-6.png"
+loading="lazy"
+alt="select proxy hosts"
+>&lt;/li>
+&lt;/ol>
+&lt;h2 id="on-ubuntu-server">&lt;a href="#on-ubuntu-server" class="header-anchor">&lt;/a>On Ubuntu Server
+&lt;/h2>&lt;p>Wireguard와 이를 쉽게 사용할 수 있는 &lt;a class="link" href="https://github.com/subspacecommunity/subspace/tree/master" target="_blank" rel="noopener"
+>Subspace&lt;/a>를 실행합니다.&lt;/p>
+&lt;ol>
+&lt;li>우선 아래 과정을 통해 Wireguard를 설치합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo su
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt-get update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt-get install -y wireguard
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Remove dnsmasq because it will run inside the container.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt-get remove -y dnsmasq
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Disable systemd-resolved listener if it blocks port 53.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;DNSStubListener=no&amp;#34;&lt;/span> &amp;gt;&amp;gt; /etc/systemd/resolved.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">systemctl restart systemd-resolved
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Set Cloudfare DNS server.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> nameserver 1.1.1.1 &amp;gt; /etc/resolv.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> nameserver 1.0.0.1 &amp;gt;&amp;gt; /etc/resolv.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Load modules.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">modprobe wireguard
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">modprobe iptable_nat
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">modprobe ip6table_nat
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Enable modules when rebooting.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;wireguard&amp;#34;&lt;/span> &amp;gt; /etc/modules-load.d/wireguard.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;iptable_nat&amp;#34;&lt;/span> &amp;gt; /etc/modules-load.d/iptable_nat.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;ip6table_nat&amp;#34;&lt;/span> &amp;gt; /etc/modules-load.d/ip6table_nat.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Check if systemd-modules-load service is active.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">systemctl status systemd-modules-load.service
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Enable IP forwarding.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sysctl -w net.ipv4.ip_forward&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sysctl -w net.ipv6.conf.all.forwarding&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">exit&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>docker-compose를 위한 폴더를 생성합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mkdir subspace&lt;span class="p">;&lt;/span> &lt;span class="nb">cd&lt;/span> subspace
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>다음과 같은 docker-compose 파일을 작성합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat &amp;gt; docker-compose.yml &lt;span class="s">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">version: &amp;#34;3.3&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">services:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> subspace:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> image: subspacecommunity/subspace:latest
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> container_name: subspace
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> volumes:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - /opt/docker/subspace:/data
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> restart: always
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> environment:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_HTTP_HOST=vpn.example.duckdns.org # 설정한 proxy-host의 이름과 동일해야 합니다.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_LETSENCRYPT=false
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_HTTP_INSECURE=true
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_HTTP_ADDR=&amp;#34;:5000&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_NAMESERVERS=1.1.1.1,8.8.8.8
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_LISTENPORT=51820
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_IPV4_POOL=10.99.97.0/24
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_IPV6_POOL=fd00::10:97:0/64
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_IPV4_GW=10.99.97.1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_IPV6_GW=fd00::10:97:1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_IPV6_NAT_ENABLED=1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_DNSMASQ_DISABLED=1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> cap_add:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - NET_ADMIN
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> network_mode: &amp;#34;host&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>docker-compose를 실행합니다
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker-compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h2 id="vpn-configure-추가">&lt;a href="#vpn-configure-%ec%b6%94%ea%b0%80" class="header-anchor">&lt;/a>VPN Configure 추가
+&lt;/h2>&lt;ol>
+&lt;li>설정한 vpn domain으로 접속후 계정을 생성합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-7.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>configure를 발급받습니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-8.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>config 파일을 다운로드 받습니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-9.png"
+loading="lazy"
+alt="img"
+>
+config 파일의 내용은 다음과 같습니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Interface&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">PrivateKey&lt;/span> &lt;span class="o">=&lt;/span> ~~~
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">DNS&lt;/span> &lt;span class="o">=&lt;/span> 10.99.97.1, fd00::10:97:1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Address&lt;/span> &lt;span class="o">=&lt;/span> 10.99.97.2/24,fd00::10:97:2/64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Peer&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">PublicKey&lt;/span> &lt;span class="o">=&lt;/span> ~~~
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Endpoint&lt;/span> &lt;span class="o">=&lt;/span> vpn.aiden-jeon.duckdns.org:51820
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">AllowedIPs&lt;/span> &lt;span class="o">=&lt;/span> 0.0.0.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>이 때 AllowedIPs를 VPN IP의 0번으로 수정합니다.
+제 경우 10.99.97.x 이기 때문에 10.99.97.0/24를 입력합니다.
+수정된 파일은 다음과 같습니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Interface&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">PrivateKey&lt;/span> &lt;span class="o">=&lt;/span> ~~~
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">DNS&lt;/span> &lt;span class="o">=&lt;/span> 10.99.97.1, fd00::10:97:1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Address&lt;/span> &lt;span class="o">=&lt;/span> 10.99.97.2/24,fd00::10:97:2/64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Peer&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">PublicKey&lt;/span> &lt;span class="o">=&lt;/span> ~~~
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Endpoint&lt;/span> &lt;span class="o">=&lt;/span> vpn.aiden-jeon.duckdns.org:51820
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">AllowedIPs&lt;/span> &lt;span class="o">=&lt;/span> 10.99.97.0/24
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>vpn에 추가할 서버에 접속후 wireguard를 설치합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt-get install -y resolvconf wireguard
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>발급 받은 config 파일을 다음 위치에 적어줍니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo cp wg0.conf /etc/wireguard/wg0.conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>systemctl을 설정합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo systemctl &lt;span class="nb">enable&lt;/span> wg-quick@wg0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl start wg-quick@wg0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl status wg-quick@wg0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>인터페이스를 확인하고 서버로 ping을 날려봅니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ifconfig w0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ping 10.99.97.1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol></description></item><item><title>Nginx Proxy Manager 설정하기</title><link>https://aiden-jeon.github.io/blog/p/nginx-proxy-manager-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0/</link><pubDate>Wed, 13 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/nginx-proxy-manager-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0/</guid><description>&lt;p>이번 포스트에서는 생성한 인스턴스를 nginx proxy로 관리하는 방법에 대해서 설명합니다.&lt;/p>
+&lt;h2 id="ubuntu-instance-기본-설정">&lt;a href="#ubuntu-instance-%ea%b8%b0%eb%b3%b8-%ec%84%a4%ec%a0%95" class="header-anchor">&lt;/a>Ubuntu Instance 기본 설정
+&lt;/h2>&lt;h3 id="1-기본-패키지-업데이트">&lt;a href="#1-%ea%b8%b0%eb%b3%b8-%ed%8c%a8%ed%82%a4%ec%a7%80-%ec%97%85%eb%8d%b0%ec%9d%b4%ed%8a%b8" class="header-anchor">&lt;/a>1. 기본 패키지 업데이트
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt update &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> sudo apt -y upgrade
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="2-swap-memory-생성">&lt;a href="#2-swap-memory-%ec%83%9d%ec%84%b1" class="header-anchor">&lt;/a>2. Swap Memory 생성
+&lt;/h3>&lt;p>Free tier의 메모리는 1G 이므로 스왑 메모리를 생성하도록 하겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo fallocate -l 2G /swapfile
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo chmod &lt;span class="m">600&lt;/span> /swapfile
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mkswap /swapfile
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>생성된 스왑 메모리를 확인합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">free -h
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>재부팅해도 스왑 메모리가 유지되도록 수정합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo vim /etc/fstab
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>아래 내용을 추가합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">/swapfile swap swap defaults 0 0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>추가한 후의 모습은 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">LABEL&lt;/span>&lt;span class="o">=&lt;/span>cloudimg-rootfs / ext4 defaults &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">LABEL&lt;/span>&lt;span class="o">=&lt;/span>UEFI /boot/efi vfat defaults &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/swapfile swap swap defaults &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="3-시간-설정">&lt;a href="#3-%ec%8b%9c%ea%b0%84-%ec%84%a4%ec%a0%95" class="header-anchor">&lt;/a>3. 시간 설정
+&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo timedatectl set-timezone Asia/Seoul
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="nginx-proxy-manager">&lt;a href="#nginx-proxy-manager" class="header-anchor">&lt;/a>Nginx Proxy Manager
+&lt;/h2>&lt;h3 id="1-iptable-초기화">&lt;a href="#1-iptable-%ec%b4%88%ea%b8%b0%ed%99%94" class="header-anchor">&lt;/a>1. iptable 초기화
+&lt;/h3>&lt;p>oracle에서 기본적으로 설치한 iptable 규칙을 초기화합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo iptables -F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo iptables -X
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo netfilter-persistent save
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo netfilter-persistent reload
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="2-docker-설치">&lt;a href="#2-docker-%ec%84%a4%ec%b9%98" class="header-anchor">&lt;/a>2. docker 설치
+&lt;/h3>&lt;p>&lt;a class="link" href="https://docs.docker.com/engine/install/ubuntu/" target="_blank" rel="noopener"
+>공식 홈페이지&lt;/a>를 참고해 docker를 설치합니다.&lt;/p>
+&lt;ol>
+&lt;li>Setup repository
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt-get update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt-get install &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> apt-transport-https &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> ca-certificates &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> curl &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> gnupg &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> lsb-release
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>Add Docker&amp;rsquo;s official GPG key
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">curl -fsSL https://download.docker.com/linux/ubuntu/gpg &lt;span class="p">|&lt;/span> sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">echo&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="s2">&amp;#34;deb [arch=&lt;/span>&lt;span class="k">$(&lt;/span>dpkg --print-architecture&lt;span class="k">)&lt;/span>&lt;span class="s2"> signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &lt;/span>&lt;span class="k">$(&lt;/span>lsb_release -cs&lt;span class="k">)&lt;/span>&lt;span class="s2"> stable&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> sudo tee /etc/apt/sources.list.d/docker.list &amp;gt; /dev/null
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>Install docker
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt-get update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt-get install docker-ce docker-ce-cli containerd.io
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>실행 확인
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker ps
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>실행이 안될 경우 &lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/pre-requisites-for-k3s-setup/###1.3 권한 문제 해결" >포스트&lt;/a>를 참고하세요.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="3-docker-compose-설치">&lt;a href="#3-docker-compose-%ec%84%a4%ec%b9%98" class="header-anchor">&lt;/a>3. docker-compose 설치
+&lt;/h3>&lt;p>&lt;a class="link" href="https://docs.docker.com/compose/install/" target="_blank" rel="noopener"
+>공식 홈페이지&lt;/a>를 참고해 docker-compose를 설치합니다.&lt;/p>
+&lt;ol>
+&lt;li>Download Docker Compose
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo curl -L &lt;span class="s2">&amp;#34;https://github.com/docker/compose/releases/download/1.29.2/docker-compose-&lt;/span>&lt;span class="k">$(&lt;/span>uname -s&lt;span class="k">)&lt;/span>&lt;span class="s2">-&lt;/span>&lt;span class="k">$(&lt;/span>uname -m&lt;span class="k">)&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> -o /usr/local/bin/docker-compose
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>Apply permission
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo chmod +x /usr/local/bin/docker-compose
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>Add Path
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>Test
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker-compose --version
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h3 id="4-docker-composeyaml-작성">&lt;a href="#4-docker-composeyaml-%ec%9e%91%ec%84%b1" class="header-anchor">&lt;/a>4. &lt;code>docker-compose.yaml&lt;/code> 작성
+&lt;/h3>&lt;ol>
+&lt;li>폴더 생성
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mkdir ~/npm&lt;span class="p">;&lt;/span> &lt;span class="nb">cd&lt;/span> ~/npm
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;code>docker-compose.yaml&lt;/code> 작성&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat &amp;gt; docker-compose.yml &lt;span class="s">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">version: &amp;#34;3&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">services:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> app:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> image: &amp;#39;jc21/nginx-proxy-manager:latest&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> restart: always
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> network_mode: &amp;#34;host&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> environment:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # These are the settings to access your db
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> DB_MYSQL_HOST: localhost
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> DB_MYSQL_PORT: 3306
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> DB_MYSQL_USER: &amp;#34;npm&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> DB_MYSQL_PASSWORD: &amp;#34;npm&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> DB_MYSQL_NAME: &amp;#34;npm&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # If you would rather use Sqlite uncomment this
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # and remove all DB_MYSQL_* lines above
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # DB_SQLITE_FILE: &amp;#34;/data/database.sqlite&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # Uncomment this if IPv6 is not enabled on your host
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # DISABLE_IPV6: &amp;#39;true&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> volumes:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - /home/ubuntu/npm/data:/data
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - /home/ubuntu/npm/letsencrypt:/etc/letsencrypt
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> depends_on:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - db
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> db:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> image: &amp;#39;jc21/mariadb-aria:latest&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> restart: always
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> network_mode: &amp;#34;host&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> environment:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> MYSQL_ROOT_PASSWORD: &amp;#39;npm&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> MYSQL_DATABASE: &amp;#39;npm&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> MYSQL_USER: &amp;#39;npm&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> MYSQL_PASSWORD: &amp;#39;npm&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> volumes:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - /home/ubuntu/npm/mysql:/var/lib/mysql
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol start="3">
+&lt;li>docker-compose 실행
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker-compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>실행 확인
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker-compose logs
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>로그의 제일 마지막에 다음과 같은 출력이 있다면 정상적으로 실행된 것입니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">app_1 &lt;span class="p">|&lt;/span> &lt;span class="o">[&lt;/span>10/13/2021&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>9:53:02 AM&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>SSL &lt;span class="o">]&lt;/span> › ℹ info Renewing SSL certs close to expiry...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">app_1 &lt;span class="p">|&lt;/span> &lt;span class="o">[&lt;/span>10/13/2021&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>9:53:02 AM&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>IP Ranges&lt;span class="o">]&lt;/span> › ℹ info IP Ranges Renewal Timer initialized
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">app_1 &lt;span class="p">|&lt;/span> &lt;span class="o">[&lt;/span>10/13/2021&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>9:53:02 AM&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>Global &lt;span class="o">]&lt;/span> › ℹ info Backend PID &lt;span class="m">246&lt;/span> listening on port &lt;span class="m">3000&lt;/span> ...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">app_1 &lt;span class="p">|&lt;/span> &lt;span class="o">[&lt;/span>10/13/2021&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>9:53:03 AM&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>Nginx &lt;span class="o">]&lt;/span> › ℹ info Reloading Nginx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">app_1 &lt;span class="p">|&lt;/span> &lt;span class="o">[&lt;/span>10/13/2021&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>9:53:03 AM&lt;span class="o">]&lt;/span> &lt;span class="o">[&lt;/span>SSL &lt;span class="o">]&lt;/span> › ℹ info Renew Complete
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h3 id="5-dns-설정">&lt;a href="#5-dns-%ec%84%a4%ec%a0%95" class="header-anchor">&lt;/a>5. DNS 설정
+&lt;/h3>&lt;p>무료로 이용할 수 있는 &lt;a class="link" href="https://www.duckdns.org/" target="_blank" rel="noopener"
+>duckdns&lt;/a>를 사용해 DNS를 연결하겠습니다.&lt;/p>
+&lt;ol>
+&lt;li>로그인 한 뒤 사용할 dns를 추가합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/nginx_proxy-0.png"
+loading="lazy"
+alt="add dns"
+>&lt;/li>
+&lt;li>oracle에서 받은 public ip를 입력합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/nginx_proxy-1.png"
+loading="lazy"
+alt="update current ip"
+>&lt;/li>
+&lt;/ol>
+&lt;h3 id="6-nginx-proxy-연결">&lt;a href="#6-nginx-proxy-%ec%97%b0%ea%b2%b0" class="header-anchor">&lt;/a>6. Nginx Proxy 연결
+&lt;/h3>&lt;p>&lt;code>http://&amp;lt;Public IP&amp;gt;:81&lt;/code>로 접속합니다.&lt;/p>
+&lt;p>다음과 같이 화면이 출력됩니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/nginx_proxy-2.png"
+loading="lazy"
+alt="login"
+>&lt;/p>
+&lt;p>기본 아이디와 비밀번호는 다음과 같습니다.&lt;/p>
+&lt;ul>
+&lt;li>id: &lt;a class="link" href="mailto:admin@example.com" >admin@example.com&lt;/a>&lt;/li>
+&lt;li>pw: changeme&lt;/li>
+&lt;/ul>
+&lt;p>접속 후 아이디와 비밀번호를 바꿔줍니다.&lt;/p>
+&lt;h3 id="7-nginx-dns-연결">&lt;a href="#7-nginx-dns-%ec%97%b0%ea%b2%b0" class="header-anchor">&lt;/a>7. Nginx DNS 연결
+&lt;/h3>&lt;ol>
+&lt;li>Proxy Hosts를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/nginx_proxy-3.png"
+loading="lazy"
+alt="select proxy hosts"
+>&lt;/li>
+&lt;li>Add Proxy Host를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/nginx_proxy-4.png"
+loading="lazy"
+alt="add proxy hosts"
+>&lt;/li>
+&lt;li>Nginx Proxy Host를 접속한 dns를 입력해줍니다.
+저는 npm을 subdomain으로 생성했습니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/nginx_proxy-5.png"
+loading="lazy"
+alt="select dns"
+>&lt;/li>
+&lt;li>설정한 dns로 접속되는지 확인합니다.&lt;/li>
+&lt;li>https 접속을 위한 ssl를 설정해주어야 합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/nginx_proxy-6.png"
+loading="lazy"
+alt="edit"
+>&lt;/li>
+&lt;li>다음과 같은 내용으로 작성합니다.&lt;br>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/nginx_proxy-7.png"
+loading="lazy"
+alt="ssl"
+>&lt;/li>
+&lt;li>oracle cloud에서 81번 포트를 삭제합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/nginx_proxy-8.png"
+loading="lazy"
+alt="erase port"
+>&lt;/li>
+&lt;/ol></description></item><item><title>Oracle Cloud Public IP 사용하기</title><link>https://aiden-jeon.github.io/blog/p/oracle-cloud-public-ip-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</link><pubDate>Wed, 13 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/oracle-cloud-public-ip-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</guid><description>&lt;p>이번 포스트에서는 할당 받은 Public IP를 사용하는 방법에 대해서 설명합니다.&lt;/p>
+&lt;h2 id="1-인스턴스-생성하기">&lt;a href="#1-%ec%9d%b8%ec%8a%a4%ed%84%b4%ec%8a%a4-%ec%83%9d%ec%84%b1%ed%95%98%ea%b8%b0" class="header-anchor">&lt;/a>1. 인스턴스 생성하기
+&lt;/h2>&lt;ol>
+&lt;li>Instances 메뉴를 선택합니다.&lt;br>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-0.png"
+loading="lazy"
+alt="instances"
+>&lt;/li>
+&lt;li>Create Instance를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-1.png"
+loading="lazy"
+alt="create instance"
+>&lt;/li>
+&lt;li>Instances 이름을 입력합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-2.png"
+loading="lazy"
+alt="instance name"
+>&lt;/li>
+&lt;li>이미지를 변경합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-3.png"
+loading="lazy"
+alt="change image"
+>&lt;/li>
+&lt;li>사용할 이미지는 Canonical Ubuntu 입니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-4.png"
+loading="lazy"
+alt="select image"
+>&lt;/li>
+&lt;li>저는 ssh key를 자체적으로 발급받고 사용하려고 합니다.
+이를 위해서 Private Key를 저장합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-5.png"
+loading="lazy"
+alt="ssh"
+>&lt;/li>
+&lt;li>볼륨은 따로 건들지 않겠습니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-6.png"
+loading="lazy"
+alt="volume"
+>&lt;/li>
+&lt;/ol>
+&lt;h2 id="2-public-ip-할당하기">&lt;a href="#2-public-ip-%ed%95%a0%eb%8b%b9%ed%95%98%ea%b8%b0" class="header-anchor">&lt;/a>2. Public IP 할당하기
+&lt;/h2>&lt;ol>
+&lt;li>생성된 인스턴스 화면에서 Attached VNCs 메뉴를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-7.png"
+loading="lazy"
+alt="attached vcns"
+>&lt;/li>
+&lt;li>생성한 instance 이름을 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-8.png"
+loading="lazy"
+alt="select instance"
+>&lt;/li>
+&lt;li>IPv4 Addrresses 를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-9.png"
+loading="lazy"
+alt="ipv4"
+>&lt;/li>
+&lt;li>&amp;hellip;을 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-10.png"
+loading="lazy"
+alt="more"
+>&lt;/li>
+&lt;li>Edit을 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-11.png"
+loading="lazy"
+alt="edit"
+>&lt;/li>
+&lt;li>No Pulic IP를 선택하고 Update합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-12.png"
+loading="lazy"
+alt="no publice ip"
+>&lt;/li>
+&lt;li>다시 edit을 누릅니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-13.png"
+loading="lazy"
+alt="edit"
+>&lt;/li>
+&lt;li>Reserved public IP를 선택하고 생성된 IP를 선택한뒤 Update합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-14.png"
+loading="lazy"
+alt="reserved public ip"
+>&lt;/li>
+&lt;li>다음과 같이 IP가 할당된 것을 확인합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-15.png"
+loading="lazy"
+alt="check ip"
+>&lt;/li>
+&lt;/ol>
+&lt;h2 id="3-접속하기">&lt;a href="#3-%ec%a0%91%ec%86%8d%ed%95%98%ea%b8%b0" class="header-anchor">&lt;/a>3. 접속하기
+&lt;/h2>&lt;ol>
+&lt;li>이미지를 생성할 때 다운로드 받은 key를 &lt;code>~/.ssh&lt;/code>로 옮깁니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mv ssh-key-2021-10-13.key ~/.ssh/oracle.key
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> ~/.ssh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>400 권한을 줍니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">chmod &lt;span class="m">400&lt;/span> oracle.key
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>ssh를 이용해 접속합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh ubuntu@&amp;lt;PUBLIC IP&amp;gt; -i ~/.ssh/oracle.key
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol></description></item><item><title>Oracle Cloud Public IP 할당 받기</title><link>https://aiden-jeon.github.io/blog/p/oracle-cloud-public-ip-%ED%95%A0%EB%8B%B9-%EB%B0%9B%EA%B8%B0/</link><pubDate>Wed, 13 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/oracle-cloud-public-ip-%ED%95%A0%EB%8B%B9-%EB%B0%9B%EA%B8%B0/</guid><description>&lt;p>이번 포스트에서는 Oracle Cloud 무료 버전을 이용해 Public IP를 할당 받는 방법에 대해서 설명합니다.&lt;/p>
+&lt;h2 id="1-구획-생성하기">&lt;a href="#1-%ea%b5%ac%ed%9a%8d-%ec%83%9d%ec%84%b1%ed%95%98%ea%b8%b0" class="header-anchor">&lt;/a>1. 구획 생성하기
+&lt;/h2>&lt;ol>
+&lt;li>Compartments 메뉴를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-0.png"
+loading="lazy"
+alt="compartments"
+>&lt;/li>
+&lt;li>Create Compartment를 누른 후 사용할 이름과 설명을 적어줍니다
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-1.png"
+loading="lazy"
+alt="create compartments"
+>&lt;/li>
+&lt;/ol>
+&lt;h2 id="2-networking">&lt;a href="#2-networking" class="header-anchor">&lt;/a>2. Networking
+&lt;/h2>&lt;ol>
+&lt;li>Virtual Cloud Networks 메뉴를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-2.png"
+loading="lazy"
+alt="virtual cloud networks"
+>&lt;/li>
+&lt;li>Compartment에서 생성한 구획을 선택하고 Start VCN Wizard 버튼을 눌러줍니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-3.png"
+loading="lazy"
+alt="start vcn wizard"
+>&lt;/li>
+&lt;li>다음 항목들을 클릭하고 넘어갑니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-4.png"
+loading="lazy"
+alt="next vcn wizard"
+>&lt;/li>
+&lt;li>vcn 이름을 작성하고 다음으로 넘어갑니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-5.png"
+loading="lazy"
+alt="vcn name"
+>&lt;/li>
+&lt;li>생성을 누릅니다.$$
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-6.png"
+loading="lazy"
+alt="create vcn"
+>&lt;/li>
+&lt;li>생성이 완료되면 다음과 같이 나옵니다.
+View Virtual Cloud Network를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-7.png"
+loading="lazy"
+alt="view vcn"
+>&lt;/li>
+&lt;li>구획 이름과 vcn 이름을 확인합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-8.png"
+loading="lazy"
+alt="check vcn"
+>&lt;/li>
+&lt;/ol>
+&lt;h2 id="3-security">&lt;a href="#3-security" class="header-anchor">&lt;/a>3. Security
+&lt;/h2>&lt;h3 id="31-http-https">&lt;a href="#31-http-https" class="header-anchor">&lt;/a>3.1 http, https
+&lt;/h3>&lt;ol>
+&lt;li>security list를 선택하고 Default Security List를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-9.png"
+loading="lazy"
+alt="security list"
+>&lt;/li>
+&lt;li>Add Ingress Rules를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-10.png"
+loading="lazy"
+alt="add ingress rule"
+>&lt;/li>
+&lt;li>다음과 같이 http와 https를 위한 포트를 추가합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-11.png"
+loading="lazy"
+alt="http https port"
+>&lt;/li>
+&lt;li>다음과 같이 룰이 추가된 것을 확인합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-12.png"
+loading="lazy"
+alt="check http https port"
+>&lt;/li>
+&lt;/ol>
+&lt;h3 id="32-nginx-proxy">&lt;a href="#32-nginx-proxy" class="header-anchor">&lt;/a>3.2 nginx proxy
+&lt;/h3>&lt;ol>
+&lt;li>다음과 같이 nginx proxy를 위한 81 포트를 추가합니다.
+ngix설정 후 해당 포트는 삭제합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-13.png"
+loading="lazy"
+alt="nginx proxy port"
+>&lt;/li>
+&lt;li>다음과 같이 룰이 추가된 것을 확인합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-14.png"
+loading="lazy"
+alt="checkt nginx proxy port"
+>&lt;/li>
+&lt;/ol>
+&lt;h2 id="4-public-ip">&lt;a href="#4-public-ip" class="header-anchor">&lt;/a>4. Public IP
+&lt;/h2>&lt;ol>
+&lt;li>
+&lt;p>IP Management 메뉴를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-15.png"
+loading="lazy"
+alt="ip management"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Public 구획에서 Reserve Public IP Address를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-16.png"
+loading="lazy"
+alt="reserve public ip address"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>ip 이름을 설정한 후 Reserve Public IP Address를 선택합니다.&lt;br>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-17.png"
+loading="lazy"
+alt="security list"
+>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>다음과 같이 IP가 추가된 것을 확인합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-18.png"
+loading="lazy"
+alt="security list"
+>&lt;/p>
+&lt;/li>
+&lt;/ol></description></item></channel></rss>

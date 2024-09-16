@@ -1,0 +1,651 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="CKA를 준비하면서 공부한 요약 내용입니다.\n강의 What is CKA? Kubernetes Security Primitives Secrure Hosts Password based authentication disabled SSH Key based authentication Secure kubernetes kube-apiserver Who can access? What can they do? Authentication Who can access? Files - Username and Passwords Fiels - Username and Tokens Certificates External Authenication providers - LDAP Service Accounts Authorization What can they do? RBAC Authorization ABAC Authorization Node Authorization Webhook Mode TLS Certificates "><title>(CKA) 06. Security</title>
+<link rel=canonical href=https://aiden-jeon.github.io/blog/p/cka-06.-security/><link rel=stylesheet href=/blog/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="(CKA) 06. Security"><meta property='og:description' content="CKA를 준비하면서 공부한 요약 내용입니다.\n강의 What is CKA? Kubernetes Security Primitives Secrure Hosts Password based authentication disabled SSH Key based authentication Secure kubernetes kube-apiserver Who can access? What can they do? Authentication Who can access? Files - Username and Passwords Fiels - Username and Tokens Certificates External Authenication providers - LDAP Service Accounts Authorization What can they do? RBAC Authorization ABAC Authorization Node Authorization Webhook Mode TLS Certificates "><meta property='og:url' content='https://aiden-jeon.github.io/blog/p/cka-06.-security/'><meta property='og:site_name' content="Aiden's Camp"><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='k8s'><meta property='article:tag' content='cka'><meta property='article:published_time' content='2021-05-23T08:00:00+00:00'><meta property='article:modified_time' content='2021-05-23T08:00:00+00:00'><meta name=twitter:title content="(CKA) 06. Security"><meta name=twitter:description content="CKA를 준비하면서 공부한 요약 내용입니다.\n강의 What is CKA? Kubernetes Security Primitives Secrure Hosts Password based authentication disabled SSH Key based authentication Secure kubernetes kube-apiserver Who can access? What can they do? Authentication Who can access? Files - Username and Passwords Fiels - Username and Tokens Certificates External Authenication providers - LDAP Service Accounts Authorization What can they do? RBAC Authorization ABAC Authorization Node Authorization Webhook Mode TLS Certificates "><link rel="shortcut icon" href=/blog/icons/favicon.ico><script async src="https://www.googletagmanager.com/gtag/js?id=G-419F58RW9W"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-419F58RW9W")}</script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/blog/><img src=/blog/imgs/avatar_hu6933059792947527008.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🔥</span></figure><div class=site-meta><h1 class=site-name><a href=/blog>Aiden's Camp</a></h1><h2 class=site-description>Welcome to Aiden's Camp</h2></div></header><ol class=menu-social><li><a href=https://github.com/Aiden-Jeon target=_blank title=GitHub rel=me><svg class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://www.linkedin.com/in/jongseob-jeon/ target=_blank title=Linkedin rel=me><svg fill="#000" height="800" width="800" id="Layer_1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 310 310"><g id="XMLID_801_"><path id="XMLID_802_" d="M72.16 99.73H9.927c-2.762.0-5 2.239-5 5v199.928c0 2.762 2.238 5 5 5H72.16c2.762.0 5-2.238 5-5V104.73c0-2.76100000000001-2.238-5-5-5z"/><path id="XMLID_803_" d="M41.066.341C18.422.341.0 18.743.0 41.362.0 63.991 18.422 82.4 41.066 82.4c22.626.0 41.033-18.41 41.033-41.038C82.1 18.743 63.692.341 41.066.341z"/><path id="XMLID_804_" d="M230.454 94.761c-24.995.0-43.472 10.745-54.679 22.954V104.73c0-2.761-2.238-5-5-5h-59.599c-2.762.0-5 2.239-5 5v199.928c0 2.762 2.238 5 5 5h62.097c2.762.0 5-2.238 5-5V205.74c0-33.333 9.054-46.319 32.29-46.319 25.306.0 27.317 20.818 27.317 48.034v97.204c0 2.762 2.238 5 5 5H305c2.762.0 5-2.238 5-5V194.995C310 145.43 300.549 94.761 230.454 94.761z"/></g></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/blog/><svg class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span></a></li><li><a href=/blog/categories><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg>
+<span>Categories</span></a></li><li><a href=/blog/tags><svg class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11 3l9 9a1.5 1.5.0 010 2l-6 6a1.5 1.5.0 01-2 0L3 11V7a4 4 0 014-4h4"/><circle cx="9" cy="9" r="2"/></svg>
+<span>Tags</span></a></li><li><a href=/blog/links/><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg>
+<span>Links</span></a></li><li><a href=/blog/search/><svg class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span></a></li><li><a href=/blog/archives/><svg class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+<span>Archives</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ul><li><a href=#kubernetes-security-primitives>Kubernetes Security Primitives</a><ul><li><a href=#secrure-hosts>Secrure Hosts</a></li><li><a href=#secure-kubernetes>Secure kubernetes</a></li><li><a href=#authentication>Authentication</a><ul><li><a href=#who-can-access>Who can access?</a></li></ul></li><li><a href=#authorization>Authorization</a><ul><li><a href=#what-can-they-do>What can they do?</a></li></ul></li><li><a href=#tls-certificates>TLS Certificates</a></li><li><a href=#network-policies>Network Policies</a></li></ul></li><li><a href=#authentication-1>Authentication</a><ul><li><a href=#accounts>Accounts</a></li><li><a href=#auth-mechanisms>Auth Mechanisms</a><ul><li><a href=#basic---file>Basic - file</a></li><li><a href=#basic---token>Basic - token</a></li></ul></li></ul></li><li><a href=#tls>TLS</a><ul><li><a href=#server-certificates-for-servers>Server Certificates for Servers</a><ul><li><a href=#kube-api-server>Kube-Api server</a></li><li><a href=#etcd-server>ETCD Server</a></li><li><a href=#kubelet-server>KUBELET Server</a></li></ul></li><li><a href=#client-certificates-for-clients>Client Certificates for Clients</a><ul><li><a href=#admin>Admin</a></li><li><a href=#kube-scheduler>Kube-Scheduler</a></li><li><a href=#kube-controller-manager>Kube-Controller-Manager</a></li><li><a href=#kube-proxy>Kube-Proxy</a></li></ul></li></ul></li><li><a href=#certification-creation>Certification Creation</a><ul><li><a href=#openssl-to-create-client-certification>OpenSSL to Create Client Certification</a></li><li><a href=#how-to-use>How to use</a></li><li><a href=#openssl-to-create-server-certification>OpenSSL to Create Server Certification</a><ul><li><a href=#etcd-servers>ETCD Servers</a></li><li><a href=#kube-api-server-1>Kube-Api Server</a></li><li><a href=#kubelet-server-1>Kubelet Server</a></li></ul></li></ul></li><li><a href=#view-certificate-details>View Certificate Details</a><ul><li><a href=#inspect-service-logs>Inspect Service Logs</a></li><li><a href=#view-logs>View Logs</a></li></ul></li><li><a href=#certificates-api>Certificates API</a><ul><li><a href=#certificate-signing-request>Certificate Signing Request</a><ul><li><a href=#order>Order</a></li><li><a href=#request>Request</a></li><li><a href=#approve>Approve</a></li><li><a href=#상세-요청>상세 요청</a></li><li><a href=#deny>Deny</a></li><li><a href=#delete>Delete</a></li></ul></li><li><a href=#contoller-manager>Contoller Manager</a></li></ul></li><li><a href=#kubeconfig>Kubeconfig</a><ul><li><a href=#using-kubectl-with-crt>Using kubectl with crt</a></li><li><a href=#using-kubectl-with-config-file>Using kubectl with config file</a></li><li><a href=#kubeconfig-file>KubeConfig File</a><ul><li><a href=#command-line-tool>Command Line Tool</a></li></ul></li></ul></li><li><a href=#api-groups>API Groups</a><ul><li><a href=#example>Example</a></li><li><a href=#types>Types</a></li><li><a href=#api-apis>API, APIS</a></li></ul></li><li><a href=#authorization-1>Authorization</a><ul><li><a href=#authorization-mechanisms>Authorization Mechanisms</a><ul><li><a href=#types-1>Types</a></li><li><a href=#node>Node</a></li><li><a href=#abac>ABAC</a></li><li><a href=#rbac>RBAC</a></li><li><a href=#webhook>Webhook</a></li><li><a href=#alwaysallow>AlwaysAllow</a></li><li><a href=#alwaysdeny>AlwaysDeny</a></li></ul></li><li><a href=#setting>Setting</a></li><li><a href=#inspect>Inspect</a></li></ul></li><li><a href=#cluster-roles>Cluster Roles</a><ul><li><a href=#types-2>Types</a></li><li><a href=#clusterroles>Clusterroles</a></li><li><a href=#clusterrolebining>Clusterrolebining</a></li></ul></li><li><a href=#image-security>Image Security</a><ul><li><a href=#private-repository>Private Repository</a><ul><li><a href=#login-to-private-repository>Login to private repository</a></li><li><a href=#create-secret>Create secret</a></li><li><a href=#create-pod>Create pod</a></li></ul></li></ul></li><li><a href=#security-context>Security Context</a></li><li><a href=#network-policy>Network Policy</a><ul><li><a href=#ingress--egress>Ingress & Egress</a></li><li><a href=#traffic>traffic</a></li><li><a href=#network-security>Network Security</a><ul><li><a href=#selectors>Selectors</a></li></ul></li></ul></li><li><a href=#network-policies-1>Network Policies</a></li></ul></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/blog/categories/kubernetes/>Kubernetes</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/blog/p/cka-06.-security/>(CKA) 06. Security</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>May 23, 2021</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>9 minute read</time></div></footer></div></header><section class=article-content><p>CKA를 준비하면서 공부한 요약 내용입니다.</p><ul><li><a class=link href=https://www.udemy.com/course/certified-kubernetes-administrator-with-practice-tests/ target=_blank rel=noopener>강의</a></li><li><a class=link href=https://www.cncf.io/certification/cka/ target=_blank rel=noopener>What is CKA?</a></li></ul><h2 id=kubernetes-security-primitives><a href=#kubernetes-security-primitives class=header-anchor></a>Kubernetes Security Primitives</h2><h3 id=secrure-hosts><a href=#secrure-hosts class=header-anchor></a>Secrure Hosts</h3><ul><li>Password based authentication disabled</li><li>SSH Key based authentication</li></ul><h3 id=secure-kubernetes><a href=#secure-kubernetes class=header-anchor></a>Secure kubernetes</h3><ul><li>kube-apiserver<ul><li>Who can access?</li><li>What can they do?</li></ul></li></ul><h3 id=authentication><a href=#authentication class=header-anchor></a>Authentication</h3><h4 id=who-can-access><a href=#who-can-access class=header-anchor></a>Who can access?</h4><ul><li>Files - Username and Passwords</li><li>Fiels - Username and Tokens</li><li>Certificates</li><li>External Authenication providers - LDAP</li><li>Service Accounts</li></ul><h3 id=authorization><a href=#authorization class=header-anchor></a>Authorization</h3><h4 id=what-can-they-do><a href=#what-can-they-do class=header-anchor></a>What can they do?</h4><ul><li>RBAC Authorization</li><li>ABAC Authorization</li><li>Node Authorization</li><li>Webhook Mode</li></ul><h3 id=tls-certificates><a href=#tls-certificates class=header-anchor></a>TLS Certificates</h3><p><img src=/imgs/cka/security-1.png loading=lazy alt=tls-certificates-example></p><h3 id=network-policies><a href=#network-policies class=header-anchor></a>Network Policies</h3><p><img src=/imgs/cka/security-2.png loading=lazy alt=networking-policies-example></p><h2 id=authentication-1><a href=#authentication-1 class=header-anchor></a>Authentication</h2><p>Users</p><ul><li>Admins</li><li>Developers</li><li>Application End Users</li><li>Bots</li></ul><h3 id=accounts><a href=#accounts class=header-anchor></a>Accounts</h3><ul><li>User<ul><li>Admins</li><li>Developers</li></ul></li><li>Servcie Accounts<ul><li>Bots</li><li>not supported officialy in k8s</li></ul></li></ul><h3 id=auth-mechanisms><a href=#auth-mechanisms class=header-anchor></a>Auth Mechanisms</h3><ul><li>kube-apiserver<ul><li>Static Password File</li><li>Static Token File</li><li>Certificates</li><li>Identity Service</li></ul></li></ul><h4 id=basic---file><a href=#basic---file class=header-anchor></a>Basic - file</h4><ul><li><code>user-details.csv</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>password123,user1,u0001
+</span></span><span class=line><span class=cl>password123,user2,u0002
+</span></span></code></pre></td></tr></table></div></div></li><li><code>kube-apiserver.service</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nv>ExecStart</span><span class=o>=</span>/usr/local/bin/kube-apiserver <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>      --basic-auth-file<span class=o>=</span>user-details.csv <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>      ...
+</span></span></code></pre></td></tr></table></div></div></li><li>kubeadm<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>creationTimestamp</span><span class=p>:</span><span class=w> </span><span class=kc>null</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>kube-apiserver</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>command</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>kube-apiserver</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- --<span class=l>authorization-mode=Node,RBAC</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=l>&lt;content-hidden&gt;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- --<span class=l>basic-auth-file=/tmp/users/user-details.csv</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li><li>pod<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>kube-apiserver</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>kube-system</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>command</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>kube-apiserver</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=l>&lt;content-hidden&gt;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>k8s.gcr.io/kube-apiserver-amd64:v1.11.3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>kube-apiserver</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>volumeMounts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>mountPath</span><span class=p>:</span><span class=w> </span><span class=l>/tmp/users</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>usr-details</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>readOnly</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>hostPath</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>path</span><span class=p>:</span><span class=w> </span><span class=l>/tmp/users</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>type</span><span class=p>:</span><span class=w> </span><span class=l>DirectoryOrCreate</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>usr-details</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li><li>Authenticate User<ul><li><code>curl -v -k &lt;https://master-node-ip:6443/api/v1/pods> -u "user1:password123"</code></li></ul></li></ul><h4 id=basic---token><a href=#basic---token class=header-anchor></a>Basic - token</h4><ul><li><code>user-token-details.csv</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>asdfbasdhjasdhjkfhjk12312,user1,u0001
+</span></span><span class=line><span class=cl>1234g23rgy8werfg89asdfasd,user2,u0002
+</span></span></code></pre></td></tr></table></div></div></li><li><code>kube-apiserver.service</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nv>ExecStart</span><span class=o>=</span>/usr/local/bin/kube-apiserver <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>      --token-auth-file<span class=o>=</span>user-details.csv <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>      ...
+</span></span></code></pre></td></tr></table></div></div></li><li>kubeadm<ul><li><code>kubectl edit</code></li></ul></li><li>Authenticate User<ul><li><code>curl -v -k &lt;https://master-node-ip:6443/api/v1/pods> --header "Authorization: Bearer asdfbasdhjasdhjkfhjk12312</code></li></ul></li></ul><h2 id=tls><a href=#tls class=header-anchor></a>TLS</h2><ul><li>master node</li><li>worker nodes</li></ul><h3 id=server-certificates-for-servers><a href=#server-certificates-for-servers class=header-anchor></a>Server Certificates for Servers</h3><p><img src=/imgs/cka/security-3.png loading=lazy alt=server-certificates-for-server></p><h4 id=kube-api-server><a href=#kube-api-server class=header-anchor></a>Kube-Api server</h4><ul><li>exposes a service that other components as well as external users use to manage the k8s cluster</li><li>server<ul><li>certificates to secure all communications with its clients</li><li><code>apiserver.crt</code></li><li><code>apiserver.key</code></li></ul></li></ul><h4 id=etcd-server><a href=#etcd-server class=header-anchor></a>ETCD Server</h4><ul><li><code>etcdserver.crt</code></li><li><code>etcdserver.key</code></li></ul><h4 id=kubelet-server><a href=#kubelet-server class=header-anchor></a>KUBELET Server</h4><ul><li><code>kubelet.crt</code></li><li><code>kubelet.key</code></li></ul><h3 id=client-certificates-for-clients><a href=#client-certificates-for-clients class=header-anchor></a>Client Certificates for Clients</h3><p><img src=/imgs/cka/security-4.png loading=lazy alt=client-certificates-for-clients></p><h4 id=admin><a href=#admin class=header-anchor></a>Admin</h4><ul><li><code>admin.crt</code></li><li><code>admin.key</code></li></ul><h4 id=kube-scheduler><a href=#kube-scheduler class=header-anchor></a>Kube-Scheduler</h4><ul><li><code>scheduler.crt</code></li><li><code>scheduler.key</code></li></ul><h4 id=kube-controller-manager><a href=#kube-controller-manager class=header-anchor></a>Kube-Controller-Manager</h4><ul><li><code>controll-manager.crt</code></li><li><code>controll-manager.key</code></li></ul><h4 id=kube-proxy><a href=#kube-proxy class=header-anchor></a>Kube-Proxy</h4><ul><li><code>kube-proxy.crt</code></li><li><code>kube-proxy.key</code></li></ul><h2 id=certification-creation><a href=#certification-creation class=header-anchor></a>Certification Creation</h2><h3 id=openssl-to-create-client-certification><a href=#openssl-to-create-client-certification class=header-anchor></a>OpenSSL to Create Client Certification</h3><ul><li>Certificate Authority(CA)<ul><li>Generate Keys (ca.key)<ul><li><code>openssl genrsa -out ca.key 2048</code></li></ul></li><li>Certificate Signing Requests (ca.csr)<ul><li><code>openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA" -out ca.csr</code></li></ul></li><li>Sign Certificates (ca.crt)<ul><li><code>openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt</code></li></ul></li></ul></li><li>Admin User<ul><li>Generate Keys (admin.key)<ul><li><code>openssl genrsa -out admin.key 2048</code></li></ul></li><li>Certificate Signing Requests (admin.csr)<ul><li><code>openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr</code></li><li><code>"/CN=kube-admin/O=system:masters"</code> ← admin user</li></ul></li><li>Sign Certificates (admin.crt)<ul><li><code>openssl x509 -req -in admin.csr -signkey ca.key -out admin.crt</code></li></ul></li></ul></li><li>Kube Scheduler</li><li>Kube Controller Manager</li><li>kube Proxy</li></ul><h3 id=how-to-use><a href=#how-to-use class=header-anchor></a>How to use</h3><ul><li><code>curl &lt;https://kube-apisever:6443/api/v1/pods> --key admin.key --cert admin.crt --cacert ca.crt</code></li><li>definition<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>clusters</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>cluster</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>certificate-authority</span><span class=p>:</span><span class=w> </span><span class=l>ca.crt</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>server</span><span class=p>:</span><span class=w> </span><span class=l>&lt;https://kube-apiserver:6443&gt;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>kubernetes</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Config</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>users</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>kubernetes-admin</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>user</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>client-certificate</span><span class=p>:</span><span class=w> </span><span class=l>admin.crt</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>clinet-key</span><span class=p>:</span><span class=w> </span><span class=l>admin.key</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h3 id=openssl-to-create-server-certification><a href=#openssl-to-create-server-certification class=header-anchor></a>OpenSSL to Create Server Certification</h3><h4 id=etcd-servers><a href=#etcd-servers class=header-anchor></a>ETCD Servers</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl>- <span class=l>etcd</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>key-file=</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>cert-file=</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>peer-cert-file=</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>peer-client-cert-auth=</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>peer-key-file=</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>peer-trusted-ca-cile</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>trusted-ca-file= </span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=kube-api-server-1><a href=#kube-api-server-1 class=header-anchor></a>Kube-Api Server</h4><p><img src=/imgs/cka/security-5.png loading=lazy alt=server-certificate-example></p><ul><li>Generate Keys (apiserver.key)<ul><li><code>openssl genrsa -out apiserver.key 2048</code></li></ul></li><li>Certificate Signing Requests (apiserver.csr)<ul><li><code>openssl.cnf</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[req]
+</span></span><span class=line><span class=cl>req_extensions = v3_req
+</span></span><span class=line><span class=cl>[ v3_req ]
+</span></span><span class=line><span class=cl>basicConstraints = CA:FALSE
+</span></span><span class=line><span class=cl>keyUsage = nonRpudiation,
+</span></span><span class=line><span class=cl>subjectAltName = @alt_names
+</span></span><span class=line><span class=cl>[alt_names]
+</span></span><span class=line><span class=cl>DNS.1 = kubernetes
+</span></span><span class=line><span class=cl>DNS.2 = kubernetes.default
+</span></span><span class=line><span class=cl>DNS.3 = kubernetes.default.svc
+</span></span><span class=line><span class=cl>DNS.4 = kubernetes.default.svc.cluster.local
+</span></span><span class=line><span class=cl>IP.1 = 10.96.0.1
+</span></span><span class=line><span class=cl>IP.2 = 172.17.0.87
+</span></span></code></pre></td></tr></table></div></div></li><li><code>openssl req -new -key apiserver.key -subj "/CN=kube-apiserver" -out apiserver.csr -config openssl.cnf</code></li></ul></li><li>Sign Certificates (apiserver.crt)<ul><li><code>openssl x509 -req -in apiserver.csr -CA ca.crt -CAkey ca.key -out apiserver.crt</code></li></ul></li></ul><h4 id=kubelet-server-1><a href=#kubelet-server-1 class=header-anchor></a>Kubelet Server</h4><ul><li>server cert
+<img src=/imgs/cka/security-6.png loading=lazy alt=server-cert-examples><ul><li>definition<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>kubelet.config.k8s.io/v1beta1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>KubeletConfiguration</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>authentication</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>x509</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>clientCAFile</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/var/lib/kubernetes/ca.pem&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>authorization</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>mode</span><span class=p>:</span><span class=w> </span><span class=l>Webhook</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>clusterDomain</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;cluster.local&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>clusterDNS</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=s2>&#34;10.32.0.10&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>podCIDR</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;$(POD_CIDR)&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>resolveConf</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/run/systemd/resolve/resolv.conf&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>reuntimeRequrestTimeout</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;15m&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>tlsCertFile</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/var/lib/kubelet/kubelet-node01.crt&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>tlsPrivateKeyFile</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/var/lib/kubelet/kubelet-node01.key&#34;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul></li><li>client cert
+<img src=/imgs/cka/security-7.png loading=lazy alt=client-crt-examples></li></ul><h2 id=view-certificate-details><a href=#view-certificate-details class=header-anchor></a>View Certificate Details</h2><ul><li>The Hard Way<ul><li><code>cat /etc/systemd/system/kube-apiserver.service</code></li></ul></li><li>kubeadm<ul><li><code>cat /etc/kubernetes/manifest/kube-apiserver.yaml</code></li></ul></li></ul><h3 id=inspect-service-logs><a href=#inspect-service-logs class=header-anchor></a>Inspect Service Logs</h3><ul><li><code>journalctl -u etcd.service</code></li></ul><h3 id=view-logs><a href=#view-logs class=header-anchor></a>View Logs</h3><ul><li><code>kubectl logs etcd-master</code></li></ul><h2 id=certificates-api><a href=#certificates-api class=header-anchor></a>Certificates API</h2><h3 id=certificate-signing-request><a href=#certificate-signing-request class=header-anchor></a>Certificate Signing Request</h3><h4 id=order><a href=#order class=header-anchor></a>Order</h4><ol><li>Create <code>CertificateSigningReqeust</code> Object</li><li>Review Requests</li><li>Approve Requests</li><li>Share Certs to Users</li></ol><h4 id=request><a href=#request class=header-anchor></a>Request</h4><ul><li><code>openssl genrsa -out jan.key 2048</code></li><li><code>openssl req -new -key jane.key -subj "/CN=jane" -out jan.csr</code></li><li>send to the administrator</li><li>administrator takes the key and creates a <code>CertifacteSigningRequest</code> obejct<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>certificates.k8s.io/v1beta1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>CeritifcateSigningRequest</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>jane</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>groups</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>system:authenticated</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>usage</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>digital signature</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>key encipherment</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>server auth</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>request</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=l>&lt;cat jane.csr | base64&gt;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li><code>cat akshay.csr | base64 | tr -d "\\n"</code></li></ul></li></ul><h4 id=approve><a href=#approve class=header-anchor></a>Approve</h4><ul><li><code>kubectl get csr</code><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>&gt; k get csr
+</span></span><span class=line><span class=cl>NAME     AGE   SIGNERNAME                            REQUESTOR          CONDITION
+</span></span><span class=line><span class=cl>akshay   10s   kubernetes.io/kube-apiserver-client   kubernetes-admin   Pending
+</span></span></code></pre></td></tr></table></div></div></li><li><code>kubectl certificate approve jane</code></li></ul><h4 id=상세-요청><a href=#%ec%83%81%ec%84%b8-%ec%9a%94%ec%b2%ad class=header-anchor></a>상세 요청</h4><ul><li><code>kubectl get csr jane -0 yaml</code></li></ul><h4 id=deny><a href=#deny class=header-anchor></a>Deny</h4><ul><li><code>kubectl certificate deny agent-smith</code></li></ul><h4 id=delete><a href=#delete class=header-anchor></a>Delete</h4><ul><li><code>kubectl delete csr agent-smith</code></li></ul><h3 id=contoller-manager><a href=#contoller-manager class=header-anchor></a>Contoller Manager</h3><ul><li>CSR-APPROVING</li><li>CSR-SIGNING</li><li><code>cat /etc/kubernetes/manifests/kube-controller-manager.yaml</code></li></ul><h2 id=kubeconfig><a href=#kubeconfig class=header-anchor></a>Kubeconfig</h2><h3 id=using-kubectl-with-crt><a href=#using-kubectl-with-crt class=header-anchor></a>Using kubectl with crt</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>kubectl get pods
+</span></span><span class=line><span class=cl>  --server my-kube-playground:6443
+</span></span><span class=line><span class=cl>  --client-key admin.key
+</span></span><span class=line><span class=cl>  --client-certificated admin.crt
+</span></span><span class=line><span class=cl>  --certificate-authority ca.crt
+</span></span></code></pre></td></tr></table></div></div><ul><li>this is tedious task<ul><li>→ move it to config file</li></ul></li></ul><h3 id=using-kubectl-with-config-file><a href=#using-kubectl-with-config-file class=header-anchor></a>Using kubectl with config file</h3><ul><li>config<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>  --server my-kube-playground:6443
+</span></span><span class=line><span class=cl>  --client-key admin.key
+</span></span><span class=line><span class=cl>  --client-certificated admin.crt
+</span></span><span class=line><span class=cl>  --certificate-authority ca.crt
+</span></span></code></pre></td></tr></table></div></div></li><li>kubectl<ul><li><code>kubectl get pods --kubeconfig config</code></li><li>default config file path<ul><li><code>.kube/config</code></li></ul></li></ul></li></ul><h3 id=kubeconfig-file><a href=#kubeconfig-file class=header-anchor></a>KubeConfig File</h3><ul><li>clusters<ul><li>development</li><li>production</li><li>google</li><li><code>--server my-kube-playground:6443</code></li></ul></li><li>contexts<ul><li>match cluster and users<ul><li>admin@production</li><li>dev@google</li><li>mykubeadmin@mykubeplayground</li></ul></li></ul></li><li>users<ul><li>admin</li><li>dev user</li><li>prod user</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>  --client-key admin.key
+</span></span><span class=line><span class=cl>  --client-certificated admin.crt
+</span></span><span class=line><span class=cl>  --certificate-authority ca.crt
+</span></span></code></pre></td></tr></table></div></div></li><li>defintion<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Config</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>current-context</span><span class=p>:</span><span class=w> </span><span class=l>dev-user@google</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>clusters</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-kube-playground</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>cluster</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>certificate-authority</span><span class=p>:</span><span class=w> </span><span class=l>ca.crt</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>server</span><span class=p>:</span><span class=w> </span><span class=l>my-kube-playground:6443</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>contexts</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-kube-admin@my-kube-playground</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>context</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>clusters</span><span class=p>:</span><span class=w> </span><span class=l>my-kube-playground</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>user</span><span class=p>:</span><span class=w> </span><span class=l>my-kube-admin</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>...</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>users</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-kube-admin</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>user</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>client-certificate</span><span class=p>:</span><span class=w> </span><span class=l>admin.crt</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>client-key</span><span class=p>:</span><span class=w> </span><span class=l>admin.key</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>...</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li><code>current-context</code><ul><li>default context</li></ul></li><li><code>certificate-authority</code><ul><li>instead file path using data directly</li><li><code>certificate-authority-data</code><ul><li>with base64 encoding</li></ul></li></ul></li></ul></li></ul><h4 id=command-line-tool><a href=#command-line-tool class=header-anchor></a>Command Line Tool</h4><ul><li>view<ul><li><code>kubectl config view</code></li><li><code>kubectl config view --kubeconfig=&lt;config-file-name></code></li></ul></li><li>update<ul><li><code>kubectl config use-context prod-user@production</code></li></ul></li><li>helo<ul><li><code>kubectl config -h</code></li></ul></li></ul><h2 id=api-groups><a href=#api-groups class=header-anchor></a>API Groups</h2><h3 id=example><a href=#example class=header-anchor></a>Example</h3><ul><li><code>curl &lt;https://kube-master:6443/version</code>></li><li><code>curl &lt;https://kube-master:6443/api/v1/pods</code>></li></ul><h3 id=types><a href=#types class=header-anchor></a>Types</h3><ul><li><code>/metrics</code></li><li><code>/healthz</code></li><li><code>/version</code></li><li><code>/api</code></li><li><code>/apis</code></li><li><code>/logs</code></li></ul><h3 id=api-apis><a href=#api-apis class=header-anchor></a>API, APIS</h3><ul><li><code>api</code><ul><li>core group
+<img src=/imgs/cka/security-8.png loading=lazy alt=core-grup></li></ul></li><li><code>apis</code><ul><li>named group
+<img src=/imgs/cka/security-9.png loading=lazy alt=named-group></li></ul></li><li>CLT<ul><li><code>curl &lt;http://localhost:6443> -k</code></li><li><code>curl &lt;http://localhost:6443> -k | grep "name"</code></li><li>need certificates file</li></ul></li><li><code>kubectl proxy</code><ul><li>to see proxy</li><li><code>kube proxy</code> ≠ <code>kubectl proxy</code></li><li><code>kube proxy</code><ul><li>enable connectivity betewwnd pods and services across different nodes in the cluster.</li></ul></li><li><code>kubectl proxy</code><ul><li>HTTP proxy service created by kubectl utility to access the kube-api sever</li></ul></li></ul></li></ul><h2 id=authorization-1><a href=#authorization-1 class=header-anchor></a>Authorization</h2><h3 id=authorization-mechanisms><a href=#authorization-mechanisms class=header-anchor></a>Authorization Mechanisms</h3><h4 id=types-1><a href=#types-1 class=header-anchor></a>Types</h4><ul><li>Node</li><li>ABAC</li><li>RBAC</li><li>Webhook</li></ul><h4 id=node><a href=#node class=header-anchor></a>Node</h4><ul><li>Node Authorizer</li></ul><h4 id=abac><a href=#abac class=header-anchor></a>ABAC</h4><p>User Attribute Based Authorization</p><ul><li>dev-user<ul><li>→ Can view PODs</li><li>→ Can create PODs</li><li>→ Can delete PODs</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=p>{</span><span class=nt>&#34;kind&#34;</span><span class=p>:</span> <span class=s2>&#34;Policy&#34;</span><span class=p>,</span> <span class=nt>&#34;spec&#34;</span><span class=p>:</span> <span class=p>{</span><span class=nt>&#34;user&#34;</span><span class=p>:</span> <span class=s2>&#34;dev-user&#34;</span><span class=p>,</span> <span class=nt>&#34;namespace&#34;</span><span class=p>:</span> <span class=s2>&#34;*&#34;</span><span class=p>,</span> <span class=nt>&#34;resource&#34;</span><span class=p>:</span> <span class=s2>&#34;pods&#34;</span><span class=p>,</span> <span class=nt>&#34;apiGroup&#34;</span><span class=p>:</span> <span class=s2>&#34;*&#34;</span><span class=p>}}</span>
+</span></span></code></pre></td></tr></table></div></div></li></ul><h4 id=rbac><a href=#rbac class=header-anchor></a>RBAC</h4><p>Rule Based Authorizaion</p><ul><li>Developer<ul><li>→ Can view PODs</li><li>→ Can create PODs</li><li>→ Can delete PODs</li></ul></li><li>definition<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Role</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>developer</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>rules</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;pods&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;list&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;get&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;create&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;update&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;delete&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>resourceNames</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;blue&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;orange&#34;</span><span class=p>]</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li>rules have 3 sections<ul><li><code>apiGroups</code></li><li><code>resources</code></li><li><code>verbs</code></li></ul></li></ul></li><li>link users to rule<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>RoleBinding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>devuser-developer-binding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>subjects</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>User</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>dev-user</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>roleRef</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Role</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>developer</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li><li>view<ul><li><code>kubectl get roles</code></li><li><code>kubectl get rolebindings</code></li></ul></li><li>Check Access<ul><li><code>kubectl auth can-i create deployments</code></li><li><code>kubectl auth can-i delete nodes</code></li><li><code>kubectl auth can-i create deployments --as dev-user</code></li></ul></li></ul><h4 id=webhook><a href=#webhook class=header-anchor></a>Webhook</h4><ul><li>outsource all the mechanism</li></ul><h4 id=alwaysallow><a href=#alwaysallow class=header-anchor></a>AlwaysAllow</h4><ul><li>always allow</li></ul><h4 id=alwaysdeny><a href=#alwaysdeny class=header-anchor></a>AlwaysDeny</h4><ul><li>always deny</li></ul><h3 id=setting><a href=#setting class=header-anchor></a>Setting</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nv>ExecStart</span> <span class=o>=</span> ...<span class=se>\\</span>
+</span></span><span class=line><span class=cl>  --authorization-mode<span class=o>=</span>AlwaysAllow
+</span></span></code></pre></td></tr></table></div></div><ul><li>default : <code>AlwaysAllow</code></li><li>multiple mode:<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Node,RBAC,Webhook
+</span></span></code></pre></td></tr></table></div></div><ul><li>if one&rsquo;s requiest is denied, it pass to next chain</li><li>if approved no more checks.</li></ul></li></ul><h3 id=inspect><a href=#inspect class=header-anchor></a>Inspect</h3><ul><li><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kubectl describe pod kube-apisever-controlplane -n kube-system
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>--authorizastion mode</code></li></ul></li></ul><h2 id=cluster-roles><a href=#cluster-roles class=header-anchor></a>Cluster Roles</h2><h3 id=types-2><a href=#types-2 class=header-anchor></a>Types</h3><ul><li>namespace ← role<ul><li>pods</li><li>replicasets</li><li>&mldr;</li><li><code>kubectl api-resources --namespaced=true</code></li></ul></li><li>cluster scoped<ul><li>nodes</li><li>pv</li><li>&mldr;</li><li><code>kubectl api-resources --namespaced=false</code></li></ul></li></ul><h3 id=clusterroles><a href=#clusterroles class=header-anchor></a>Clusterroles</h3><ul><li>Cluster admin<ul><li>Can view Nodes</li><li>can create Nodes</li><li>Can delete Nodes</li></ul></li><li>definition<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorizastion.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-administrator</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>rules</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>apiGroups</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>resources</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;nodes&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>verbs</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;list&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;get&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;create&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;delete&#34;</span><span class=p>]</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h3 id=clusterrolebining><a href=#clusterrolebining class=header-anchor></a>Clusterrolebining</h3><ul><li>definition<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRoleBinding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-admin-role-binding</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>subjects</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>User</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-admin</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>roleRef</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ClusterRole</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>cluster-administrator</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>apiGroup</span><span class=p>:</span><span class=w> </span><span class=l>rbac.authorization.k8s.io</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h2 id=image-security><a href=#image-security class=header-anchor></a>Image Security</h2><h3 id=private-repository><a href=#private-repository class=header-anchor></a>Private Repository</h3><h4 id=login-to-private-repository><a href=#login-to-private-repository class=header-anchor></a>Login to private repository</h4><ul><li><code>docker login private-registry.io</code></li><li><code>docker run private-registry.io/apss/internal-app</code></li></ul><h4 id=create-secret><a href=#create-secret class=header-anchor></a>Create secret</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=l>kubectl create secrete docker-registry regcred  \\</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>docker-server=private-registry.io  \\</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>docker-username=registry-user  \\</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>docker-password=registry-password  \\</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>--<span class=l>docker-email=registry-user@org.com</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=create-pod><a href=#create-pod class=header-anchor></a>Create pod</h4><ul><li>definition<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Poid</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>nginx-pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>nginx</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>private-registry.op/apps/internal-app</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>imagePullSecrets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>regcred</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h2 id=security-context><a href=#security-context class=header-anchor></a>Security Context</h2><ul><li>definition for pod<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>web-pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>securityContext</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>runAsUser</span><span class=p>:</span><span class=w> </span><span class=m>1000</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>command</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;sleep&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;3600&#34;</span><span class=p>]</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li><li>definition for container<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>web-pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>containers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>ubuntu</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>command</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;sleep&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;3600&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>securityContext</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>runAsUser</span><span class=p>:</span><span class=w> </span><span class=m>1000</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>capabilities</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>add</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;AMC_ADMIN&#34;</span><span class=p>]</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li><code>capabilities</code><ul><li>only supported at the container level</li></ul></li></ul></li></ul><h2 id=network-policy><a href=#network-policy class=header-anchor></a>Network Policy</h2><h3 id=ingress--egress><a href=#ingress--egress class=header-anchor></a>Ingress & Egress</h3><p><img src=/imgs/cka/security-10.png loading=lazy alt=ingres-egress-outline></p><ul><li>ingress<ul><li>for a web serever the incoming traffic from the users is an ingress</li></ul></li><li>egress<ul><li>outgoing request to the app server</li><li>allow external calls</li></ul></li></ul><h3 id=traffic><a href=#traffic class=header-anchor></a>traffic</h3><p><img src=/imgs/cka/security-11.png loading=lazy alt=traffic-outline></p><h3 id=network-security><a href=#network-security class=header-anchor></a>Network Security</h3><ul><li>Network Policy<ul><li>eg) Allow Ingress Raffic From API pod on Port 3306</li></ul></li></ul><h4 id=selectors><a href=#selectors class=header-anchor></a>Selectors</h4><ul><li>definition<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersions</span><span class=p>:</span><span class=w> </span><span class=l>networking.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>NetworkPolicy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>db-policy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>podSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>mathLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>role</span><span class=p>:</span><span class=w> </span><span class=l>db</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>policyTpes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>Ingress</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>ingress</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>from</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>podSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>api-pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>TCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>3306</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul><h2 id=network-policies-1><a href=#network-policies-1 class=header-anchor></a>Network Policies</h2><ul><li>network policy to pod to protect<ul><li>defintion<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersions</span><span class=p>:</span><span class=w> </span><span class=l>networking.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>NetworkPolicy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>db-policy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>podSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>mathLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>role</span><span class=p>:</span><span class=w> </span><span class=l>db</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul></li><li>what type of policies?<ul><li>ingress or egress or both ?</li><li>allow incoming request → ingress</li><li>if incoming request is allowed, response is allowed automatically</li><li>definition<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=w>  </span><span class=nt>policyTpes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>Ingress</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul></li><li>define specific rules<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=w>  </span><span class=nt>ingress</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>from</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>podSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>api-pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>TCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>3306</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li><li>allow only in prod namespace<ul><li>definition (and)<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=w>  </span><span class=nt>ingress</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>from</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>podSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>api-pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>namespaceSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>prod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>TCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>3306</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li>if only <code>namespaceSelector</code> is defined<ul><li>allow or request in same namespace</li></ul></li></ul></li><li>definition (or)<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=w>  </span><span class=nt>ingress</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>from</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>podSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>api-pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>namespaceSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>prod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>TCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>3306</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><ul><li>use array</li></ul></li></ul></li><li>to backup in server<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=w>  </span>- <span class=nt>ipBlock</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>cidr</span><span class=p>:</span><span class=w> </span><span class=m>192.168.5.10</span><span class=l>/32</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li><li>to push to bakcup server<div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>apiVersions</span><span class=p>:</span><span class=w> </span><span class=l>networking.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>NetworkPolicy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>db-policy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>podSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>mathLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>role</span><span class=p>:</span><span class=w> </span><span class=l>db</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>policyTpes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>Ingress</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>Egress</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>ingress</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>from</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>podSelector</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>          </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>api-pod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>TCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>3306</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>egress</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>to</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>ipBlock</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nt>cidr</span><span class=p>:</span><span class=w> </span><span class=m>192.168.5.10</span><span class=l>/32</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>protocol</span><span class=p>:</span><span class=w> </span><span class=l>TCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>80</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div></li></ul></section><footer class=article-footer><section class=article-tags><a href=/blog/tags/k8s/>K8s</a>
+<a href=/blog/tags/cka/>Cka</a></section><section class=article-copyright><svg class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY-NC-SA 4.0</span></section></footer><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css integrity=sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV crossorigin=anonymous><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js integrity=sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8 crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous defer></script><script>window.addEventListener("DOMContentLoaded",()=>{renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}],ignoredClasses:["gist"]})})</script></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/blog/p/cka-cka-%ED%95%A9%EA%B2%A9-%ED%9B%84%EA%B8%B0/><div class=article-details><h2 class=article-title>(CKA) CKA 합격 후기</h2></div></a></article><article><a href=/blog/p/cka-09.-design-and-install-a-k8s-cluster/><div class=article-details><h2 class=article-title>(CKA) 09. Design and Install a k8s Cluster</h2></div></a></article><article><a href=/blog/p/cka-08.-networking/><div class=article-details><h2 class=article-title>(CKA) 08. Networking</h2></div></a></article><article><a href=/blog/p/cka-08.-networking-pre-requisites/><div class=article-details><h2 class=article-title>(CKA) 08. Networking Pre-requisites</h2></div></a></article><article><a href=/blog/p/cka-07.-storage/><div class=article-details><h2 class=article-title>(CKA) 07. Storage</h2></div></a></article></div></div></aside><script src=https://utteranc.es/client.js repo=aiden-jeon/aiden-jeon.github.io issue-term=pathname label=comment crossorigin=anonymous async></script><style>.utterances{max-width:unset}</style><script>let utterancesLoaded=!1;function setUtterancesTheme(e){let t=document.querySelector(".utterances iframe");t&&t.contentWindow.postMessage({type:"set-theme",theme:`github-${e}`},"https://utteranc.es")}addEventListener("message",e=>{if(e.origin!=="https://utteranc.es")return;utterancesLoaded=!0,setUtterancesTheme(document.documentElement.dataset.scheme)}),window.addEventListener("onColorSchemeChange",e=>{if(!utterancesLoaded)return;setUtterancesTheme(e.detail)})</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2024 Aiden's Camp</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.27.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/blog/ts/main.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
