@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Xai on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/xai/</link><description>Recent content in Xai on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 19 Jul 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/xai/index.xml" rel="self" type="application/rss+xml"/><item><title>Properties of Explanations</title><link>https://aiden-jeon.github.io/blog/p/properties-of-explanations/</link><pubDate>Mon, 19 Jul 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/properties-of-explanations/</guid><description>&lt;h1 id="properties-of-explanations">&lt;a href="#properties-of-explanations" class="header-anchor">&lt;/a>Properties of Explanations
+&lt;/h1>&lt;p>딥러닝 모델을 해석하려는 목적은 모델의 의사 결정 과정을 사람이 이해할 수 있게 하는데 있습니다.
+이 목적이 달성되었다고 보려면 다음 두 가지 특성이 만족해야 됩니다.&lt;/p>
+&lt;ol>
+&lt;li>explanations should be easy for humans to interpret&lt;/li>
+&lt;li>explanations should be faithfully describing the decision-making process of the target model&lt;/li>
+&lt;/ol>
+&lt;h2 id="easiness-to-interpret">&lt;a href="#easiness-to-interpret" class="header-anchor">&lt;/a>Easiness to interpret
+&lt;/h2>&lt;p>모델 예측의 설명이 어렵다면 사람들이 사용하기 어렵습니다. 예를 들어서 뉴럴넷 모델의 해석이라고 모델의 모든 함수들의 chain 값을 준다면 이는 모델을 이해하는데 아무런 도움이 되지 않습니다.&lt;/p>
+&lt;p>각 모델 설명 방법 별로 해석 방법은 다양합니다. 예를 들어서 minimal suffictient subsets는 일부의 feature만 있어도 모델 예측을 할 수 있는 모든 정보는 들어 있다고 해석할 수 있습니다. 그런데 Shapley value를 이용한 설명 방법은 사람이 이해하기 어렵습니다. Shapley value는 가능한 모든 경우의 수에서 각 marginal contribution을 계산한 값입니다. 이렇게 정량화된 값은 사람마다 다를 수 있지만 직관적이진 않습니다. 주어진 Shapley value의 값과 방향만 보고 feature별 중요도를 비교하는 등 잘못된 해석을 할 수 있습니다.&lt;/p>
+&lt;h2 id="faithfulness">&lt;a href="#faithfulness" class="header-anchor">&lt;/a>Faithfulness
+&lt;/h2>&lt;p>모델 설명의 충실함은 모델이 예측하는 의사 결정 과정을 얼마나 잘 맞추었는지로 평가할 수 있습니다.
+여기서 주의해야 할 것은 이 개념이 모델 설명이 얼마나 정확했는지와는 다른 개념입니다.&lt;/p>
+&lt;p>모델의 설명은 사용자들에게 모델에 대한 인식과 신뢰에 영향을 줍니다.
+그렇기 때문에 충실하지 못한 모델의 설명은 잘못된 모델을 믿게 만들 수 있습니다.&lt;/p></description></item><item><title>Feature-Based Explanations</title><link>https://aiden-jeon.github.io/blog/p/feature-based-explanations/</link><pubDate>Sun, 18 Jul 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/feature-based-explanations/</guid><description>&lt;h1 id="feature-based-explanations">&lt;a href="#feature-based-explanations" class="header-anchor">&lt;/a>Feature-Based Explanations
+&lt;/h1>&lt;ul>
+&lt;li>$m$: model&lt;/li>
+&lt;li>$x=(x_1, x_2, &amp;hellip;, x_n)$: an instance with variable $n$
+&lt;ul>
+&lt;li>eg) $x_i$ 는 문장 $x$의 $i$번 째 토큰&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Importance weights explanations&lt;/strong>는 각 feature $x_i$별로 중요도를 숫자로 표현&lt;br>
+&lt;strong>Subsets explanations&lt;/strong>는 $x$가 예측에 영향을 미친 subset $x$를 제공&lt;/p>
+&lt;h2 id="1-importance-weights">&lt;a href="#1-importance-weights" class="header-anchor">&lt;/a>1. Importance Weights
+&lt;/h2>&lt;h3 id="11-feature-additive-weights">&lt;a href="#11-feature-additive-weights" class="header-anchor">&lt;/a>1.1) Feature-Additive Weights
+&lt;/h3>&lt;p>&lt;em>Feature-additivity&lt;/em>란 모든 feature의 중요도의 합이 모델의 예측에서 모델의 편향을 뺀 값과 동일해야 하는 속성을 말합니다.&lt;/p>
+&lt;p>분류 문제에서는 모델의 예측은 각 클래스별 확률이고, 보통 이 중 가장 높은 확률값으로 반환합니다. 모델의 편향이란 reference, baseline 입력과 같이 아무런 정보(no information)도 없는 예측입니다. 예를 들어서 이미지 처리에서는 검은색 이미지, 자연어 처리에서는 zero-vector embedding을 baseline으로 사용합니다.&lt;/p>
+&lt;p>더할 수 있는 성질과 유사하게 예측에 대한 설명에 사용된 모든 피쳐들은 occlusion, omission 방법이 가능합니다. Occlusion이란 특정 feature를 baseline feature로 대체하는 것을, Omission은 특정 feature를 완전히 제거하는 것을 의미합니다. 예를 들어 자연어 처리에서 Omission이란 문장의 길이를 변수로 사용하는 방법 입니다. Feature에 변형을 가하는 occlusion과 omission은 out-of-distribution 입력으로 신뢰할 수 없는 중요치를 제공하게 됩니다.&lt;/p>
+&lt;p>Feature-additivitiy 제약 조건 아래, feature ${\{ x_{i} \}}&lt;em>{i}$ 는 $\{w&lt;/em>{i}(m,x)\}_i$ 의 가중치를 갖게 됩니다.&lt;/p>
+&lt;p>$$\sum_{i=1}^{\left| \mathbf{x} \right|}{w_{i}(m,\mathbf{x})=m(\mathbf{x})-m(\mathbf{b})}\tag{1}$$&lt;/p>
+&lt;p>수식에서 $m$은 모델, $\mathbf{x}$는 instance, $\mathbf{b}$는 베이스라인 input을 의미합니다.
+회귀 모델에서 $m(\mathbf{x})$는 모델이 예측한 실제 값이며, 분류 모델에서는 클래로 예측한 확률입니다.&lt;/p>
+&lt;h4 id="shapley-values">&lt;a href="#shapley-values" class="header-anchor">&lt;/a>Shapley values
+&lt;/h4>&lt;p>&lt;a class="link" href="https://arxiv.org/abs/1705.07874" target="_blank" rel="noopener"
+>Lundberg and Lee (2017)&lt;/a> 연구는 feature-additive 설명 방법을 하나로 통합하기 위해 진행된 연구입니다. 연구에서는 게임이론의 Shapley values만이 연구에서 정의한 세 가지의 특성을 만족하는 유일한 방법임을 증명했습니다.&lt;/p>
+&lt;ol>
+&lt;li>Local Accuracy (completeness)&lt;br>
+이 특성을 만족하기 위해서는 위에서 제시한 (1)식을 만족해야 합니다. 모든 feature-additive 방법들이 제공하는 중요도가 이 식을 만족하지는 않습니다. 예를 들으서 LIME은 $\mathbf{x}$의 주변에서 선형 회귀 모델을 학습합기 때문에 같은 값을 재현할 수 가 없습니다.&lt;/li>
+&lt;li>Missingness&lt;br>
+이 특성을 만족하기 위해서는 $\mathbf{x}$에 존재하지 않는 feature는 중요도가 0이어야 합니다. 예를 들어서 모델 $m$과 문장 $\mathbf{x}$이 있을 때, $\mathbf{x}$에 존재하는 토큰들만 0 또는 다른 값의 중요도를 가져야합니다. 문장 $\mathbf{x}$에 존재하지 않는 다른 단어들은 0의 중요도여야 합니다.&lt;/li>
+&lt;li>Consistency&lt;br>
+이 특성을 만족하기 위해서는 두 개의 모델 $m$, $m&amp;rsquo;$ 있을 때 어떤 feature $x_i$가 모델 $m&amp;rsquo;$ 보다 $m$ 에서 더 큰 기여(marginal contribution)를 했다면 모델 $m$에서의 feature $x_i$의 기여도가 $m&amp;rsquo;$의 $x_i$의 기여도 보다 더 크게 나와야 합니다.&lt;/li>
+&lt;/ol>
+&lt;h3 id="12-non-feature-additive-weights">&lt;a href="#12-non-feature-additive-weights" class="header-anchor">&lt;/a>1.2) Non-Feature-Additive Weights
+&lt;/h3>&lt;p>대부분의 importance weights explainer들은 feature-additivity 특성을 기본으로 합니다. 다만 일부 연구에서는 이러한 특성을 신경쓰지 않습니다. 예를 들어 LS-Tree는 구분 분석 트리(parse tree)를 언어 데이터에 사용해 문장 내 토큰 간의 상호작용을 감지하고 이를 정량화하는데 가중치를 사용 할 수 있도록 합니다.&lt;/p>
+&lt;h2 id="2-minimal-sufficient-subsets">&lt;a href="#2-minimal-sufficient-subsets" class="header-anchor">&lt;/a>2. Minimal Sufficient Subsets
+&lt;/h2>&lt;p>다른 유명한 예측을 설명하는 방법으로는 minimal sufficient subset(mss) 가 있습니다. Minimal sufficient subset란 입력으로 받은 feature중 일부분만 사용했을 때 전체 feature를 사용한 값과 같은 예측을 할 수 있는 feature subset을 말합니다.&lt;/p>
+&lt;p>Minimal sufficient subset를 구하기 위해서는 우선 feature의 부분 집합 $\mathbf{x}_\mathbf{s}$ 를 모델 $m$으로 예측해야 합니다.&lt;/p>
+&lt;p>이 때 위에서 설명한 omission과 deletion을 이용해 $\mathbf{x}$를 $\mathbf{x}_\mathbf{s}$를 만들 수 있습니다.&lt;/p>
+&lt;p>그런데 만약 모델이 feature의 부분 집합으로는 예측할 수 없고 feature 전체를 필요로 하는 경우에는 이 방법을 적용할 수 없습니다. 전체 feature를 필요하는 경우 이 방법으로 이용한 설명에는 아무런 정보가 없습니다(uninformative).
+그럼에도 일부 feature만 사용하는 모델에 대해서는 좋은 설명 방법이 됩니다. 예를 들어서 computer vision에서는 모든 픽셀이 문제를 푸는데 필요하지 않습니다. 비슷하게 감정분석에서는 일부 구문만 있어도 충분히 감정을 분류할 수 있습니다.&lt;/p>
+&lt;p>또한 여러 개의 minimal sufficient subset이 존재할 수 있는데, 이 때 각 minimal sufficient subset들은 인스턴스의 예측을 설명하는 하나의 독립적인 잠재적 설명(potential explanation)이 됩니다. 이런 경우에는 모델의 전체적인 면(complete view) 를 보여주기 위해서는 가능한 모든 minimal sufficient subset를 보여주어야 합니다.&lt;/p>
+&lt;p>Minimal Sufficient Subsets를 이용하는 설명 방법으로는 L2X, SIS, Anchors, INVASE 등이 있습니다.
+L2X는 전체 feature를 이용한 예측과 subset feature를 이용한 예측의 상호 정보(mutual information)을 극대화 시키는 subset를 학습합니다.
+다만, L2X를 계산하기 위해서는 최소의 원소 개수(cardinality of a minimal sufficient subset)를 모수로서 정해야 합니다.
+이러한 요소는 L2X를 실제 문제에 적용을 어렵게 합니다.
+이를 극복한 알고리즘이 INVASE인데, 이 알고리즘은 각 인스턴스 별로 최소의 원소 개수를 다르게 지정할 수 있습니다.
+L2X와 INVASE 알고리즘은 한 개의 subset만을 제공합니다. 반대로 SIS는 서로 겹치지(overlap) 않는 minimal sufficient subset를 제공합니다.&lt;/p></description></item><item><title>Types of Explanatory Methods</title><link>https://aiden-jeon.github.io/blog/p/types-of-explanatory-methods/</link><pubDate>Wed, 14 Jul 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/types-of-explanatory-methods/</guid><description>&lt;p>&lt;strong>들어가기 앞서..&lt;/strong>&lt;br>
+본 포스트는 &lt;a class="link" href="https://arxiv.org/abs/2010.01496?fbclid=IwAR3Y5gfxtckZR4lHpFpQgo6ba-v_O0Fj-93G0sRMtXKYTBdESeH29uN4mg8" target="_blank" rel="noopener"
+>Explaining Deep Neural Networks
+&lt;/a> 논문을 읽고 요약한 내용입니다.
+더 자세한 내용은 해당 논문을 참고해주세요.&lt;/p>
+&lt;hr>
+&lt;h1 id="types-of-explanatory-methods">&lt;a href="#types-of-explanatory-methods" class="header-anchor">&lt;/a>Types of Explanatory Methods
+&lt;/h1>&lt;h2 id="1-post-hoc-versus-self-explanatory">&lt;a href="#1-post-hoc-versus-self-explanatory" class="header-anchor">&lt;/a>1. Post-Hoc versus Self-Explanatory
+&lt;/h2>&lt;p>&lt;strong>Post-hoc explanatory methods&lt;/strong>&lt;br>
+사후 설명 방법은 이미 학습이 끝나서 고정된 모델을 대상으로 합니다.&lt;br>
+이러한 방법의 대표적인 예시로는 LIME이 있습니다. LIME은 설명하고자 하는 모델의 예측을 그 주변의 값들을 이용해 선형 회귀와 같은 해석 가능한 모델을 학습시켜서 설명합니다.&lt;br>
+- 장점) 고정된 모델을 대상으로 하기 때문에 모델에 영향을 미치지 않음&lt;br>
+- 단점) 모델 학습 외에 추가적인 학습이 필요하며 이를 위한 설명이 있는 데이터셋이 필요&lt;/p>
+&lt;p>&lt;strong>Self-explanatory models&lt;/strong>&lt;br>
+자기 설명(Self-explanatory)이 가능한 모델들은 아키텍쳐 속에 모델의 예측의 해석을 제공할 수 있는 방법을 내장하고 있습니다. 큰 그림으로 보자면 self-explanatory model들은 두 개의 모듈, predictor 와 explanation generator를 갖고 있습니다.&lt;br>
+- 장점) 모델의 학습과 explanation generator를 동시에 함으로 추가적인 데이터가 필요 없음&lt;br>
+- 단점) predictor와 explanation generator가 묶여서(jointly) 학습되는데 이 때 explanation generator 가 predictor의 학습에 영향을 미치고 이는 모델의 성능의 저하로 이어짐&lt;/p>
+&lt;h2 id="2-black-box-versus-white-box">&lt;a href="#2-black-box-versus-white-box" class="header-anchor">&lt;/a>2. Black-Box versus White-Box
+&lt;/h2>&lt;p>모델을 설명하기 위해서 다른 분류 방법으로는 모델의 구조의 이해가 필요한지에 따라 나눌 수 있습니다. 이 분류 방법은 Post-hoc explanatory methods의 세분화한 것입니다.&lt;/p>
+&lt;p>&lt;strong>Black-box/model-agnostic explainers&lt;/strong>&lt;br>
+블랙 박스 explainer들은 대상 모델에 input에 대한 결과만을 요청할 수 있습니다. 대표적으로 LIME, KernalSHAP, L2X 그리고 LS-Tree 와 같은 방법들이 있습니다.&lt;br>
+- 장점) 모델에 대한 이해가 필요 없기 때문에 어떤 형태의 모델에도 빠르게 적용할 수 있음&lt;br>
+- 단점) 모델에 대한 이해가 없기 때문에 input과 prediction 사이의 correlation에 영향을 받아모델의 설명력이 부정확해질 수 있음&lt;/p>
+&lt;p>&lt;strong>White-box/model-dependant explainers&lt;/strong>&lt;br>
+화이트 박스 explainer들은 대상 모델의 구조(Architecture)에 접근이 가능해야 합니다. 대표적으로 LRP, DeepLIFT, saliency maps, integrated gradients, Grad-CAM, DeepSHAP 그리고 MaxSHAP와 같은 방법이 있습니다.&lt;/p>
+&lt;h2 id="3-instance-wise-versus-global">&lt;a href="#3-instance-wise-versus-global" class="header-anchor">&lt;/a>3. Instance-Wise versus Global
+&lt;/h2>&lt;p>모델을 설명하는 또 다른 분류 방법은 설명의 범위에 따라 나눌 수 있습니다. 이 분류 방법 또한 주로 Post-hoc explanatory methods을 세분화한 것 입니다. Self-explanatory model들은 기본적으로 Instance-wise explainers 입니다.&lt;/p>
+&lt;p>&lt;strong>Instance-wise explainers&lt;/strong>&lt;br>
+모델의 단일 예측(individual instance) 결과에 대해서 설명을 제공합니다. 예를 들어 LIME은 instance 별로 linear regression을 학습해 설명합니다.&lt;br>
+- 장점) End user가 요구하는 모델의 결정에 대한 설명을 제공할 수 있음&lt;/p>
+&lt;p>&lt;strong>Global explainers&lt;/strong>&lt;br>
+조금 더 high-level에서 모델의 내부 동작 방식에 대해서 설명합니다. 예를 들어서 뉴럴 네트워크를 soft decision tree로 distilling 하여서 전체 설명력을 제공합니다.&lt;br>
+- 장점) 모델에 발생할 수 있는 biases를 빠르게 진단하거나 지식의 발견에 유용함&lt;/p>
+&lt;p>Global explainers은 주로 모델을 해석할 수 있는 모델로 distiling 하기 때문에 instance-wise에 대한 설명도 제공 할 수 있습니다. 하지만 Instance-wise explainer로 모델의 전체 동작 방식을 설명하기에는 어려움이 있습니다. 비록 Instance-wise explainer 방법이 모델의 전체 동작 방식을 설명하기에는 어렵지만, 전체 모델의 설명력을 얻기 위한 시작점으로 사용할 수 있습니다.&lt;/p>
+&lt;h2 id="4-forms-of-explanations">&lt;a href="#4-forms-of-explanations" class="header-anchor">&lt;/a>4. Forms of Explanations
+&lt;/h2>&lt;p>모델을 설명하기 위한 방법에 따라서 나눌 수 도 있습니다. 각 방법에 따른 방법론들은 논문을 참고해주세요. 이 챕터에서는 간단하게 개념만 설명하고 넘어갑니다.&lt;/p>
+&lt;h3 id="feature-based-explanations">&lt;a href="#feature-based-explanations" class="header-anchor">&lt;/a>Feature-based explanations
+&lt;/h3>&lt;p>Feature에 기반한 설명은 현재 가장 많이 사용되는 방법입니다. 이 방법은 모델의 개별 예측을 중요도(importance)또는 기여도(contribution)로 평가하는 방식입니다. 텍스트의 토큰과 이미지의 super-pixel 도 feature에 포함합니다.&lt;/p>
+&lt;p>&lt;strong>importance weights&lt;/strong>&lt;br>
+Importance weights explanation은 입력 feature의 모델이 수행한 예측에 대한 기여 정도를 숫자로 나타냅니다.&lt;/p>
+&lt;p>&lt;strong>subsets of features&lt;/strong>&lt;br>
+Subset explanation은 각 instance 별로 예측에 중요한 feature의 subset을 제공합니다.&lt;/p>
+&lt;p>예를 들어서문장 감정 분류 모델이 &lt;code>“The movie was very good.&amp;quot;&lt;/code>를, &lt;code>&amp;quot;4/5점, 긍정&amp;quot;&lt;/code>이라고 분류했습니다. 이 때 subset explanation은 &lt;code>{“very”, “good”}&lt;/code>을 중요한 feature로 제공합니다. 반면, importance weights explanation는 &lt;code>{&amp;quot;good&amp;quot;: 3, &amp;quot;very&amp;quot;:1}&lt;/code>(이 때 두 점수의 합은 분류 모델의 예측인 4점 입니다)을 제공합니다.&lt;/p>
+&lt;h3 id="natural-language-explanations">&lt;a href="#natural-language-explanations" class="header-anchor">&lt;/a>Natural language explanations
+&lt;/h3>&lt;p>자연어에 대한 설명은 예측에 대한 결과를 사람과 같은 방식으로 전달합니다. 예를 들어서 “A woman is walking her dog in the park.”라는 문장에 “A person is in the park.”를 포함시켜서 설명한다면, “A woman is a person, and walking in the park implies being in the park.”과 같이 설명할 수 있습니다.&lt;/p>
+&lt;h3 id="concept-based-explanations">&lt;a href="#concept-based-explanations" class="header-anchor">&lt;/a>Concept-based explanations
+&lt;/h3>&lt;p>Concept-based explainers는 사용자가 정의한 high-level의 컨셉의 중요도를 정령화 하는 것을 목표로 합니다.&lt;/p>
+&lt;h3 id="example-based-explanations">&lt;a href="#example-based-explanations" class="header-anchor">&lt;/a>Example-based explanations
+&lt;/h3>&lt;p>Example-based는 모델이 예측한 결과에 영향을 미친 training set의 instance를 제시합니다.&lt;/p>
+&lt;h3 id="surrogate-explanations">&lt;a href="#surrogate-explanations" class="header-anchor">&lt;/a>Surrogate explanations
+&lt;/h3>&lt;p>Surrogate explainers는 설명이 가능한 대체 모델을 제공하고자 합니다.&lt;/p>
+&lt;h3 id="combinations-of-forms-of-explanations">&lt;a href="#combinations-of-forms-of-explanations" class="header-anchor">&lt;/a>Combinations of forms of explanations
+&lt;/h3>&lt;p>단일 explainer는 여러 개의 설명을 제공할 수 있습니다.&lt;/p></description></item><item><title>Introduction to XAI</title><link>https://aiden-jeon.github.io/blog/p/introduction-to-xai/</link><pubDate>Wed, 31 Mar 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/introduction-to-xai/</guid><description>&lt;h2 id="introduction-to-xaiexplainable-ai">&lt;a href="#introduction-to-xaiexplainable-ai" class="header-anchor">&lt;/a>Introduction to XAI(eXplainable AI)
+&lt;/h2>&lt;p>최근 많은 산업에서 딥러닝을 적용을 시도하고 있습니다. 하지만 모델의 결과가 어떤 과정을 통해서 그런 예측을 했는지 해석하기 어려운 &amp;lsquo;블랙박스&amp;rsquo; 문제는 딥러닝 적용을 blocking하는 큰 요인입니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/xai/xai-1.png"
+loading="lazy"
+alt="그림-1"
+>&lt;/p>
+&lt;p>예를 들어 신규 대출을 받으려는 고객이 있습니다. 은행에서는 이 고객이 대출을 잘 갚을 수 있을지에 대해 심사를 하고 대출을 승인을 결정합니다. 이 은행에서는 딥러닝 모델을 이용해 고객들의 대출 심사를 합니다. 모델은 이 고객에게 대출을 거절했습니다. 고객과 대출 담당자는 대출이 거절된 이유가 고객의 나이, 직업 등 어떤 이유로 대출이 거절 되었는지 알고 싶습니다. 여기서 문제가 발생합니다. 우리는 딥러닝 모델의 결정을 해석할 수가 없습니다. 이러한 해석을 할 수 없다는 단점은 여러 산업에서 딥러닝 모델의 적용을 망설이게 합니다.&lt;/p>
+&lt;h2 id="interpretable-vs-accurate-trade-off">&lt;a href="#interpretable-vs-accurate-trade-off" class="header-anchor">&lt;/a>Interpretable vs Accurate Trade-off
+&lt;/h2>&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/xai/xai-2.png"
+loading="lazy"
+alt="그림-2"
+>&lt;/p>
+&lt;p>그럼 이런 의문이 들 수 도 있습니다. 해석이 힘든 딥러닝 모델 대신 해석하기 쉬운 선형회귀분석 같은 모델을 사용하면 되지 않을까? 하지만 복잡한 모델과 간단한 모델, 이 두 모델 사이에는 Trade-off 가 있습니다. 해석이 쉬운 모델들은 정확도가 떨어지며, 높은 정확도를 보이는 모델은 해석이 어렵습니다.&lt;/p>
+&lt;p>그럼 해석하기도 쉽고 정확도도 높은 모델을 만들면 되지 않을까요? 방법은 두가지가 있습니다. 해석이 쉬운 모델의 정확도를 높이는 방법과 정확도가 높은 모델의 해석 가능성을 높이는 방법입니다. 그리고 최근 논문들을 보면 2번의 방법을 연구하는 추세입니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/xai/xai-3.png"
+loading="lazy"
+alt="그림-3"
+>&lt;/p>
+&lt;ol>
+&lt;li>해석이 쉬운 모델의 정확도를 높이는 방법&lt;/li>
+&lt;/ol>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/xai/xai-4.png"
+loading="lazy"
+alt="그림-4"
+>&lt;/p>
+&lt;ol start="2">
+&lt;li>정확도가 높은 모델의 해석 가능성을 높이는 방법&lt;/li>
+&lt;/ol>
+&lt;h2 id="대리-분석-surrogate-analysis">&lt;a href="#%eb%8c%80%eb%a6%ac-%eb%b6%84%ec%84%9d-surrogate-analysis" class="header-anchor">&lt;/a>대리 분석 (Surrogate Analysis)
+&lt;/h2>&lt;p>Surrogate Analysis를 우리 말로 하면 대리 분석입니다. 즉, 해석이 어려운 모델을 바로 해석하지 않고 해석 가능한 대리 모델을 만들고 이를 이용해 모델의 예측 결과를 해석합니다.&lt;/p>
+&lt;h3 id="글로벌-대리-분석-global-surrogate-analysis">&lt;a href="#%ea%b8%80%eb%a1%9c%eb%b2%8c-%eb%8c%80%eb%a6%ac-%eb%b6%84%ec%84%9d-global-surrogate-analysis" class="header-anchor">&lt;/a>글로벌 대리 분석 (Global Surrogate Analysis)
+&lt;/h3>&lt;p>글로벌 대리 분석이란 전체 학습 데이터를 사용해 블랙박스 함수 f를 따라하는 유사함수 g를 만들고 g를 해석 가능하도록 변조하는 방법을 말합니다.&lt;/p>
+&lt;h4 id="글로벌-대리-분석-수행-과정">&lt;a href="#%ea%b8%80%eb%a1%9c%eb%b2%8c-%eb%8c%80%eb%a6%ac-%eb%b6%84%ec%84%9d-%ec%88%98%ed%96%89-%ea%b3%bc%ec%a0%95" class="header-anchor">&lt;/a>글로벌 대리 분석 수행 과정
+&lt;/h4>&lt;ol>
+&lt;li>데이터 집합 X를 선택합니다. 이 때 집합은 학습 데이터 전체 또는 일부입니다.&lt;/li>
+&lt;li>선택한 데이터 집합 X에 대해 블랙박스 모델 f의 예측 결과를 구합니다. 이 집합과 예측 값은 해석가능한 모델을 fit 시키기 위한 데이터셋으로 사용됩니다.&lt;/li>
+&lt;li>해석 가능한 모델(g)을 고릅니다.&lt;/li>
+&lt;li>해석 가능한 모델을 2번에서 만든 데이터셋을 이용해 학습합니다.&lt;/li>
+&lt;li>데이터 X에 대하여 모델 f가 예측한 결과(2)와 모델 g의 예측 결과를 비교하면서 두 모델이 최대한 유사한 결과를 내도록 튜닝합니다.&lt;/li>
+&lt;li>설명 가능한 모델 g을 이용해 블랙박스 모델(f)을 해석합니다.&lt;/li>
+&lt;/ol>
+&lt;h4 id="장점">&lt;a href="#%ec%9e%a5%ec%a0%90" class="header-anchor">&lt;/a>장점
+&lt;/h4>&lt;ol>
+&lt;li>유연함(Flexible)
+&lt;ul>
+&lt;li>모든 해석 가능한 모델에 사용할 수 있다.&lt;/li>
+&lt;li>모든 블랙박스 모델에 사용할 수 있다.&lt;/li>
+&lt;li>예를 들어, 선형분석이 편한 이용자와 의사결정나무가 편한 이용자가 있을 때, 한 블랙박스 모델을 선형분석, 의사결정나무 로 대리 분석 모델을 만들 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>직관적(Intuitive)
+&lt;ul>
+&lt;li>쉽게 실행할 수 있다.&lt;/li>
+&lt;li>쉽게 설명할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>평가의 용이
+&lt;ul>
+&lt;li>R-Squared 척도와 같이 대리분석 모델이 얼마나 블랙박스 모델을 잘 설명했는지 알 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="단점">&lt;a href="#%eb%8b%a8%ec%a0%90" class="header-anchor">&lt;/a>단점
+&lt;/h4>&lt;ol>
+&lt;li>모델에 대한 결론을 낼 수는 있지만, 데이터에 대한 결론을 낼 수는 없다.&lt;/li>
+&lt;li>얼마나 대리 분석 모델을 fitting 시켜야 하는지 알 수 없다.&lt;/li>
+&lt;li>대리 분석 모델로 선택한 모델의 모든 장점과 단점이 따라온다.&lt;/li>
+&lt;/ol>
+&lt;h3 id="로컬-대리-분석-local-surrogate-analysis">&lt;a href="#%eb%a1%9c%ec%bb%ac-%eb%8c%80%eb%a6%ac-%eb%b6%84%ec%84%9d-local-surrogate-analysis" class="header-anchor">&lt;/a>로컬 대리 분석 (Local Surrogate Analysis)
+&lt;/h3>&lt;p>글로벌 대리 분석에서 블랙박스 모델을 해석하려는 것과 반대로 로컬 대리 분석은 개별적인 예측을 설명하기 위한 방법입니다. 로컬 대리 분석에는 모델과 관련 없이(Model-Agnostic) 사용 할 수 있는 방법과 특정한 모델에서(model-type-specific) 사용할 수 있는 방법이 있습니다. LIME(Local Interpretable model-agnostic explanations)은 대표적인 모델과 관련 없이 사용할 수 있는 로컬 대리 분석 방법입니다. 특정한 모델에서 사용하는 방법은 DeepLIFT 등이 있습니다.&lt;/p>
+&lt;h4 id="로컬-대리-분석-방법">&lt;a href="#%eb%a1%9c%ec%bb%ac-%eb%8c%80%eb%a6%ac-%eb%b6%84%ec%84%9d-%eb%b0%a9%eb%b2%95" class="header-anchor">&lt;/a>로컬 대리 분석 방법
+&lt;/h4>&lt;ol>
+&lt;li>블랙박스 모델 예측을 설명하고자 하는 instance (x)를 하나 선택합니다.&lt;/li>
+&lt;li>데이터를 섞어(perturb) 새로운 데이터 집합(x&amp;rsquo;)을 만듭니다.&lt;/li>
+&lt;li>생성된 데이터 집합(x&amp;rsquo;)을 해석하려는 모델에 넣어 예측 값f(x&amp;rsquo;)을 계산합니다. 생성된 데이터와 예측 값은 대리 분석 모델의 데이터로 사용됩니다.&lt;/li>
+&lt;li>정의된 거리에 따라 새로운 데이터의 가중치(w)를 계산합니다.&lt;/li>
+&lt;li>가중치를 이용해 해석 가능한 모델을 학습합니다. g(f, x&amp;rsquo;, w)&lt;/li>
+&lt;li>로컬 모델을 이용해 예측을 설명합니다.&lt;/li>
+&lt;/ol>
+&lt;h4 id="장점-1">&lt;a href="#%ec%9e%a5%ec%a0%90-1" class="header-anchor">&lt;/a>장점
+&lt;/h4>&lt;ol>
+&lt;li>설명이 선택적이고 대조적이다.
+&lt;ul>
+&lt;li>LASSO나 짧은 트리를 이용하면 변수들을 선택할 수 있고 설명을 +,- 로 대조적으로 만들 수 있다.&lt;/li>
+&lt;li>이는 human-friendly 한 설명을 할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>fidelity measure
+&lt;ul>
+&lt;li>해석 가능한 모델이 블랙박스 모델의 예측과 얼마나 잘 일치하는 지를 평가하는 척도&lt;/li>
+&lt;li>이를 이용해 블랙박스 예측을 설명하는데 얼마나 신뢰할 수 있는지를 설명할 수 있다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h4 id="단점-1">&lt;a href="#%eb%8b%a8%ec%a0%90-1" class="header-anchor">&lt;/a>단점
+&lt;/h4>&lt;ol>
+&lt;li>설명 모델의 복잡도를 사전에 정의해야 한다.
+&lt;ul>
+&lt;li>Tree의 깊이 등.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>설명의 불안정성
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://arxiv.org/pdf/1806.08049.pdf" target="_blank" rel="noopener"
+>논문&lt;/a>에서 두 개의 매우 가까운 점에 대한 설명이 시뮬레이션된 환경에서 크게 다르다는 것을 보여주었다.&lt;/li>
+&lt;li>샘플링 과정을 반복하면 나오는 탐색은 다를 수 있다.&lt;/li>
+&lt;li>불안정하다는 것은 설명을 신뢰하기 어렵다는 뜻.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;h2 id="reference">&lt;a href="#reference" class="header-anchor">&lt;/a>Reference
+&lt;/h2>&lt;ul>
+&lt;li>XAI 설명 가능한 인공지능, 인공지능을 해부하다&lt;/li>
+&lt;li>&lt;a class="link" href="https://christophm.github.io/interpretable-ml-book/global.html" target="_blank" rel="noopener"
+>https://christophm.github.io/interpretable-ml-book/global.html&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.microsoft.com/en-us/research/uploads/prod/2019/05/Explainable-AI-for-Science-and-Medicine-slides.pdf" target="_blank" rel="noopener"
+>https://www.microsoft.com/en-us/research/uploads/prod/2019/05/Explainable-AI-for-Science-and-Medicine-slides.pdf&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>LIME with code</title><link>https://aiden-jeon.github.io/blog/p/lime-with-code/</link><pubDate>Wed, 31 Mar 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/lime-with-code/</guid><description>&lt;h2 id="lime-local-interpretable-model-agnostic-explanations">&lt;a href="#lime-local-interpretable-model-agnostic-explanations" class="header-anchor">&lt;/a>&lt;strong>(LIME) Local Interpretable Model-agnostic Explanations&lt;/strong>​
+&lt;/h2>&lt;h3 id="objective-of-lime">&lt;a href="#objective-of-lime" class="header-anchor">&lt;/a>&lt;strong>Objective of LIME&lt;/strong>
+&lt;/h3>&lt;p>$$\xi(x)=\underset{g\in G}{\operatorname{argmin}} L(f,g,\pi_{x})+\Omega(g)$$&lt;/p>
+&lt;p>​&lt;/p>
+&lt;h3 id="train-f">&lt;a href="#train-f" class="header-anchor">&lt;/a>&lt;strong>Train $f$&lt;/strong>
+&lt;/h3>&lt;hr>
+&lt;p>이번 포스트에서는 예제 데이터로 fetch_20newsgroups를 사용했습니다.
+fetch_20newsgroups 데이터에는 총 20개의 Class가 존재합니다.
+하지만 문제를 단순하게 하기 위해서 이번 포스트에서는 20개 Class 모두를 사용하기 보다는 &amp;ldquo;atheism&amp;rdquo;, &amp;ldquo;christian&amp;rdquo; 2개의 카테고리만 이용하겠습니다.
+이렇게 되면 이제 두 클래스를 분류하는 Binary Text Classification 문제가 되고 모델로는 Random Forest를 사용해 보겠습니다.&lt;/p>
+&lt;p>그리고 학습된 Random forest를 $f$ 라고 정의하겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">sklearn&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">sklearn.ensemble&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sklearn.pipeline&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">make_pipeline&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sklearn.datasets&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">fetch_20newsgroups&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">categories&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;alt.atheism&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;soc.religion.christian&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">newsgroups_train&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">fetch_20newsgroups&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">subset&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;train&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">categories&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">categories&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">newsgroups_test&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">fetch_20newsgroups&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">subset&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;test&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">categories&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">categories&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">class_names&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;atheism&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;christian&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">vectorizer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">sklearn&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">feature_extraction&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">text&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">TfidfVectorizer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">lowercase&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">train_vectors&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">vectorizer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit_transform&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">newsgroups_train&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">test_vectors&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">vectorizer&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">transform&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">newsgroups_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">rf&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">sklearn&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ensemble&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">RandomForestClassifier&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">n_estimators&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">500&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">rf&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">train_vectors&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">newsgroups_train&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">c&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">make_pipeline&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vectorizer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">rf&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>다음으로 test data에서 $x$를 선택합니다.
+선택된 $x$에 대해서 Random Forest 모델 $f$를 이용해 예측된 $f(x)$를 해석하고자 합니다.
+하지만 Random Forest $f$ 는 블랙박스 모델이기 때문에 이를 직접적으로 해석할 수는 없습니다.
+그래서 $f(x)$를 바로 해석하는 대신 해석할 수 있는 모델 $g$를 이용해 $f(x)$의 결과를 해석해 보겠습니다.&lt;/p>
+&lt;p>newsgroups_test에서 첫 번째 데이터를 이용해서 LIME의 동작 방법에 대해서 알아보겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">text_instance&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">instance_label&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">newsgroups_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">newsgroups_test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>데이터를 한번 확인 해보겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">text_instance&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">&amp;#39;From: crackle!dabbott@munnari.oz.au (NAME)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Subject: &amp;#34;Why I am not Bertrand Russell&amp;#34; (2nd request)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Reply-To: dabbott@augean.eleceng.adelaide.edu.au (Derek Abbott)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Organization: Electrical &amp;amp; Electronic Eng., University of Adelaide&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Lines: 4&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Could the guy who wrote the article &amp;#34;Why I am not Bertrand Russell&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">resend me a copy?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Sorry, I accidently deleted my copy and forgot your name.&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>이 데이터의 레이블은 1, &amp;ldquo;christian&amp;rdquo; 입니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">instance_label&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">1&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>위에서 우리가 학습한 모델 $f$을 이용해 예측해 보면 모델이 정답인 1로 예측합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">c&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">predict&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="n">text_instance&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>위에서 학습한 모델이 잘 예측을 하는 것을 확인했습니다. 이제 이 모델은 어떻게 1이라고 예측을 하게 됐을까요? 이제부터 그 과정에 대해서 알아보려고 합니다.&lt;/p>
+&lt;h3 id="interpretable-data-representation">&lt;a href="#interpretable-data-representation" class="header-anchor">&lt;/a>&lt;strong>Interpretable Data Representation&lt;/strong>
+&lt;/h3>&lt;hr>
+&lt;p>우선 데이터 $x$ 를 interpretable representation이 가능한 $x&amp;rsquo;$ 으로 변환합니다. Text의 경우 interpretable represenstion은 단어가 존재한다/존재하지 않는다 입니다.&lt;/p>
+&lt;p>아래 코드는 단어를 숫자로 mapping 시켜주는 역할을 합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">lime.lime_text&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">TextDomainMapper&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">IndexedString&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">indexed_string&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">IndexedString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">text_instance&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">bow&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">split_expression&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="sa">r&lt;/span>&lt;span class="s2">&amp;#34;\W+&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">mask_string&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">None&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">domain_mapper&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TextDomainMapper&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">indexed_string&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​
+$x&amp;rsquo;$ 는 모든 단어가 존재하기 때문에 아래와 같이 모든 값이 존재한다를 뜻하는 1로 채워져 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="sampling-for-local-exploration">&lt;a href="#sampling-for-local-exploration" class="header-anchor">&lt;/a>&lt;strong>Sampling for Local Exploration&lt;/strong>
+&lt;/h3>&lt;hr>
+&lt;p>이제 위에서 변환된 $x&amp;rsquo;$ 주변에서 $z&amp;rsquo;$을 샘플링 합니다. 샘플링 방법은 random 하게 값을 고른 후 1을 0으로 바꿔주면 됩니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">numpy&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">np&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sklearn.utils&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">check_random_state&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">random_state&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">check_random_state&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">2020&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">num_samples&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">doc_size&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">indexed_string&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">num_words&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sample&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">random_state&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">randint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">doc_size&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">num_samples&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ones&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">num_samples&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">doc_size&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ones&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">doc_size&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>샘플링된 $z&amp;rsquo;$ 를 확인하면 다음과 같습니다. data의 첫번째는 $x&amp;rsquo;$ 이며, 나머지는 $z&amp;rsquo;$ 입니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">data&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">([[&lt;/span>&lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">1.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.&lt;/span>&lt;span class="p">]])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>$z&amp;rsquo;$ 를 원래의 표현(텍스트) 로 복원시키면 이 값이 $z$ 가 됩니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">features_range&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">doc_size&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">inverse_data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">indexed_string&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">raw_string&lt;/span>&lt;span class="p">()]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">size&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="nb">enumerate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sample&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">start&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">inactive&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">random_state&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">choice&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">features_range&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">replace&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">False&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">inactive&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">inverse_data&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">append&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">indexed_string&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">inverse_removing&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">inactive&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>inverse_data를 확인하면 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">inverse_data&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[&lt;/span>&lt;span class="s1">&amp;#39;From: crackle!dabbott@munnari.oz.au (NAME)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Subject: &amp;#34;Why I am not Bertrand Russell&amp;#34; (2nd request)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Reply-To: dabbott@augean.eleceng.adelaide.edu.au (Derek Abbott)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Organization: Electrical &amp;amp; Electronic Eng., University of Adelaide&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Lines: 4&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Could the guy who wrote the article &amp;#34;Why I am not Bertrand Russell&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">resend me a copy?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Sorry, I accidently deleted my copy and forgot your name.&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;: crackle!@munnari..au ()&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: &amp;#34;Why I am not &amp;#34; ( request)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">-: @..adelaide..au ( )&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Organization: &amp;amp; ., University &lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: 4&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1"> wrote article &amp;#34;Why I am not &amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1"> a ?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Sorry, I accidently forgot .&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;From: crackle!@munnari.oz.au (NAME)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Subject: &amp;#34;Why I am not Bertrand Russell&amp;#34; (2nd request)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Reply-To: @augean.eleceng.adelaide..au (Derek Abbott)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Organization: Electrical &amp;amp; Electronic Eng., University of Adelaide&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Lines: &lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Could the guy the article &amp;#34;Why I am not Bertrand Russell&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1"> me a copy?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Sorry, I my copy and forgot your .&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;From: crackle!dabbott@.oz.au (NAME)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Subject: &amp;#34;Why I am not Bertrand Russell&amp;#34; (2nd request)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Reply-To: dabbott@augean.eleceng.adelaide.edu.au (Derek Abbott)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: Electrical &amp;amp; Electronic Eng., University of Adelaide&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Lines: 4&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1"> the guy who wrote the article &amp;#34;Why I am not Bertrand Russell&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">resend a copy?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Sorry, I accidently deleted my copy and forgot your name.&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;From: crackle!dabbott@munnari.oz.au (NAME)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Subject: &amp;#34;Why am not Bertrand Russell&amp;#34; (2nd request)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">-: dabbott@augean.eleceng.adelaide.edu.au (Derek Abbott)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Organization: Electrical &amp;amp; Electronic Eng., University of &lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Lines: 4&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Could the guy who wrote the article &amp;#34;Why am not Bertrand Russell&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">resend me a copy?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Sorry, accidently deleted my copy and forgot your name.&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;From: crackle!dabbott@.. (NAME)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: &amp;#34; I not Russell&amp;#34; ( )&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">-To: dabbott@augean.... (Derek Abbott)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: &amp;amp; Eng., University Adelaide&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: &lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1"> who article &amp;#34; I not Russell&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">resend a copy?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">, I accidently my copy and name.&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;From: crackle!dabbott@munnari.oz.au (NAME)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Subject: &amp;#34;Why I am not Bertrand Russell&amp;#34; (2nd request)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Reply-To: dabbott@.eleceng.adelaide.edu.au (Derek Abbott)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Organization: Electrical &amp;amp; Electronic Eng., University of Adelaide&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Lines: 4&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Could the guy who wrote the &amp;#34;Why I am not Bertrand Russell&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1"> me a copy?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Sorry, I accidently deleted my copy and forgot name.&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;From: crackle!dabbott@munnari.oz.au ()&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: &amp;#34;Why I not Bertrand Russell&amp;#34; (2nd request)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Reply-To: dabbott@augean.eleceng.adelaide.edu.au (Derek Abbott)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Organization: Electrical &amp;amp; Electronic Eng., University of Adelaide&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: 4&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1"> wrote article &amp;#34;Why I not Bertrand Russell&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">resend me a copy?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">Sorry, I accidently deleted my copy and forgot your name.&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;From: crackle!@..au ()&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: &amp;#34;Why I not Bertrand Russell&amp;#34; (2nd request)&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">-: @augean....au ( )&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Organization: Electrical &amp;amp; Electronic ., University Adelaide&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">Lines: &lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1"> who article &amp;#34;Why I not Bertrand Russell&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1"> ?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">, I deleted your .&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;: !@.. ()&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: &amp;#34; &amp;#34; ( )&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">-: @.eleceng... ( )&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: &amp;amp; ., &lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">: &lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1"> &amp;#34; &amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1"> me ?&lt;/span>&lt;span class="se">\n\n&lt;/span>&lt;span class="s1">, .&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;/p>
+&lt;p>샘플링된 $z$ 값을 해석하려는 모델 $f$ 에 넣어서 $g$를 학습할 때 사용할 $label$ 을 만듭니다.&lt;/p>
+&lt;p>$$label = f(z)$$&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">labels&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">c&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">predict_proba&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">inverse_data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>예측된 label 값은 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">labels&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">([[&lt;/span>&lt;span class="mf">0.284&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.716&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.276&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.724&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.262&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.738&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.292&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.708&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.282&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.718&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.174&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.826&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.232&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.768&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.298&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.702&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.246&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.754&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">[&lt;/span>&lt;span class="mf">0.098&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.902&lt;/span>&lt;span class="p">]])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;/p>
+&lt;h3 id="sparse-linear-explanations">&lt;a href="#sparse-linear-explanations" class="header-anchor">&lt;/a>&lt;strong>Sparse Linear Explanations&lt;/strong>
+&lt;/h3>&lt;hr>
+&lt;p>다음으로는 $g$를 학습시킬 때 필요한 $weight$를 계산해야 합니다.&lt;/p>
+&lt;p>위에서 random 하게 뽑힌 $z&amp;rsquo;$들이 원본 데이터와 거리가 얼마나 먼 곳에서 있는지에 따라서 학습할 때 가중치로 사용합니다.&lt;/p>
+&lt;p>$$\pi_{x}=exp(-D(x,z)^{2}/\sigma^{2}): \text{sample weight}$$&lt;/p>
+&lt;p>$D$는 거리를 계산하는 함수이며 각 데이터 특성별로 사용하는 Distance function은 다음과 같습니다.&lt;/p>
+&lt;ul>
+&lt;li>text: cosine distance&lt;/li>
+&lt;li>image: $L2$ distance&lt;/li>
+&lt;/ul>
+&lt;p>​&lt;/p>
+&lt;h4 id="distance">&lt;a href="#distance" class="header-anchor">&lt;/a>&lt;strong>Distance&lt;/strong>
+&lt;/h4>&lt;p>우선 $x$ 와 $z$ 사이의 거리를 계산합니다. 이 예시는 text 이기 때문에 cosine distance 를 구했습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">**&lt;/span>&lt;span class="kn">import&lt;/span> &lt;span class="nn">scipy&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="nn">sp&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">distance_metric&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;cosine&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">distance_fn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">sklearn&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">metrics&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">pairwise&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">pairwise_distances&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">x&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">metric&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">distance_metric&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">ravel&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mi">100&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">distances&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">distance_fn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sp&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sparse&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">csr_matrix&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>계산된 거리는 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">distances&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">([&lt;/span> &lt;span class="mf">0.&lt;/span> &lt;span class="p">,&lt;/span> &lt;span class="mf">40.59114742&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">9.2514787&lt;/span> &lt;span class="p">,&lt;/span> &lt;span class="mf">4.001634&lt;/span> &lt;span class="p">,&lt;/span> &lt;span class="mf">4.001634&lt;/span> &lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">32.84492632&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">4.001634&lt;/span> &lt;span class="p">,&lt;/span> &lt;span class="mf">8.17749432&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">35.83110521&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">80.19704914&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;/p>
+&lt;h4 id="kerenl-function">&lt;a href="#kerenl-function" class="header-anchor">&lt;/a>&lt;strong>Kerenl function&lt;/strong>
+&lt;/h4>&lt;p>$pi_{x}$는 exponential kernel 입니다. 앞서 계산한 distance를 kernel에 넣어서 값을 변환시켜줍니다. 이 때 식의 sigma는 kernel width 로 해석됩니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">functools&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">partial&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">kernel&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">d&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">kernel_width&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">sqrt&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">d&lt;/span> &lt;span class="o">**&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="n">kernel_width&lt;/span> &lt;span class="o">**&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">kernel_width&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">25&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">kernel_fn&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">partial&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">kernel&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">kernel_width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">kernel_width&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">weights&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">kernel_fn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">distances&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>계산된 weight는 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">weights&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mf">1.&lt;/span> &lt;span class="p">,&lt;/span> &lt;span class="mf">0.26763986&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.93381971&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.98727124&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.98727124&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="mf">0.42188127&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.98727124&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.94790866&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.35804576&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.005827&lt;/span> &lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;/p>
+&lt;h4 id="feature-selection">&lt;a href="#feature-selection" class="header-anchor">&lt;/a>&lt;strong>Feature selection&lt;/strong>
+&lt;/h4>&lt;p>다음으로 계산해야 할 것은 $\Omega(g)$입니다. 논문에서는 이 부분을 K-LASSO로 대신했지만 실제 코드에서는 Ridge 또는 이용자가 준 값 k를 사용합니다. 설명할 변수들을 Ridge모델로 학습 후 선택합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">sklearn.linear_model&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">Ridge&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">labels_column&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">labels&lt;/span>&lt;span class="p">[:,&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">num_features&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">10&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">clf&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Ridge&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">alpha&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mf">0.01&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">fit_intercept&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">random_state&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">random_state&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">clf&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">labels_column&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sample_weight&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">weights&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">coef&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">clf&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">coef_&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">weighted_data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">coef&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">feature_weights&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">sorted&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">zip&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">range&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">shape&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]),&lt;/span> &lt;span class="n">weighted_data&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">reverse&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">used_features&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">array&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="n">x&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">feature_weights&lt;/span>&lt;span class="p">[:&lt;/span>&lt;span class="n">num_features&lt;/span>&lt;span class="p">]])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>선택된 feature은 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">used_features&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mi">50&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">49&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">48&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">47&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">46&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">45&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">44&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">43&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">42&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">41&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​&lt;/p>
+&lt;h3 id="train-g">&lt;a href="#train-g" class="header-anchor">&lt;/a>&lt;strong>Train $g$&lt;/strong>
+&lt;/h3>&lt;hr>
+&lt;p>선택된 변수들을 이용하여서 $g$를 학습합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">easy_model&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">Ridge&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">alpha&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">fit_intercept&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">random_state&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">random_state&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">easy_model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">[:,&lt;/span> &lt;span class="n">used_features&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">labels_column&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sample_weight&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">weights&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">prediction_score&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">easy_model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">score&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">[:,&lt;/span> &lt;span class="n">used_features&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">labels_column&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sample_weight&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">weights&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>예측된 점수값은 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">prediction_score&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mf">0.7873828293020748&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>학습된 모델을 이용해 설명하려는 instance의 예측합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">local_pred&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">easy_model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">predict&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">used_features&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">reshape&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>예측된 값은 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">local_pred&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">array&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="mf">0.71951834&lt;/span>&lt;span class="p">])&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>설명 변수들을 coefficient 크기를 기준으로 정렬합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">local_exp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">sorted&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">zip&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">used_features&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">easy_model&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">coef_&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">key&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">lambda&lt;/span> &lt;span class="n">x&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">np&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">abs&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]),&lt;/span> &lt;span class="n">reverse&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>정렬된 변수들의 순서는 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">local_exp&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[(&lt;/span>&lt;span class="mi">49&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.028394961697102435&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="mi">43&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.016671889703629914&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="mi">48&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.01667188970362991&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="mi">45&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.011273894261784378&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="mi">44&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.005261889646530821&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="mi">46&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.003666088585078779&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="mi">47&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0036660885850787785&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="mi">42&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0036660885850787785&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="mi">41&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.0025519331421568372&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="mi">50&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0009561320807047926&lt;/span>&lt;span class="p">)]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>feature를 원래 값(text)으로 복원합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="o">&amp;gt;&lt;/span> &lt;span class="n">domain_mapper&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">map_exp_ids&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">local_exp&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">[(&lt;/span>&lt;span class="s1">&amp;#39;your&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.028394961697102435&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;Sorry&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.016671889703629914&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;forgot&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.01667188970362991&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;deleted&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.011273894261784378&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;accidently&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.005261889646530821&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;my&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.003666088585078779&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;and&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0036660885850787785&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;copy&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0036660885850787785&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;a&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mf">0.0025519331421568372&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;name&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mf">0.0009561320807047926&lt;/span>&lt;span class="p">)]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>​
+LIME의 해석에 관한 부분은 공식 github repo를 참조해주세요.&lt;/p>
+&lt;p>&lt;em>&lt;a class="link" href="https://github.com/marcotcr/lime" target="_blank" rel="noopener"
+>https://github.com/marcotcr/lime&lt;/a>&lt;/em>&lt;/p></description></item></channel></rss>

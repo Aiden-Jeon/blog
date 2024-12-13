@@ -1,0 +1,1442 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>K3s on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/k3s/</link><description>Recent content in K3s on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 08 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/k3s/index.xml" rel="self" type="application/rss+xml"/><item><title>kubeflow 설치 중 auth dex 이슈 해결하기</title><link>https://aiden-jeon.github.io/blog/p/kubeflow-%EC%84%A4%EC%B9%98-%EC%A4%91-auth-dex-%EC%9D%B4%EC%8A%88-%ED%95%B4%EA%B2%B0%ED%95%98%EA%B8%B0/</link><pubDate>Fri, 08 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/kubeflow-%EC%84%A4%EC%B9%98-%EC%A4%91-auth-dex-%EC%9D%B4%EC%8A%88-%ED%95%B4%EA%B2%B0%ED%95%98%EA%B8%B0/</guid><description>&lt;p>Kubeflow 설치 중 auth의 dex pod이 동작하지 않는 것을 확인했습니다.
+우선, auth namespace를 확인해봤습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl get all -n auth
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>다음과 같은 결과를 얻을 수 있었습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">NAME READY STATUS RESTARTS AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pod/dex-6f4f4fd769-wdfhp 0/1 Error &lt;span class="m">197&lt;/span> 16h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME TYPE CLUSTER-IP EXTERNAL-IP PORT&lt;span class="o">(&lt;/span>S&lt;span class="o">)&lt;/span> AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">service/dex NodePort 10.43.69.43 &amp;lt;none&amp;gt; 5556:32000/TCP 16h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME READY UP-TO-DATE AVAILABLE AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">deployment.apps/dex 0/1 &lt;span class="m">1&lt;/span> &lt;span class="m">0&lt;/span> 16h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME DESIRED CURRENT READY AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">replicaset.apps/dex-6f4f4fd769 &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> &lt;span class="m">0&lt;/span> 16h
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>dex pod을 확인해 보니 다음과 같았습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl describe -n auth po dex-6f4f4fd769-wdfhp
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>CrashLoopBackOff 상태임을 확인했습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-gdscript3" data-lang="gdscript3">&lt;span class="line">&lt;span class="cl">&lt;span class="n">Name&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">dex&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">6&lt;/span>&lt;span class="n">f4f4fd769&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">wdfhp&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Namespace&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">auth&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Priority&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="ne">Node&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">mrx&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">desktop3&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mf">10.160&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mf">121.43&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Start&lt;/span> &lt;span class="n">Time&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Thu&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">07&lt;/span> &lt;span class="n">Oct&lt;/span> &lt;span class="mi">2021&lt;/span> &lt;span class="mi">17&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">56&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">55&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="mi">0900&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Labels&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">app&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">dex&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pod&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">template&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nb">hash&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">6&lt;/span>&lt;span class="n">f4f4fd769&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Annotations&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">none&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Status&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Running&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="ne">IP&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">10.42&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mf">0.36&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">IPs&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="ne">IP&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mf">10.42&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mf">0.36&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Controlled&lt;/span> &lt;span class="n">By&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">ReplicaSet&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">dex&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">6&lt;/span>&lt;span class="n">f4f4fd769&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Containers&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">dex&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="ne">Container&lt;/span> &lt;span class="n">ID&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">docker&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">//&lt;/span>&lt;span class="mi">5&lt;/span>&lt;span class="n">d1ec3cba7b0630e7fd254fbd5c5372a5459235c696884e209606a0e0facc856&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="ne">Image&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">quay&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">dexidp&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">dex&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">v2&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="mf">24.0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="ne">Image&lt;/span> &lt;span class="n">ID&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">docker&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">pullable&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="o">//&lt;/span>&lt;span class="n">quay&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">dexidp&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">dex&lt;/span>&lt;span class="err">@&lt;/span>&lt;span class="n">sha256&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">c9b7f6d0d9539bc648e278d64de46eb45f8d1e984139f934ae26694fe7de6077&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Port&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">5556&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">TCP&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Host&lt;/span> &lt;span class="n">Port&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">TCP&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Command&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">dex&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">serve&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">dex&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">cfg&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">config&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">yaml&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">State&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Waiting&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Reason&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">CrashLoopBackOff&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Last&lt;/span> &lt;span class="n">State&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Terminated&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Reason&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Error&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Exit&lt;/span> &lt;span class="n">Code&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Started&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Fri&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">08&lt;/span> &lt;span class="n">Oct&lt;/span> &lt;span class="mi">2021&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="mi">0900&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Finished&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Fri&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">08&lt;/span> &lt;span class="n">Oct&lt;/span> &lt;span class="mi">2021&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="mi">28&lt;/span> &lt;span class="o">+&lt;/span>&lt;span class="mi">0900&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Ready&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">False&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Restart&lt;/span> &lt;span class="n">Count&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">197&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="ne">Environment&lt;/span> &lt;span class="n">Variables&lt;/span> &lt;span class="n">from&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">dex&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">oidc&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">client&lt;/span> &lt;span class="n">Secret&lt;/span> &lt;span class="n">Optional&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="bp">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="ne">Environment&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">none&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Mounts&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">/&lt;/span>&lt;span class="n">etc&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">dex&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">cfg&lt;/span> &lt;span class="n">from&lt;/span> &lt;span class="n">config&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">rw&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">/&lt;/span>&lt;span class="k">var&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">secrets&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">kubernetes&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">io&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">serviceaccount&lt;/span> &lt;span class="n">from&lt;/span> &lt;span class="n">kube&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">api&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">access&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">r69m8&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">ro&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Conditions&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Type&lt;/span> &lt;span class="n">Status&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Initialized&lt;/span> &lt;span class="n">True&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Ready&lt;/span> &lt;span class="n">False&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ContainersReady&lt;/span> &lt;span class="n">False&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PodScheduled&lt;/span> &lt;span class="n">True&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Volumes&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">config&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Type&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">ConfigMap&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">a&lt;/span> &lt;span class="n">volume&lt;/span> &lt;span class="n">populated&lt;/span> &lt;span class="n">by&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="n">ConfigMap&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Name&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">dex&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Optional&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="bp">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">kube&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">api&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">access&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">r69m8&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Type&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">Projected&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">a&lt;/span> &lt;span class="n">volume&lt;/span> &lt;span class="n">that&lt;/span> &lt;span class="n">contains&lt;/span> &lt;span class="n">injected&lt;/span> &lt;span class="n">data&lt;/span> &lt;span class="n">from&lt;/span> &lt;span class="n">multiple&lt;/span> &lt;span class="n">sources&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">TokenExpirationSeconds&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">3607&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>좀 더 자세한 내용을 확인하기 위해서 로그도 확인해봤습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl log -n auth po dex-6f4f4fd769-wdfhp
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>로그 결과는 아래와 같았습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">time&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;2021-10-08T01:20:28Z&amp;#34;&lt;/span> &lt;span class="nv">level&lt;/span>&lt;span class="o">=&lt;/span>info &lt;span class="nv">msg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;config using log level: debug&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">time&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;2021-10-08T01:20:28Z&amp;#34;&lt;/span> &lt;span class="nv">level&lt;/span>&lt;span class="o">=&lt;/span>info &lt;span class="nv">msg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;config issuer: http://dex.auth.svc.cluster.local:5556/dex&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">failed to initialize storage: failed to inspect service account token: jwt claim &lt;span class="s2">&amp;#34;kubernetes.io/serviceaccount/namespace&amp;#34;&lt;/span> not found
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>제일 마지막에 있는 이슈를 기준으로 찾아보니 쿠버네티스 v1.21 이후 dex에서 jwt 파싱에 관한 문제였습니다.&lt;br>
+&lt;a class="link" href="https://github.com/dexidp/dex/issues/2082" target="_blank" rel="noopener"
+>https://github.com/dexidp/dex/issues/2082&lt;/a>&lt;/p>
+&lt;p>해결 방법은 dex container에 &lt;code>KUBERNETES_POD_NAMESPACE&lt;/code> env을 직접 추가해주면 됩니다.&lt;/p>
+&lt;p>저는 helm차트를 이용하지 않았기 때문에 직접 deployment를 수정하였습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl edit deployments -n auth dex
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">spec:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> template:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> spec:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> containers:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - name:dex
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> env:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> - name: KUBERNETES_POD_NAMESPACE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> value: &amp;lt;your-namespace-name&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>추가 후 확인하면 다음과 같이 됩니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">k get all -n auth
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">NAME READY STATUS RESTARTS AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pod/dex-9bfcdd65c-9pt7c 1/1 Running &lt;span class="m">0&lt;/span> 70s
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME TYPE CLUSTER-IP EXTERNAL-IP PORT&lt;span class="o">(&lt;/span>S&lt;span class="o">)&lt;/span> AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">service/dex NodePort 10.43.69.43 &amp;lt;none&amp;gt; 5556:32000/TCP 16h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME READY UP-TO-DATE AVAILABLE AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">deployment.apps/dex 1/1 &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> 16h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME DESIRED CURRENT READY AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">replicaset.apps/dex-6f4f4fd769 &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> 16h
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">replicaset.apps/dex-9bfcdd65c &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> 70s
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">replicaset.apps/dex-58c689dffb &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> &lt;span class="m">0&lt;/span> 8m32s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>k3s Installation</title><link>https://aiden-jeon.github.io/blog/p/k3s-installation/</link><pubDate>Fri, 01 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/k3s-installation/</guid><description>&lt;p>&lt;strong>Kubeflow 설치 시리즈&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/pre-requisites-for-k3s-setup/" >Pre-Requisites for k3s Setup&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/k3s-installation/" >k3s Installation&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/kubeflow-installation/" >Kubeflow Installation&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>이번 포스트에서는 서버에 k3s를 설치하는 과정에 대해서 설명합니다.&lt;br>
+필요한 &lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/pre-requisites-for-k3s-setup/" >준비 과정&lt;/a>을 확인 후 진행해 주세요.&lt;/p>
+&lt;hr>
+&lt;h1 id="k3s-installation">&lt;a href="#k3s-installation" class="header-anchor">&lt;/a>k3s Installation
+&lt;/h1>&lt;ol>
+&lt;li>k3s 설치&lt;br>
+k3s는 gpu를 사용하기 위해서 도커를 백엔드로 사용하겠습니다.&lt;br>
+docker 백엔드는 &lt;code>--docker&lt;/code>를 추가하면 됩니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">curl -sfL https://get.k3s.io &lt;span class="p">|&lt;/span> sh -s - server --disable traefik --disable servicelb --disable local-storage --docker
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>k3s config 확인
+k3s를 설치후 k3s config를 확인합니다
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>k3s config를 kubeconfig로 복사
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mkdir .kube
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp /etc/rancher/k3s/k3s.yaml .kube/config
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo chown mrx:mrx .kube/config
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>local로 kube config 옮기기&lt;br>
+local에서 &lt;code>~/.kube/config&lt;/code>로 설정합니다.&lt;br>
+multi-context인 경우 multi-context에 맞게 설정합니다.&lt;br>
+multi-context는 &lt;code>kubectl ctx&lt;/code> 를 통해 쉽게 변경할 수 있습니다.&lt;/li>
+&lt;li>local에서 서버 확인하기
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl get nodes
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h1 id="kubernetes-setup">&lt;a href="#kubernetes-setup" class="header-anchor">&lt;/a>Kubernetes Setup
+&lt;/h1>&lt;p>k3s를 설치 후에는 서버로 사용할 수 있도록 써드파티들을 설치해주어야 합니다.&lt;br>
+위의 k3s installation 과정이 끝났다면 로컬에서 서버를 &lt;code>kubectl&lt;/code> 을 통해 관리할 수 있습니다.&lt;br>
+아래 과정은 모두 local에서 이루어집니다. (&lt;code>kubectl&lt;/code>의 context를 잘 확인 후 진행하시기 바랍니다.)&lt;/p>
+&lt;h2 id="1-nvidia-device-plugin">&lt;a href="#1-nvidia-device-plugin" class="header-anchor">&lt;/a>1. Nvidia Device Plugin
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm repo add nvdp https://nvidia.github.io/k8s-device-plugin
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm repo update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm install &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --version&lt;span class="o">=&lt;/span>0.9.0 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --generate-name &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> nvdp/nvidia-device-plugin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="2-ingress">&lt;a href="#2-ingress" class="header-anchor">&lt;/a>2. Ingress
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm repo update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm install ingress-nginx/ingress-nginx -g -n ingress-nginx --create-namespace --set controller.service.type&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;NodePort&amp;#39;&lt;/span> --set controller.service.nodePorts.http&lt;span class="o">=&lt;/span>&lt;span class="m">32080&lt;/span> --set controller.service.nodePorts.https&lt;span class="o">=&lt;/span>&lt;span class="m">32443&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="3-longhorn">&lt;a href="#3-longhorn" class="header-anchor">&lt;/a>3. Longhorn
+&lt;/h2>&lt;p>Longhorn은 k3s에서 StorageClass를 생성을 해줍니다.&lt;/p>
+&lt;h3 id="on-local">&lt;a href="#on-local" class="header-anchor">&lt;/a>On Local
+&lt;/h3>&lt;ol>
+&lt;li>설치
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm repo add longhorn https://charts.longhorn.io
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm repo update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm install longhorn longhorn/longhorn --namespace longhorn-system --set csi.kubeletRootDir&lt;span class="o">=&lt;/span>/var/lib/kubelet --create-namespace
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>VPN IP 설정하기
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo sh -c &lt;span class="s2">&amp;#34;echo &amp;#39;&amp;lt;VPN_IP&amp;gt; longhorn.k3s.cluster.local&amp;#39; &amp;gt;&amp;gt; /etc/hosts&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>auth &amp;amp; ingress 생성&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">USER&lt;/span>&lt;span class="o">=&lt;/span>admin&lt;span class="p">;&lt;/span> &lt;span class="nv">PASSWORD&lt;/span>&lt;span class="o">=&lt;/span>adminadmin&lt;span class="p">;&lt;/span> &lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">USER&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="s2">:&lt;/span>&lt;span class="k">$(&lt;/span>openssl passwd -stdin -apr1 &lt;span class="o">&amp;lt;&amp;lt;&amp;lt;&lt;/span> &lt;span class="si">${&lt;/span>&lt;span class="nv">PASSWORD&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="k">)&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &amp;gt;&amp;gt; auth
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl -n longhorn-system create secret generic basic-auth --from-file&lt;span class="o">=&lt;/span>auth
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat &lt;span class="s">&amp;lt;&amp;lt;EOF | kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">apiVersion: networking.k8s.io/v1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">kind: Ingress
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">metadata:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> name: longhorn-ingress
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> namespace: longhorn-system
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> annotations:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> ingress.kubernetes.io/rewrite-target: /
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> kubernetes.io/ingress.class: &amp;#34;nginx&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # type of authentication
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> nginx.ingress.kubernetes.io/auth-type: basic
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # prevent the controller from redirecting (308) to HTTPS
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> nginx.ingress.kubernetes.io/ssl-redirect: &amp;#39;false&amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # name of the secret that contains the user/password definitions
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> nginx.ingress.kubernetes.io/auth-secret: basic-auth
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # message to display with an appropriate context why the authentication is required
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> nginx.ingress.kubernetes.io/auth-realm: &amp;#39;Authentication Required &amp;#39;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> # custom max body size for file uploading like backing image uploading
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> nginx.ingress.kubernetes.io/proxy-body-size: 10000m
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">spec:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> rules:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - host: longhorn.k3s.cluster.local
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> http:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> paths:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - pathType: Prefix
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> path: &amp;#34;/&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> backend:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> service:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> name: longhorn-frontend
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> port:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> number: 80
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="on-server">&lt;a href="#on-server" class="header-anchor">&lt;/a>On Server
+&lt;/h3>&lt;p>로컬에서 확인할 수 있는 reverse-proxy를 설정해주는 작업입니다.
+이 작업은 서버에서 이루어집니다.&lt;/p>
+&lt;ol>
+&lt;li>reverse-proxy 폴더 생성
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mkdir reverse-proxy
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> reverse-proxy
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>reverse-proxy 폴더 아래 다음 파일들 생성 합니다. &lt;br>
+생성할 파일은 총 3개 입니다.
+&lt;ul>
+&lt;li>&lt;code>Dockerfile&lt;/code>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">FROM nginx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">COPY ./longhorn.conf /etc/nginx/conf.d/longhorn.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">COPY ./kubeflow.conf /etc/nginx/conf.d/kubeflow.conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;code>longhorn.conf&lt;/code>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">server &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> listen 80&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server_name longhorn.k3s.cluster.local&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> location / &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_redirect off&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_pass_header Server&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header Host &lt;span class="nv">$http_host&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header X-Real-IP &lt;span class="nv">$remote_addr&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header X-Forwarded-For &lt;span class="nv">$proxy_add_x_forwarded_for&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header X-Forwarded-Proto &lt;span class="nv">$scheme&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header X-NginX-Proxy true&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header X-Scheme &lt;span class="nv">$scheme&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_pass http://localhost:32080&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;code>kubeflow.conf&lt;/code>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">server &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> listen 80&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> server_name kubeflow.k3s.cluster.local&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> location / &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_redirect off&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_pass_header Server&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header Host &lt;span class="nv">$http_host&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header X-Real-IP &lt;span class="nv">$remote_addr&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header X-Forwarded-For &lt;span class="nv">$proxy_add_x_forwarded_for&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header X-Forwarded-Proto &lt;span class="nv">$scheme&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header X-NginX-Proxy true&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header X-Scheme &lt;span class="nv">$scheme&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_pass http://localhost:32455&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_http_version 1.1&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header Upgrade &lt;span class="nv">$http_upgrade&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> proxy_set_header Connection &lt;span class="s2">&amp;#34;upgrade&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> add_header X-Frame-Options SAMEORIGIN&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>reverse proxy docker를 빌드합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker build -t reverse-proxy .
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>빌드한 docker image를 실행합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker run -d --net host reverse-proxy
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h3 id="on-local-1">&lt;a href="#on-local-1" class="header-anchor">&lt;/a>On local
+&lt;/h3>&lt;p>다음 주소로 접속이 되는지 확인합니다.&lt;br>
+&lt;a class="link" href="http://longhorn.k3s.cluster.local/" target="_blank" rel="noopener"
+>http://longhorn.k3s.cluster.local/&lt;/a>&lt;/p>
+&lt;p>이 때 기본 ID/PWD는 다음과 같습니다.&lt;/p>
+&lt;ul>
+&lt;li>id: admin&lt;/li>
+&lt;li>pw: adminadmin&lt;/li>
+&lt;/ul>
+&lt;p>로그인이 되면 다음과 같은 화면이 나옵니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/k3s/longhorn.png"
+loading="lazy"
+alt="longhorn"
+>&lt;/p></description></item><item><title>Kubeflow Installation</title><link>https://aiden-jeon.github.io/blog/p/kubeflow-installation/</link><pubDate>Fri, 01 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/kubeflow-installation/</guid><description>&lt;p>&lt;strong>Kubeflow 설치 시리즈&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/pre-requisites-for-k3s-setup/" >Pre-Requisites for k3s Setup&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/k3s-installation/" >k3s Installation&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/kubeflow-installation/" >Kubeflow Installation&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>이번 포스트에서는 서버에 kubeflow를 설치하는 과정에 대해서 설명합니다.&lt;br>
+필요한 준비 과정을 확인 후 진행해 주세요.&lt;/p>
+&lt;ol>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/pre-requisites-for-k3s-setup/" >Pre-Requisites for k3s Setup&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/k3s-installation/" >k3s Installation&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>이번 포스트에서 사용하는 kubeflow의 버전은 &lt;code>1.3.0&lt;/code> 입니다.&lt;br>
+버전이 바뀔 경우 해당 설치 과정과 달라질 수 있습니다.&lt;br>
+자세한 내용은 &lt;a class="link" href="https://github.com/kubeflow/manifests/tree/v1.3.0" target="_blank" rel="noopener"
+>링크&lt;/a>를 확인해 주세요.&lt;/p>
+&lt;h1 id="kustomize">&lt;a href="#kustomize" class="header-anchor">&lt;/a>Kustomize
+&lt;/h1>&lt;p>Kubeflow를 설치하기 위해서는 kustmoize와 kubeflow manifest가 필요합니다.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Clone kubeflow/manifest&lt;br>
+Clone 받는 위치는 편한 곳에 하면 됩니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git clone https://github.com/kubeflow/manifests
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>kustomize 다운로드&lt;br>
+kubelfow manifest를 지원하는 kustomize를 다운 받습니다.
+포스트를 작성하는 기준으로는 3.2.0을 지원합니다.&lt;/p>
+&lt;blockquote>
+&lt;p>kustomize (version 3.2.0)&lt;br>
+⚠️ Kubeflow 1.3.0 is not compatible with the latest versions of of kustomize 4.x. This is due to changes in the order resources are sorted and printed. Please see kubernetes-sigs/kustomize#3794 and kubeflow/manifests#1797. We know this is not ideal and are working with the upstream kustomize team to add support for the latest versions of kustomize as soon as we can.&lt;/p>
+&lt;/blockquote>
+&lt;p>&lt;a class="link" href="https://github.com/kubernetes-sigs/kustomize/releases/tag/v3.2.0" target="_blank" rel="noopener"
+>https://github.com/kubernetes-sigs/kustomize/releases/tag/v3.2.0&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>kubeflow/manifest 경로로 이동
+다운받은 kustomize를 &lt;code>kubeflow/manifest&lt;/code>로 옮겨줍니다.&lt;br>
+이 때 cli에서 편하게 사용하기 위해서 이름을 &lt;code>kustomize&lt;/code> 로 수정하면 좋습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mv ~/Downloads/kustomize_3.2.0_darwin_amd64 manifests/kustomize
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>실행 권한 주기&lt;br>
+옮긴 kustomize에 실행 권한을 줍니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> manifests
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chmod a+x kustomize
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Checkout to Version 1.3.0&lt;br>
+manifest를 1.3.0 버전으로 맞춰 줍니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git checkout v1.3.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h1 id="kubeflow-manifest-설치하기">&lt;a href="#kubeflow-manifest-%ec%84%a4%ec%b9%98%ed%95%98%ea%b8%b0" class="header-anchor">&lt;/a>Kubeflow Manifest 설치하기
+&lt;/h1>&lt;p>Kubeflow를 설치하기 위한 Manifest를 설치합니다.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>Cert-Manager&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build common/cert-manager/cert-manager-kube-system-resources/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kustomize build common/cert-manager/cert-manager-crds/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kustomize build common/cert-manager/cert-manager/overlays/self-signed &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Istio&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build common/istio-1-9-0/istio-crds/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kustomize build common/istio-1-9-0/istio-namespace/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kustomize build common/istio-1-9-0/istio-install/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Dex&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build common/dex/overlays/istio &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>OIDC AuthService
+authoservice의 경우 spec의 변경이 필요합니다.&lt;/p>
+&lt;ol>
+&lt;li>authservice spec 다운 받기
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build common/oidc-authservice/base &amp;gt; oidc-authservice.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>spec 수정&lt;br>
+authservice 의 spec을 변경합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">apps/v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">StatefulSet&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">authservice&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">namespace&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">istio-system&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">replicas&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">selector&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">matchLabels&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">app&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">authservice&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">serviceName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">authservice&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">template&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">annotations&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">sidecar.istio.io/inject&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;false&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">labels&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">app&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">authservice&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">containers&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">envFrom&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">secretRef&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">oidc-authservice-client&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">configMapRef&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">oidc-authservice-parameters&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">gcr.io/arrikto/kubeflow/oidc-authservice:28c59ef&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">imagePullPolicy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Always&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">authservice&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">containerPort&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">8080&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">http-api&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">readinessProbe&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">httpGet&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">port&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">8081&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumeMounts&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">mountPath&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/var/lib/authservice&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">data&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">securityContext&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">runAsUser&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 추가 하기&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c"># fsGroup: 111 # 지우기&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">data&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">persistentVolumeClaim&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">claimName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">authservice-pvc&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>설치
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl apply -f oidc-authservice.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>
+&lt;p>Knative&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build common/knative/knative-serving-crds/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kustomize build common/knative/knative-serving-install/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kustomize build common/istio-1-9-0/cluster-local-gateway/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Optionally, you can install Knative Eventing which can be used for inference request logging:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build common/knative/knative-eventing-crds/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kustomize build common/knative/knative-eventing-install/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Kubeflow Namespace&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build common/kubeflow-namespace/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Kubeflow Roles&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build common/kubeflow-roles/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Kubeflow Istio Resources&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build common/istio-1-9-0/kubeflow-istio-resources/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Kubeflow Pipelines using Docker&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build apps/pipeline/upstream/env/platform-agnostic-multi-user &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h1 id="microservice">&lt;a href="#microservice" class="header-anchor">&lt;/a>Microservice
+&lt;/h1>&lt;p>Kubeflow에서 사용하는 Microservice들을 설치합니다.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>KFServing&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build apps/kfserving/upstream/overlays/kubeflow &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Katib&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build apps/katib/upstream/installs/katib-with-kubeflow &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Central Dashboard&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build apps/centraldashboard/upstream/overlays/istio &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Admission Webhook&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build apps/admission-webhook/upstream/overlays/cert-manager &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Notebooks&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build apps/jupyter/notebook-controller/upstream/overlays/kubeflow &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kustomize build apps/jupyter/jupyter-web-app/upstream/overlays/istio &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Profiles + KFAM&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build apps/profiles/upstream/overlays/kubeflow &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Volumes Web App&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build apps/volumes-web-app/upstream/overlays/istio &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Tensorboard&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build apps/tensorboard/tensorboards-web-app/upstream/overlays/istio &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kustomize build apps/tensorboard/tensorboard-controller/upstream/overlays/kubeflow &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>User Namespace&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kustomize build common/user-namespace/base &lt;span class="p">|&lt;/span> kubectl apply -f -
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h1 id="설치-확인하기">&lt;a href="#%ec%84%a4%ec%b9%98-%ed%99%95%ec%9d%b8%ed%95%98%ea%b8%b0" class="header-anchor">&lt;/a>설치 확인하기
+&lt;/h1>&lt;p>다음 명령어를 통해 모든 pod들이 정상적으로 생성되고 있는지 확인합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl get pods -n cert-manager
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl get pods -n istio-system
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl get pods -n auth
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl get pods -n knative-eventing
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl get pods -n knative-serving
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl get pods -n kubeflow
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl get pods -n kubeflow-user-example-com
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="port-forwarding">&lt;a href="#port-forwarding" class="header-anchor">&lt;/a>Port-forwarding
+&lt;/h2>&lt;p>port-forwarding을 통해 kubeflow 에 접속합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol>
+&lt;li>http://localhost:8080 로 접속합니다.&lt;/li>
+&lt;li>기본 ID/PW는 다음과 같습니다.
+&lt;ul>
+&lt;li>ID: &lt;a class="link" href="mailto:user@example.com" >user@example.com&lt;/a>&lt;/li>
+&lt;li>PW: 12341234&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ol>
+&lt;blockquote>
+&lt;p>포트 포워딩후 연결이 되지 않을 경우 &lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/kubeflow-%EC%84%A4%EC%B9%98-%EC%A4%91-auth-dex-%EC%9D%B4%EC%8A%88-%ED%95%B4%EA%B2%B0%ED%95%98%EA%B8%B0/" >포스트&lt;/a>를 참고해보시기 바랍니다.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="reverse-proxy">&lt;a href="#reverse-proxy" class="header-anchor">&lt;/a>Reverse-proxy
+&lt;/h2>&lt;p>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/k3s-installation/#on-server" >다음 글&lt;/a>에서 설정한 reverse-proxy 도커를 이용해 접속할 수 있습니다.&lt;/p>
+&lt;p>우선 ingress-gateway의 연결된 포트를 확인합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl -n istio-system get service istio-ingressgateway
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>다음과 같이 포트들이 포워딩된 것을 확인할 수 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">NAME TYPE CLUSTER-IP EXTERNAL-IP PORT&lt;span class="o">(&lt;/span>S&lt;span class="o">)&lt;/span> AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">istio-ingressgateway NodePort 10.43.244.7 &amp;lt;none&amp;gt; 15021:31160/TCP,80:32455/TCP,443:32293/TCP,31400:32132/TCP,15443:32123/TCP 3d21h
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>이중 80번 포트의 포워딩 포트를 확인합니다. 저는 32455 였습니다.&lt;br>
+만약 다를 경우 &lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/k3s-installation/#on-server" >다음 글&lt;/a> 에서 &lt;code>kubeflow.conf&lt;/code>의 값을 수정하면 됩니다.&lt;/p>
+&lt;p>local에 host를 추가해줍니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo sh -c &lt;span class="s2">&amp;#34;echo &amp;#39;&amp;lt;VPN_IP&amp;gt; kubeflow.k3s.cluster.local&amp;#39; &amp;gt;&amp;gt; /etc/hosts&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;a class="link" href="http://kubeflow.k3s.cluster.local/" target="_blank" rel="noopener"
+>http://kubeflow.k3s.cluster.local/&lt;/a> 에 접속합니다.&lt;/p>
+&lt;h2 id="마무리">&lt;a href="#%eb%a7%88%eb%ac%b4%eb%a6%ac" class="header-anchor">&lt;/a>마무리
+&lt;/h2>&lt;p>설치가 정상적으로 되었다면 다음과 같은 화면이 출력됩니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/k3s/kubeflow_home.png"
+loading="lazy"
+alt="kubeflow_home"
+>&lt;/p></description></item><item><title>Pre-Requisites for k3s Setup</title><link>https://aiden-jeon.github.io/blog/p/pre-requisites-for-k3s-setup/</link><pubDate>Fri, 01 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/pre-requisites-for-k3s-setup/</guid><description>&lt;p>&lt;strong>Kubeflow 설치 시리즈&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/pre-requisites-for-k3s-setup/" >Pre-Requisites for k3s Setup&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/k3s-installation/" >k3s Installation&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/kubeflow-installation/" >Kubeflow Installation&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>이번 포스트에서는 k3s를 설정하기 전에 필요한 것들을 세팅하는 과정에 대해서 설명합니다.&lt;br>
+이번 포스트에서 진행하는 과정은 서버 데스크탑, 로컬 노트북 두 대의 장비가 있다고 가정하고 있습니다.&lt;/p>
+&lt;hr>
+&lt;h1 id="on-server">&lt;a href="#on-server" class="header-anchor">&lt;/a>On Server
+&lt;/h1>&lt;p>사용하는 서버 스s펙은 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">OS: Ubuntu 20.04 LST
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">GPU: RTX 2060 x2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">CPU: Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">MEM: 64G
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>서버에 설치할 것 들은 3가지 입니다.&lt;/p>
+&lt;ol>
+&lt;li>Docker&lt;/li>
+&lt;li>Nvidia Driver&lt;/li>
+&lt;li>WireGuard VPN (사용할 경우)&lt;/li>
+&lt;/ol>
+&lt;h2 id="1-docker">&lt;a href="#1-docker" class="header-anchor">&lt;/a>1. Docker
+&lt;/h2>&lt;h3 id="11-docker-설치">&lt;a href="#11-docker-%ec%84%a4%ec%b9%98" class="header-anchor">&lt;/a>1.1 Docker 설치
+&lt;/h3>&lt;p>k3s는 snap으로 설치된 docker를 사용할 수 없습니다.&lt;/p>
+&lt;p>아래 링크를 통해 직접 빌드를 해야 합니다.&lt;br>
+&lt;a class="link" href="https://docs.docker.com/engine/install/ubuntu/" target="_blank" rel="noopener"
+>https://docs.docker.com/engine/install/ubuntu/&lt;/a>&lt;/p>
+&lt;h3 id="12-설치-확인">&lt;a href="#12-%ec%84%a4%ec%b9%98-%ed%99%95%ec%9d%b8" class="header-anchor">&lt;/a>1.2 설치 확인
+&lt;/h3>&lt;p>링크를 통해 설치가 끝나면 sudo 권한이 있는지 확인해야 합니다.&lt;/p>
+&lt;p>우선 아래 명령어로 권한이 있는지 확인합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker ps
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>권한이 없는 경우 아래와 같은 에러를 출력합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker: Got permission denied &lt;span class="k">while&lt;/span> trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Post http://%2Fvar%2Frun%2Fdocker.sock/v1.35/containers/create: dial unix /var/run/docker.sock: connect: permission denied.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="13-권한-문제-해결">&lt;a href="#13-%ea%b6%8c%ed%95%9c-%eb%ac%b8%ec%a0%9c-%ed%95%b4%ea%b2%b0" class="header-anchor">&lt;/a>1.3 권한 문제 해결
+&lt;/h3>&lt;p>권한이 없는 경우 그룹을 생성해 추가를 해주어야 합니다.&lt;br>
+자세한 내용은 &lt;a class="link" href="https://docs.docker.com/engine/install/linux-postinstall/" target="_blank" rel="noopener"
+>링크&lt;/a>를 통해 확인할 수 있습니다.&lt;/p>
+&lt;ol>
+&lt;li>우선 &lt;code>docker&lt;/code> 그룹을 생성합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo groupadd docker
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>유저를 &lt;code>docker&lt;/code> 그룹에 추가합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo usermod -aG docker &lt;span class="nv">$USER&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>권한을 확인합니다
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker ps
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;p>다만 이 과정을 통해서도 권한이 없다는 에러가 나올 수 있습니다.
+이 경우에는 위 과정이 끝난 후 reboot을 하면 해결되는 경우도 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo reboot
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="2-nvidia-driver">&lt;a href="#2-nvidia-driver" class="header-anchor">&lt;/a>2. Nvidia Driver
+&lt;/h2>&lt;p>제가 사용하는 서버는 gpu를 이용하기 때문에 nvidia driver의 설치가 필요합니다.&lt;br>
+&lt;code>ubuntu-drivers-common&lt;/code>를 이용하면 쉽게 설치할 수 있습니다.&lt;/p>
+&lt;h3 id="21-ubuntu-drivers-common-설치">&lt;a href="#21-ubuntu-drivers-common-%ec%84%a4%ec%b9%98" class="header-anchor">&lt;/a>2.1 &lt;code>ubuntu-drivers-common&lt;/code> 설치
+&lt;/h3>&lt;ol>
+&lt;li>&lt;code>ubuntu-drivers-common&lt;/code> 설치
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt install ubuntu-drivers-common
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;code>auto install&lt;/code> 실행
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo ubuntu-drivers autoinstall
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h3 id="22-nvidia-docker-세팅">&lt;a href="#22-nvidia-docker-%ec%84%b8%ed%8c%85" class="header-anchor">&lt;/a>2.2 Nvidia Docker 세팅
+&lt;/h3>&lt;p>Docker가 gpu를 사용할 수 있도록 설정해주어야 합니다.
+자세한 내용은 &lt;a class="link" href="https://github.com/NVIDIA/k8s-device-plugin" target="_blank" rel="noopener"
+>링크&lt;/a>를 통해 확인할 수 있습니다.&lt;/p>
+&lt;ol>
+&lt;li>Nvidia Docker 설치
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">distribution&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>. /etc/os-release&lt;span class="p">;&lt;/span>&lt;span class="nb">echo&lt;/span> &lt;span class="nv">$ID$VERSION_ID&lt;/span>&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey &lt;span class="p">|&lt;/span> sudo apt-key add -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -s -L https://nvidia.github.io/nvidia-docker/&lt;span class="nv">$distribution&lt;/span>/nvidia-docker.list &lt;span class="p">|&lt;/span> sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt-get update &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> sudo apt-get install -y nvidia-docker2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl restart docker
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>Docker Config 설정&lt;br>
+sudo 권한으로 &lt;code>/etc/docker/daemon.json&lt;/code> 파일을 열어줍니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo vim /etc/docker/daemon.json
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>원본의 내용을 지우고 아래 내용으로 수정합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;default-runtime&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;nvidia&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;runtimes&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;nvidia&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;path&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;/usr/bin/nvidia-container-runtime&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;runtimeArgs&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="p">[]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>Reboot
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo reboot
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>&lt;code>nvidia-smi&lt;/code> 확인&lt;br>
+설치가 되었는지 확인합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">nvidia-smi
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h2 id="3-wireguard-vpn-사용할-경우">&lt;a href="#3-wireguard-vpn-%ec%82%ac%ec%9a%a9%ed%95%a0-%ea%b2%bd%ec%9a%b0" class="header-anchor">&lt;/a>3. WireGuard VPN (사용할 경우)
+&lt;/h2>&lt;p>저는 WireGuard VPN을 이용하고 있기 때문에 서버에 추가적인 VPN 작업을 해주었습니다.&lt;/p>
+&lt;ol>
+&lt;li>WireGuard Config 발급&lt;br>
+WireGuard에서 Ubuntu OS의 config를 생성합니다.&lt;/li>
+&lt;li>WireGuard 설치
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt-get install -y resolvconf wireguard
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>Config 복사&lt;br>
+발급받은 config를 서버의 &lt;code>/etc/wireguard/wg0.conf&lt;/code>에 옮겨 줍니다.
+저는 ssh를 이용해 전송 후 복사하였습니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo cp wg0.conf /etc/wireguard/wg0.conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>ssh가 불가능할 경우 &lt;code>sudo vim /etc/wireguard/wg0.conf&lt;/code>을 이용해 직접 수정해도 됩니다.&lt;/li>
+&lt;li>Systemctl 설정
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo systemctl &lt;span class="nb">enable&lt;/span> wg-quick@wg0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl start wg-quick@wg0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl status wg-quick@wg0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>인터페이스 확인
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ifconfig wg0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>Ping 확인
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ping 172.25.0.1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;p>WireGuard config를 수정할 경우 restart를 해줍니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo systemctl restart wg-quick@wg0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="on-local">&lt;a href="#on-local" class="header-anchor">&lt;/a>On Local
+&lt;/h1>&lt;p>로컬에서 설치 할 것 들은 2가지 입니다.&lt;/p>
+&lt;ol>
+&lt;li>&lt;code>kubectl&lt;/code>&lt;/li>
+&lt;li>&lt;code>krew&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;h2 id="1-kubectl">&lt;a href="#1-kubectl" class="header-anchor">&lt;/a>1. &lt;code>kubectl&lt;/code>
+&lt;/h2>&lt;p>각 OS에 맞는 &lt;code>kubectl&lt;/code>을 설치합니다.&lt;br>
+&lt;a class="link" href="https://kubernetes.io/docs/tasks/tools/" target="_blank" rel="noopener"
+>https://kubernetes.io/docs/tasks/tools/&lt;/a>&lt;/p>
+&lt;h2 id="2-krew">&lt;a href="#2-krew" class="header-anchor">&lt;/a>2. &lt;code>krew&lt;/code>
+&lt;/h2>&lt;ol>
+&lt;li>&lt;code>krew&lt;/code>설치&lt;br>
+각 OS에 맞는 &lt;code>krew&lt;/code>를 설치합니다.&lt;br>
+&lt;a class="link" href="https://krew.sigs.k8s.io/docs/user-guide/setup/install/" target="_blank" rel="noopener"
+>https://krew.sigs.k8s.io/docs/user-guide/setup/install/&lt;/a>&lt;/li>
+&lt;li>&lt;code>ctx&lt;/code>설치
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl krew install ctx
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol></description></item></channel></rss>

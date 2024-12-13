@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pydantic on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/pydantic/</link><description>Recent content in Pydantic on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 23 Sep 2022 20:00:00 +0900</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/pydantic/index.xml" rel="self" type="application/rss+xml"/><item><title>[ Chapter 3. API ] 3) FastAPI CRUD with Pydantic</title><link>https://aiden-jeon.github.io/blog/p/chapter-3.-api-3-fastapi-crud-with-pydantic/</link><pubDate>Fri, 23 Sep 2022 20:00:00 +0900</pubDate><guid>https://aiden-jeon.github.io/blog/p/chapter-3.-api-3-fastapi-crud-with-pydantic/</guid><description>&lt;p>&lt;a class="link" href="https://github.com/Aiden-Jeon/mle-mlops/tree/main/03_api" target="_blank" rel="noopener"
+>Github&lt;/a> 에서 해당 내용에 대해서 확인할 수 있습니다.&lt;/p>
+&lt;h2 id="overview">&lt;a href="#overview" class="header-anchor">&lt;/a>Overview
+&lt;/h2>&lt;h3 id="목표">&lt;a href="#%eb%aa%a9%ed%91%9c" class="header-anchor">&lt;/a>목표
+&lt;/h3>&lt;ul>
+&lt;li>앞서 작성한 API 코드를 pydantic을 이용해 작성합니다.&lt;/li>
+&lt;/ul>
+&lt;h3 id="요구사항">&lt;a href="#%ec%9a%94%ea%b5%ac%ec%82%ac%ed%95%ad" class="header-anchor">&lt;/a>요구사항
+&lt;/h3>&lt;ol>
+&lt;li>앞서 작성한 Create API를 Path Parameter로 작성합니다.&lt;/li>
+&lt;li>Create API에서 입력으로 받아야 하는 값들을 &lt;code>pydantic.BaseModel&lt;/code> 로 수정합니다. [&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/body/" target="_blank" rel="noopener"
+>Request Body&lt;/a>]
+&lt;ul>
+&lt;li>&lt;code>Class CreateIn(BaseModel):&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>create 함수를 수정합니다. [&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/body/#use-the-model" target="_blank" rel="noopener"
+>Use the model&lt;/a>]&lt;/li>
+&lt;li>create 후 반환하는 값을 Response Model로 수정합니다. [&lt;a class="link" href="https://fastapi.tiangolo.com/tutorial/response-model/" target="_blank" rel="noopener"
+>Response Model&lt;/a>]
+&lt;ul>
+&lt;li>&lt;code>Class CreateOut(BaseModel):&lt;/code>&lt;/li>
+&lt;li>status, id 를 반환합니다.
+&lt;ul>
+&lt;li>id는 memory에 들어있는 length를 반환합니다.&lt;/li>
+&lt;li>eg) 첫 번째 입력값의 id는 0입니다.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>create 함수의 반환 값을 ResponseModel로 수정합니다.&lt;/li>
+&lt;li>Pydantic으로 작성하기 전과 후의 api의 차이점을 비교합니다.&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h2 id="구현">&lt;a href="#%ea%b5%ac%ed%98%84" class="header-anchor">&lt;/a>구현
+&lt;/h2>&lt;h3 id="pydantic">&lt;a href="#pydantic" class="header-anchor">&lt;/a>Pydantic
+&lt;/h3>&lt;p>pydantic을 이용해 create api 에서 받을 입력 스펙과 출력 스펙을 정의합니다.&lt;/p>
+&lt;p>입력으로 받을 정보는 &lt;code>name&lt;/code>과 &lt;code>nickname&lt;/code>입니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">pydantic&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">BaseModel&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">CreateIn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">BaseModel&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">nickname&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>생성 후 전달할 정보는 &lt;code>status&lt;/code>와 &lt;code>id&lt;/code> 입니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">CreateOut&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">BaseModel&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">status&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">id&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">int&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="api">&lt;a href="#api" class="header-anchor">&lt;/a>api
+&lt;/h3>&lt;p>위에서 정의한 schema를 이용해 api 코드를 작성합니다.&lt;/p>
+&lt;p>데코레이터의 &lt;code>response_model&lt;/code> 에 &lt;code>CreateOut&lt;/code>을 입력합니다.&lt;br>
+입력으로 받은 값을 &lt;code>create_in&lt;/code> 으로 정의하고 type hint로 &lt;code>CreateIn&lt;/code>을 입력합니다.&lt;br>
+입력으로 받은 값에서 필요한 &lt;code>name&lt;/code> 과 &lt;code>nickname&lt;/code>은 &lt;code>create_in&lt;/code> 의 attribute로 있습니다.&lt;br>
+반환할 때는 &lt;code>CreateOut&lt;/code> class의 init값에 입력해서 반환합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.post&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;/nickname&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">response_model&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">CreateOut&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">create_query&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">create_in&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">CreateIn&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">KEY_VALUE_STORE&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">create_in&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">create_in&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">nickname&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">CreateOut&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">status&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;success&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">KEY_VALUE_STORE&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="실행">&lt;a href="#%ec%8b%a4%ed%96%89" class="header-anchor">&lt;/a>실행
+&lt;/h2>&lt;p>위의 코드를 &lt;code>crud_pydantic.py&lt;/code> 에 작성합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">pydantic&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">BaseModel&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">fastapi&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">FastAPI&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">KEY_VALUE_STORE&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">app&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FastAPI&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">CreateIn&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">BaseModel&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">nickname&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">CreateOut&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">BaseModel&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">status&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">str&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">id&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">int&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nd">@app.post&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;/nickname&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">response_model&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">CreateOut&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">create_query&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">create_in&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">CreateIn&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">KEY_VALUE_STORE&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">create_in&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">create_in&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">nickname&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">CreateOut&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">status&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;success&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">len&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">KEY_VALUE_STORE&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>uvicorn으로 실행합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">uvicorn crud_pydantic:app --reload
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="비교">&lt;a href="#%eb%b9%84%ea%b5%90" class="header-anchor">&lt;/a>비교
+&lt;/h2>&lt;p>pydantic을 사용하기 전과 후의 swagger를 비교하면 다음과 같습니다.
+pydantic을 사용할 경우 request_body로 받을 때의 예시와 response 에 대한 예시가 생성된 것을 확인할 수 있습니다.&lt;/p>
+&lt;h3 id="before">&lt;a href="#before" class="header-anchor">&lt;/a>Before
+&lt;/h3>&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/blog/p/chapter-3.-api-3-fastapi-crud-with-pydantic/before.png"
+width="1436"
+height="1148"
+srcset="https://aiden-jeon.github.io/blog/blog/p/chapter-3.-api-3-fastapi-crud-with-pydantic/before_hu18265569618148940459.png 480w, https://aiden-jeon.github.io/blog/blog/p/chapter-3.-api-3-fastapi-crud-with-pydantic/before_hu4856010921150790412.png 1024w"
+loading="lazy"
+alt="before pydantic"
+class="gallery-image"
+data-flex-grow="125"
+data-flex-basis="300px"
+>&lt;/p>
+&lt;h3 id="after">&lt;a href="#after" class="header-anchor">&lt;/a>After
+&lt;/h3>&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/blog/p/chapter-3.-api-3-fastapi-crud-with-pydantic/after.png"
+width="1430"
+height="1216"
+srcset="https://aiden-jeon.github.io/blog/blog/p/chapter-3.-api-3-fastapi-crud-with-pydantic/after_hu3291662834752225621.png 480w, https://aiden-jeon.github.io/blog/blog/p/chapter-3.-api-3-fastapi-crud-with-pydantic/after_hu5327786743363795567.png 1024w"
+loading="lazy"
+alt="after pydantic"
+class="gallery-image"
+data-flex-grow="117"
+data-flex-basis="282px"
+>&lt;/p></description></item></channel></rss>

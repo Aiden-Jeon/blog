@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Argocd on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/argocd/</link><description>Recent content in Argocd on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 09 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/argocd/index.xml" rel="self" type="application/rss+xml"/><item><title>argocd를 branch에서 cd</title><link>https://aiden-jeon.github.io/blog/p/argocd%EB%A5%BC-branch%EC%97%90%EC%84%9C-cd/</link><pubDate>Fri, 09 Apr 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/argocd%EB%A5%BC-branch%EC%97%90%EC%84%9C-cd/</guid><description>&lt;p>&lt;strong>CI/CD Contents 순서&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/sphinx-autoapi-%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EC%9E%90%EB%8F%99-api-%EB%AC%B8%EC%84%9C-%EC%83%9D%EC%84%B1%ED%95%98%EA%B8%B0/" >sphinx-autoapi 를 이용한 자동 api 문서 생성하기&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/github-action%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-ci/" >github action을 이용한 ci&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/ghcr%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-kubernetes-deployment-%EB%A7%8C%EB%93%A4%EA%B8%B0/" >ghcr을 이용한 kubernetes deployment 만들기&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/helm%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-deployment-chart-%EB%A7%8C%EB%93%A4%EA%B8%B0/" >helm을 이용한 deployment chart 만들기&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/argocd%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-cd/" >argocd를 이용한 cd&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/argocd%EB%A5%BC-branch%EC%97%90%EC%84%9C-cd/" >argocd를 branch에서 cd&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>이번 포스트에서는 argocd를 이용해 github branch 에서 cd(continuous delivery) 하는 법에 대해서 알아보겠습니다.&lt;/p>
+&lt;h2 id="1-github-action-설정하기">&lt;a href="#1-github-action-%ec%84%a4%ec%a0%95%ed%95%98%ea%b8%b0" class="header-anchor">&lt;/a>1. github action 설정하기
+&lt;/h2>&lt;h3 id="11-ci">&lt;a href="#11-ci" class="header-anchor">&lt;/a>1.1 CI
+&lt;/h3>&lt;p>CI를 위한 github action을 작성하겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">docker-image-ci&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">runs-on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ubuntu-18.04&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Checkout&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/checkout@v2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">submodules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">recursive&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">fetch-depth&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Create shot SHA&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">benjlevesque/short-sha@v1.2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">id&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">short-sha&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Set up Docker Buildx&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">docker/setup-buildx-action@v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Login to GitHub Container Registry&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">docker/login-action@v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">registry&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ghcr.io&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">username&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ github.repository_owner }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">password&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ secrets.CR_PAT }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Setup python&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/setup-python@v2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">python-version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;3.8.5&amp;#39;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Generate html&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> pip install -r requirements-doc.txt
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> cd docs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> make html&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Build and push&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">docker/build-push-action@v2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">push&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">context&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">./&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">file&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">docker/Dockerfile&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">tags&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> ghcr.io/aiden-jeon/sphinx-api:latest
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> ghcr.io/aiden-jeon/sphinx-api:${{ steps.short-sha.outputs.sha }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>main branch에 수정이 생기면 docs를 build하고 docker image를 만듭니다.
+docs를 build하기 위해서 &lt;code>requirements-doc.txt&lt;/code> 를 추가합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl"># requirements-doc.txt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sphinx-autoapi==1.6.0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sphinx-rtd-theme==0.5.1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="12-cd">&lt;a href="#12-cd" class="header-anchor">&lt;/a>1.2 CD
+&lt;/h3>&lt;p>CI를 위한 github action을 작성하겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">docker-image-cd&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">runs-on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ubuntu-18.04&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Create short SHA&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">benjlevesque/short-sha@v1.2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">id&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">short-sha&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Checkout deploy repo&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">actions/checkout@v2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">repository&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">aiden-jeon/github-cicd&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">token&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ secrets.CR_PAT }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">github-cicd&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Install yq&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> wget https://github.com/mikefarah/yq/releases/download/v4.4.1/yq_linux_amd64 -O ./yq
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> chmod +x ./yq&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Change image tag on values.yaml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> cat ./github-cicd/sphinx-doc/values.yaml | ./yq e &amp;#39;.image.tag=&amp;#34;${{ steps.short-sha.outputs.sha }}&amp;#34;&amp;#39; - | tee ./github-cicd/sphinx-doc/values.yaml.tmp
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> mv ./github-cicd/sphinx-doc/values.yaml.tmp ./github-cicd/sphinx-doc/values.yaml&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Commit file&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> cd github-cicd
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> git config --local user.email &amp;#34;ells2124@gmail.com&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> git config --local user.name &amp;#34;aiden-jeon&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> git add ./sphinx-doc/values.yaml
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> git commit -m &amp;#34;Update sphinx-doc image tag.&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Push changes&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">uses&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ad-m/github-push-action@master&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">with&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">directory&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">github-cicd&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">repository&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">aiden-jeon/github-cicd&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">github_token&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">${{ secrets.CR_PAT }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">branch&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">doc-pages&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">force&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>CI가 종료되면 &lt;code>doc-pages&lt;/code> branch 의 values를 수정합니다.&lt;/p>
+&lt;h2 id="2-app-생성">&lt;a href="#2-app-%ec%83%9d%ec%84%b1" class="header-anchor">&lt;/a>2. APP 생성
+&lt;/h2>&lt;p>cd를 위한 app을 생성하겠습니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-15.png"
+loading="lazy"
+alt="그림-1"
+>&lt;/p>
+&lt;p>NEW APP 을 눌러 추가하겠습니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-16.png"
+loading="lazy"
+alt="그림-2"
+>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-17.png"
+loading="lazy"
+alt="그림-3"
+>&lt;/p>
+&lt;p>그림-3과 같이 config를 입력하고 create를 해줍니다. 완성되면 아래와 같이 app이 생성됩니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-18.png"
+loading="lazy"
+alt="그림-4"
+>&lt;/p>
+&lt;p>app에 클릭해서 들어가면 다음과 같이 나옵니다. 여기서 SYNC 버튼을 눌러줍니다&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-19.png"
+loading="lazy"
+alt="그림-5"
+>&lt;/p>
+&lt;p>SYNCHRONIZE 버튼을 누릅니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-20.png"
+loading="lazy"
+alt="그림-6"
+>&lt;/p>
+&lt;p>다음은 sync가 완료된 화면입니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-21.png"
+loading="lazy"
+alt="그림-7"
+>&lt;/p>
+&lt;p>command창에서 정상적으로 떴는지 확인해봅니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">❯ kubectl get all -n sphinx-doc
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME READY STATUS RESTARTS AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pod/sphinx-branch-sphinx-doc-5c597645d-wr69x 1/1 Running &lt;span class="m">0&lt;/span> 35s
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME TYPE CLUSTER-IP EXTERNAL-IP PORT&lt;span class="o">(&lt;/span>S&lt;span class="o">)&lt;/span> AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">service/sphinx-branch-sphinx-doc NodePort 10.107.46.101 &amp;lt;none&amp;gt; 80:30903/TCP 36s
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME READY UP-TO-DATE AVAILABLE AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">deployment.apps/sphinx-branch-sphinx-doc 1/1 &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> 35s
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME DESIRED CURRENT READY AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">replicaset.apps/sphinx-branch-sphinx-doc-5c597645d &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> 35s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="4-확인">&lt;a href="#4-%ed%99%95%ec%9d%b8" class="header-anchor">&lt;/a>4. 확인
+&lt;/h2>&lt;p>다음 명령어로 접속할 ip와 포트를 얻습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">❯ minikube service -n sphinx-doc --url sphinx-branch-sphinx-doc
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">🏃 Starting tunnel &lt;span class="k">for&lt;/span> service sphinx-branch-sphinx-doc.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">|&lt;/span>------------&lt;span class="p">|&lt;/span>--------------------------&lt;span class="p">|&lt;/span>-------------&lt;span class="p">|&lt;/span>------------------------&lt;span class="p">|&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">|&lt;/span> NAMESPACE &lt;span class="p">|&lt;/span> NAME &lt;span class="p">|&lt;/span> TARGET PORT &lt;span class="p">|&lt;/span> URL &lt;span class="p">|&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">|&lt;/span>------------&lt;span class="p">|&lt;/span>--------------------------&lt;span class="p">|&lt;/span>-------------&lt;span class="p">|&lt;/span>------------------------&lt;span class="p">|&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">|&lt;/span> sphinx-doc &lt;span class="p">|&lt;/span> sphinx-branch-sphinx-doc &lt;span class="p">|&lt;/span> &lt;span class="p">|&lt;/span> http://127.0.0.1:63918 &lt;span class="p">|&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">|&lt;/span>------------&lt;span class="p">|&lt;/span>--------------------------&lt;span class="p">|&lt;/span>-------------&lt;span class="p">|&lt;/span>------------------------&lt;span class="p">|&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">http://127.0.0.1:63918
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">❗ Because you are using a Docker driver on darwin, the terminal needs to be open to run it.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>정상적으로 실행이 되었는지 확인합니다.&lt;/p></description></item><item><title>argocd를 이용한 cd</title><link>https://aiden-jeon.github.io/blog/p/argocd%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-cd/</link><pubDate>Thu, 04 Mar 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/argocd%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-cd/</guid><description>&lt;p>&lt;strong>CI/CD Contents 순서&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/sphinx-autoapi-%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EC%9E%90%EB%8F%99-api-%EB%AC%B8%EC%84%9C-%EC%83%9D%EC%84%B1%ED%95%98%EA%B8%B0/" >sphinx-autoapi 를 이용한 자동 api 문서 생성하기&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/github-action%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-ci/" >github action을 이용한 ci&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/ghcr%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-kubernetes-deployment-%EB%A7%8C%EB%93%A4%EA%B8%B0/" >ghcr을 이용한 kubernetes deployment 만들기&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/helm%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-deployment-chart-%EB%A7%8C%EB%93%A4%EA%B8%B0/" >helm을 이용한 deployment chart 만들기&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/blog/blog/p/argocd%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-cd/" >argocd를 이용한 cd&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>이번 포스트에서는 argocd를 이용해 helm chart를 cd(continuous delivery) 하는 법에 대해서 알아보겠습니다.&lt;/p>
+&lt;h2 id="1-설치">&lt;a href="#1-%ec%84%a4%ec%b9%98" class="header-anchor">&lt;/a>1. 설치
+&lt;/h2>&lt;p>argocd 설치는 &lt;a class="link" href="https://argoproj.github.io/argo-cd/getting_started/" target="_blank" rel="noopener"
+>tutorial&lt;/a>을 따라했습니다.&lt;/p>
+&lt;h2 id="2-실행">&lt;a href="#2-%ec%8b%a4%ed%96%89" class="header-anchor">&lt;/a>2. 실행
+&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 1. argocd namespace&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl create namespace argocd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># access argo cd api server&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl patch svc argocd-server -n argocd -p &lt;span class="s1">&amp;#39;{&amp;#34;spec&amp;#34;: {&amp;#34;type&amp;#34;: &amp;#34;LoadBalancer&amp;#34;}}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#port forward&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">kubectl port-forward svc/argocd-server -n argocd 8080:80
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>argocd 를 실행시켰으면 https://localhost:8080 으로 들어갑니다.&lt;br>
+기본으로 설정되어 있는 아이디는 admin이며 비밀번호는 아래 명령어로 확인할 수 있습니다.&lt;/p>
+&lt;p>v1.8.0 이하는 아래 명령어로 확인할 수 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl get pods -n argocd -l app.kubernetes.io/name&lt;span class="o">=&lt;/span>argocd-server -o name &lt;span class="p">|&lt;/span> cut -d&lt;span class="s1">&amp;#39;/&amp;#39;&lt;/span> -f &lt;span class="m">2&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>v1.9.0 이상은 아래 명령어로 확인할 수 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl -n argocd get secret argocd-initial-admin-secret -o &lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;{.data.password}&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> base64 -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="3-app-생성">&lt;a href="#3-app-%ec%83%9d%ec%84%b1" class="header-anchor">&lt;/a>3. APP 생성
+&lt;/h2>&lt;p>처음 나오는 화면은 다음과 같이 아무런 app이 없습니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-8.png"
+loading="lazy"
+alt="그림-1"
+>&lt;/p>
+&lt;p>NEW APP 을 눌러 추가하겠습니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-9.png"
+loading="lazy"
+alt="그림-2"
+>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-10.png"
+loading="lazy"
+alt="그림-3"
+>&lt;/p>
+&lt;p>그림-3과 같이 config를 입력하고 create를 해줍니다. 완성되면 아래와 같이 app이 생성됩니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-11.png"
+loading="lazy"
+alt="그림-4"
+>&lt;/p>
+&lt;p>app에 클릭해서 들어가면 다음과 같이 나옵니다. 여기서 SYNC 버튼을 눌러줍니다&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-12.png"
+loading="lazy"
+alt="그림-5"
+>&lt;/p>
+&lt;p>SYNCHRONIZE 버튼을 누릅니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-13.png"
+loading="lazy"
+alt="그림-6"
+>&lt;/p>
+&lt;p>다음은 sync가 완료된 화면입니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/github/cicd-14.png"
+loading="lazy"
+alt="그림-7"
+>&lt;/p>
+&lt;p>command창에서 정상적으로 떴는지 확인해봅니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&amp;gt; kubectl get all -n sphinx-doc
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME READY STATUS RESTARTS AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pod/sphinx-api-doc-sphinx-doc-5576ff677b-d4xzl 1/1 Running &lt;span class="m">0&lt;/span> 89s
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME TYPE CLUSTER-IP EXTERNAL-IP PORT&lt;span class="o">(&lt;/span>S&lt;span class="o">)&lt;/span> AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">service/sphinx-api-doc-sphinx-doc NodePort 10.105.22.158 &amp;lt;none&amp;gt; 80:31058/TCP 89s
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME READY UP-TO-DATE AVAILABLE AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">deployment.apps/sphinx-api-doc-sphinx-doc 1/1 &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> 89s
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">NAME DESIRED CURRENT READY AGE
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">replicaset.apps/sphinx-api-doc-sphinx-doc-5576ff677b &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> &lt;span class="m">1&lt;/span> 89s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="4-확인">&lt;a href="#4-%ed%99%95%ec%9d%b8" class="header-anchor">&lt;/a>4. 확인
+&lt;/h2>&lt;p>다음 명령어로 접속할 ip와 포트를 얻습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&amp;gt; minikube service -n sphinx-doc --url sphinx-api-doc-sphinx-doc
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">http://192.168.64.2:31058
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>정상적으로 실행이 되었는지 확인합니다.&lt;/p></description></item></channel></rss>

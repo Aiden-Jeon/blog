@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Dev on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/categories/dev/</link><description>Recent content in Dev on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 14 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/categories/dev/index.xml" rel="self" type="application/rss+xml"/><item><title>setup.py 와 Makefile 설정하기</title><link>https://aiden-jeon.github.io/blog/p/setup.py-%EC%99%80-makefile-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0/</link><pubDate>Sun, 14 Mar 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/setup.py-%EC%99%80-makefile-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0/</guid><description>&lt;p>&lt;strong>Module setup Contents 순서&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/setup-module/makefile" target="_blank" rel="noopener"
+>setup.py 와 Makefile 설정하기&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/setup-module/pylintrc" target="_blank" rel="noopener"
+>프로젝트별 pylint 설정하기&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>이번 포스트에서는 setup.py 와 Makefile을 설정하는 법에 대해 소개하겠습니다.&lt;br>
+포스트에서 사용된 코드는 &lt;a class="link" href="https://github.com/aiden-jeon/github-cicd" target="_blank" rel="noopener"
+>github&lt;/a> 에서 확인할 수 있습니다.&lt;/p>
+&lt;h3 id="1-setuppy">&lt;a href="#1-setuppy" class="header-anchor">&lt;/a>1. setup.py
+&lt;/h3>&lt;p>&lt;code>setup.py&lt;/code> 에서 사용되는 &lt;code>setuptools.setup&lt;/code>은 개발하고 있는 소스 코드를 package 형식으로 배포 할 때 이용합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">## setup.py&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">from&lt;/span> &lt;span class="nn">setuptools&lt;/span> &lt;span class="kn">import&lt;/span> &lt;span class="n">find_packages&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">setup&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">setup&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;github_cicd&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">version&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;0.0.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">packages&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">find_packages&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;src&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">python_requires&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;&amp;gt;=3.*&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">author&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;Aiden-jeon&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">author_email&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;ells2124@gmail.com&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;Example of github-cicd&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">keywords&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;ML pipeline kubeflow automation&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">url&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;https://github.com/aiden-jeon/github-cicd&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">project_urls&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Documentation&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;https://github.com/aiden-jeon/github-cicd&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s2">&amp;#34;Source Code&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;https://github.com/aiden-jeon/github-cicd&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">},&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>name&lt;/code>: 패키지가 어떤 이름으로 설치 될지를 나타냅니다.&lt;br>
+&lt;code>version&lt;/code>: 배포된 소스코드의 버전입니다.&lt;br>
+&lt;code>packages&lt;/code>: 배포에 포함 될 package들을 의미합니다. 보통 &lt;code>setuptools.find_packages&lt;/code>를 이용해 자동으로 찾습니다. 예를 들어서 src 폴더 밑에 &lt;code>module_1&lt;/code>, &lt;code>module_2&lt;/code> 가 있다면 두 모듈을 모두 찾아서 설치를 해줍니다. 이렇게 설치된 경우 아래와 같이 사용할 수 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">module_1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kn">import&lt;/span> &lt;span class="nn">module_2&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>만약, src 폴더 없이 &lt;code>module_1&lt;/code> 폴더를 설치하고 싶을 경우에는 아래와 같이 설정을 해야 합니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">packages&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;module_1&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>python_requires&lt;/code>: 실행 가능한 파이썬 버전을 의미합니다.&lt;/p>
+&lt;p>아래 코드를 이용해 작성이 완료된 &lt;code>setup.py&lt;/code>를 설치할 수 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">pip&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">e&lt;/span> &lt;span class="o">.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>사용한 python 버전의 site-packages에 가면 아래와 같이 패키지가 설치되어 있는 것을 확인 할 수 있습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&amp;gt; ls&lt;span class="p">|&lt;/span>grep github
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">github-cicd.egg-link
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="2-makefile">&lt;a href="#2-makefile" class="header-anchor">&lt;/a>2. Makefile
+&lt;/h3>&lt;p>이번에는 Makefile을 작성해보겠습니다.&lt;/p>
+&lt;h4 id="21-makefile을-사용하는-이유">&lt;a href="#21-makefile%ec%9d%84-%ec%82%ac%ec%9a%a9%ed%95%98%eb%8a%94-%ec%9d%b4%ec%9c%a0" class="header-anchor">&lt;/a>2.1 Makefile을 사용하는 이유
+&lt;/h4>&lt;blockquote>
+&lt;p>Compiling the source code files can be tiring, especially when you have to include several source files and type the compiling command every time you need to compile. Makefiles are the solution to simplify this task.&lt;/p>
+&lt;p>Makefiles are special format files that help build and manage the projects automatically.&lt;br>
+출처: &lt;a class="link" href="https://www.tutorialspoint.com/makefile/why_makefile.htm#:~:text=Compiling%20the%20source%20code%20files,and%20manage%20the%20projects%20automatically" target="_blank" rel="noopener"
+>link&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>요약하면 compile을 반복적으로 해야할 때 이러한 작업을 간단히 하기 위해 사용합니다.&lt;/p>
+&lt;h4 id="22-코드-작성">&lt;a href="#22-%ec%bd%94%eb%93%9c-%ec%9e%91%ec%84%b1" class="header-anchor">&lt;/a>2.2 코드 작성
+&lt;/h4>&lt;p>Python에서는 협업을 위한 여러가지 tool이 존재합니다.
+이러한 tool을 이용해 코드의 일관성, 타입체크, 코드 테스트를 수행할 수 있습니다.
+그런데 이 과정이 반복적으로 이루어지기 때문에 이를 코드화하려고 합니다.&lt;/p>
+&lt;ul>
+&lt;li>init
+Makefile을 수행하기 위해서는 제일 처음 필요한 패키지와 소스코드를 설치해야 합니다.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">init:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pip install -U pip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pip install -r requirements.txt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pip install -e .
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>format
+코드 format을 맞추기 위해 사용되는 툴은 주로 black 과 isort 가 있습니다.
+이 때 isort 가 black과 충돌을 일으키지 않게 &lt;code>--profile black&lt;/code>을 추가합니다.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">format:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> black .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> isort . --skip-gitignore --profile black
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>lint
+linting을 검사하기 위해 pytest 를 이용하고 pylint, flake8, mypy 를 사용하겠습니다.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">lint:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pytest src/mrxflow/ --pylint --flake8 --mypy
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>test
+test를 수행하기 위해 pytest를 이용하겠습니다.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">test:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pytest tests -s --verbose --cov&lt;span class="o">=&lt;/span>src/ --cov-report&lt;span class="o">=&lt;/span>html --cov-report&lt;span class="o">=&lt;/span>term-missing
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>전체 코드는 다음과 같습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">SHELL :&lt;span class="o">=&lt;/span> /bin/bash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">all:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">echo&lt;/span> &lt;span class="s1">&amp;#39;Makefile for github-cicd&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">init:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pip install -U pip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pip install -r requirements.txt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pip install -e .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">format:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> black .
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> isort . --skip-gitignore --profile black
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">lint:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pytest src/mrxflow/ --pylint --flake8 --mypy
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">test:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pytest tests -s --verbose --cov&lt;span class="o">=&lt;/span>src/ --cov-report&lt;span class="o">=&lt;/span>html --cov-report&lt;span class="o">=&lt;/span>term-missing
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="3-사용하기">&lt;a href="#3-%ec%82%ac%ec%9a%a9%ed%95%98%ea%b8%b0" class="header-anchor">&lt;/a>3. 사용하기
+&lt;/h3>&lt;p>&lt;code>setup.py&lt;/code>와 Makefile의 작성을 다 했다면 다음과 같이 사용할 수 있습니다.&lt;/p>
+&lt;ol>
+&lt;li>init
+Makefile에서 수행할 때 필요한 패키지를 설치합니다.&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">make init
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ol start="2">
+&lt;li>다른 명령어 사용해보기&lt;/li>
+&lt;/ol>
+&lt;ul>
+&lt;li>format&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">make format
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>lint&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">make lint
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>test&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">make &lt;span class="nb">test&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>프로젝트별 pylint 설정하기</title><link>https://aiden-jeon.github.io/blog/p/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EB%B3%84-pylint-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0/</link><pubDate>Sun, 14 Mar 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EB%B3%84-pylint-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0/</guid><description>&lt;p>&lt;strong>Module setup Contents 순서&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/setup-module/makefile" target="_blank" rel="noopener"
+>setup.py 와 Makefile 설정하기&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aiden-jeon.github.io/setup-module/pylintrc" target="_blank" rel="noopener"
+>프로젝트별 pylint 설정하기&lt;/a>&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;p>이번 포스트에서는 &lt;code>.pylintrc&lt;/code>를 이용해 프로젝트별 pylint를 설정하는 법에 대해 설명하겠습니다.
+포스트에서 사용된 코드는 &lt;a class="link" href="https://github.com/aiden-jeon/github-cicd" target="_blank" rel="noopener"
+>github&lt;/a> 에서 확인할 수 있습니다.&lt;/p>
+&lt;h2 id="1-generate-rcfile">&lt;a href="#1-generate-rcfile" class="header-anchor">&lt;/a>1. generate rcfile
+&lt;/h2>&lt;p>우선 &lt;code>.pylintrc&lt;/code> 를 생성하겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">pylint --generate-rcfile &amp;gt; .pylintrc
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;code>.pylintrc&lt;/code>를 확인해보면 여러가지 설정들이 있습니다.&lt;/p>
+&lt;h2 id="2-pylint-사용">&lt;a href="#2-pylint-%ec%82%ac%ec%9a%a9" class="header-anchor">&lt;/a>2. pylint 사용
+&lt;/h2>&lt;p>다음으로 지난번 포스트에서 만든 Makefile을 이용해 소스코드를 검사해보겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&amp;gt; make lint
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pytest src/ --pylint --flake8 --mypy
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">=================&lt;/span> &lt;span class="nb">test&lt;/span> session &lt;span class="nv">starts&lt;/span> &lt;span class="o">==================&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">platform darwin -- Python 3.8.6, pytest-6.2.1, py-1.10.0, pluggy-0.13.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">rootdir: /Users/jongseob/workspace/github-cicd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">plugins: flake8-1.0.7, mypy-0.8.0, cov-2.11.1, pylint-0.18.0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">collected &lt;span class="m">4&lt;/span> items
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">--------------------------------------------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Linting files
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">--------------------------------------------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">src/calculator.py F..s &lt;span class="o">[&lt;/span>100%&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">=======================&lt;/span> &lt;span class="nv">FAILURES&lt;/span> &lt;span class="o">=======================&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">______________ &lt;span class="o">[&lt;/span>pylint&lt;span class="o">]&lt;/span> src/calculator.py ______________
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">C: 1, 0: Missing module docstring &lt;span class="o">(&lt;/span>missing-module-docstring&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">C: 4, 4: Argument name &lt;span class="s2">&amp;#34;a&amp;#34;&lt;/span> doesn&lt;span class="s1">&amp;#39;t conform to snake_case naming style (invalid-name)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">C: 4, 4: Argument name &amp;#34;b&amp;#34; doesn&amp;#39;&lt;/span>t conform to snake_case naming style &lt;span class="o">(&lt;/span>invalid-name&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">R: 4, 4: Method could be a &lt;span class="k">function&lt;/span> &lt;span class="o">(&lt;/span>no-self-use&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">C: 26, 4: Argument name &lt;span class="s2">&amp;#34;a&amp;#34;&lt;/span> doesn&lt;span class="s1">&amp;#39;t conform to snake_case naming style (invalid-name)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">C: 26, 4: Argument name &amp;#34;b&amp;#34; doesn&amp;#39;&lt;/span>t conform to snake_case naming style &lt;span class="o">(&lt;/span>invalid-name&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">R: 26, 4: Method could be a &lt;span class="k">function&lt;/span> &lt;span class="o">(&lt;/span>no-self-use&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">=========================&lt;/span> &lt;span class="nv">mypy&lt;/span> &lt;span class="o">=========================&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Success: no issues found in &lt;span class="m">1&lt;/span> &lt;span class="nb">source&lt;/span> &lt;span class="nv">file&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">===============&lt;/span> short &lt;span class="nb">test&lt;/span> summary &lt;span class="nv">info&lt;/span> &lt;span class="o">================&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">FAILED src/calculator.py::PYLINT
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">========&lt;/span> &lt;span class="m">1&lt;/span> failed, &lt;span class="m">2&lt;/span> passed, &lt;span class="m">1&lt;/span> skipped in 0.19s &lt;span class="o">========&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">make: *** &lt;span class="o">[&lt;/span>lint&lt;span class="o">]&lt;/span> Error &lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>3가지 error가 있는 것을 볼 수 있습니다.&lt;/p>
+&lt;ul>
+&lt;li>missing-module-docstring : class docstring이 없어서 나온 에러입니다.&lt;/li>
+&lt;li>invalid-name : 변수 이름을 snake_case로 짓지 않아서 나온 에러입니다.&lt;/li>
+&lt;li>no-self-use : self를 사용하지 않아서 나온 에러입니다.&lt;/li>
+&lt;/ul>
+&lt;p>에러를 발생하지 않기 위해서는 각 에러에 맞게 코드를 수정해야 합니다.
+예를 들어서 invalid-name은 변수명 a와 b 대신 num_1, num_2 로 수정하면 해결 됩니다.&lt;/p>
+&lt;p>그런데 가끔은 이러한 변수명을 사용해야 할 경우가 있습니다.
+이런 경우 해결 할 수 있는 방법은 두 가지가 있습니다.&lt;/p>
+&lt;ol>
+&lt;li>해당 라인을 검사하지 않게 하기
+간단한 해법으로는 pylint가 해당 라인을 검사하지 않게 하는 것입니다.
+원래의 코드가 아래와 같습니다.&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">float&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">float&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="nb">float&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>여기에 주석을 추가해주면 됩니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl"> &lt;span class="k">def&lt;/span> &lt;span class="nf">add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">float&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="nb">float&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="nb">float&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="c1"># pylint: disable=invalid-name&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>이렇게 코드를 수정하면 pylint가 더 이상 해당 line에서 동일한 에러를 발생시키지 않습니다.&lt;/p>
+&lt;ol start="2">
+&lt;li>에러 자체를 검사하지 않기
+그런데 코드 한줄이 아니라 코드 전체에서 해당 lint를 검사하지 않게 하고 싶을 수도 있습니다. 이 때는 &lt;code>.pylintrc&lt;/code>에 직접 해당 lint를 검사하지 않게 추가해주면 됩니다.&lt;/li>
+&lt;/ol>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">disable=invalid-name,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>disable에 위와 같이 작성을 하면 더 이상 해당 lint를 검사하지 않습니다.&lt;/p>
+&lt;p>이번 포스트에서는 위에서 발생한 모든 에러를 &lt;code>.pylintrc&lt;/code> 에서 검사하지 않도록 했습니다. 이제 다시 lint를 확인해보겠습니다.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&amp;gt; make lint
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pytest src/ --pylint --flake8 --mypy
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">=================&lt;/span> &lt;span class="nb">test&lt;/span> session &lt;span class="nv">starts&lt;/span> &lt;span class="o">==================&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">platform darwin -- Python 3.8.6, pytest-6.2.1, py-1.10.0, pluggy-0.13.1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">rootdir: /Users/jongseob/workspace/github-cicd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">plugins: flake8-1.0.7, mypy-0.8.0, cov-2.11.1, pylint-0.18.0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">collected &lt;span class="m">4&lt;/span> items
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">--------------------------------------------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Linting files
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">--------------------------------------------------------
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">src/calculator.py .... &lt;span class="o">[&lt;/span>100%&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">=========================&lt;/span> &lt;span class="nv">mypy&lt;/span> &lt;span class="o">=========================&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Success: no issues found in &lt;span class="m">1&lt;/span> &lt;span class="nb">source&lt;/span> &lt;span class="nv">file&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">==================&lt;/span> &lt;span class="m">4&lt;/span> passed in 0.41s &lt;span class="o">===================&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>이제 더 이상 에러가 안나오는 것을 확인 할 수 있습니다.&lt;/p></description></item><item><title>MacOS에 Virtualbox Windows10 설치하기</title><link>https://aiden-jeon.github.io/blog/p/macos%EC%97%90-virtualbox-windows10-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0/</link><pubDate>Wed, 15 Jul 2020 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/macos%EC%97%90-virtualbox-windows10-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0/</guid><description>&lt;h2 id="준비">&lt;a href="#%ec%a4%80%eb%b9%84" class="header-anchor">&lt;/a>준비
+&lt;/h2>&lt;p>우선 버츄얼 박스와 윈도우10을 다운로드 받습니다.&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.virtualbox.org/wiki/Downloads" target="_blank" rel="noopener"
+>Virtual box 다운로드&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.microsoft.com/ko-kr/software-download/windows10ISO" target="_blank" rel="noopener"
+>Window10 다운로드&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="설치하기">&lt;a href="#%ec%84%a4%ec%b9%98%ed%95%98%ea%b8%b0" class="header-anchor">&lt;/a>설치하기
+&lt;/h2>&lt;p>Virtualbox를 실행시키면 아래와 같은 화면이 나옵니다.
+(2020.07 기준 virutalbox 버전은 6.1.12 입니다.)&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/windows_1.png"
+loading="lazy"
+alt="2CB89C19-07FC-43A4-956D-63DF859B4239"
+>&lt;/p>
+&lt;p>여기서 새로 만들기 버튼을 눌러줍니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/windows_2.png"
+loading="lazy"
+alt="C1B4CED5-5CA7-4945-8F03-9CA46F4BF834"
+>&lt;/p>
+&lt;p>이름에 Windows 10 이라고 입력해줍니다. 그러면 밑의 버전도 이름에 맞추어서 자동으로 변경됩니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/windows_3.png"
+loading="lazy"
+alt="58CE287C-919A-4A2C-BDBF-4BCD66D6AC75"
+>&lt;/p>
+&lt;p>추천 메모리 크기는 기본값인 2048로 둡니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/windows_4.png"
+loading="lazy"
+alt="1A563FFA-D88B-4D51-901A-D1E5E8CAB4D3"
+>&lt;/p>
+&lt;p>계속하기를 누르면 하드 디스크 크기를 설정해주어야 합니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/windows_5.png"
+loading="lazy"
+alt="04EC17F0-6A11-4FE4-9CE2-DBF4A18469DE"
+>&lt;/p>
+&lt;p>VMDK를 골라줍니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/windows_6.png"
+loading="lazy"
+alt="20E7DBBF-8382-4792-A9BC-4A9CC323D4DC"
+>&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/windows_7.png"
+loading="lazy"
+alt="786AED0C-E1C6-4A57-900F-35219368E990"
+>&lt;/p>
+&lt;p>저는 32gb 로 설정해주었습니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/windows_8.png"
+loading="lazy"
+alt="E4960960-3549-4E34-85A6-8528E19EC706"
+>&lt;/p>
+&lt;p>설치가 완료되면 다음과 같이 나옵니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/windows_9.png"
+loading="lazy"
+alt="F685527D-D908-46AA-8436-DDB0BB6D7B44"
+>&lt;/p>
+&lt;p>이제 여기서 설정 버튼을 눌러줍니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/10.png"
+loading="lazy"
+alt="7CFC4AE9-3401-434F-A842-00E48CBDE776"
+>&lt;/p>
+&lt;p>우선 시스템에서 광 디스크를 하드 디스크 밑으로 내려 줍니다. 이는 윈도우가 CD로 설치 된 후 하드 디스크로 부팅시키기 위함입니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/11.png"
+loading="lazy"
+alt="A59A7058-9541-4CB2-B452-C3DD44EB26C3"
+>&lt;/p>
+&lt;p>그리고 저장소에서 비어있음을 누르고 빨간 네모가 쳐진 시디 모양의 아이콘을 눌러줍니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/12.png"
+loading="lazy"
+alt="B2006D54-592C-4F5B-89F8-021EE17ABC61"
+>&lt;/p>
+&lt;p>그리고 가상 광학 디스크 선택/만들기를 눌러줍니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/13.png"
+loading="lazy"
+alt="A50A569F-843B-426A-A277-2D3384CD817A"
+>&lt;/p>
+&lt;p>추가를 누르고&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/14.png"
+loading="lazy"
+alt="AC69DC40-5E2A-4C4A-8D26-28EE774FC882"
+>&lt;/p>
+&lt;p>아까 다운로드 받은 windows10.ios 를 선택해줍니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/15.png"
+loading="lazy"
+alt="A564F171-514B-419F-98E5-89B2C718C4F6"
+>&lt;/p>
+&lt;p>그러면 아래와 같이 win10.ios 가 생기게 됩니다. 선택을 누르고 확인을 누르면 됩니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/16.png"
+loading="lazy"
+alt="637F6A71-E478-4F48-8BAB-D5303F198285"
+>&lt;/p>
+&lt;p>이제 시작을 눌러줍니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/17.png"
+loading="lazy"
+alt="1377F26C-A9A3-4AE6-A2C5-009C9B8CFEF5"
+>&lt;/p>
+&lt;h2 id="윈도우-설치">&lt;a href="#%ec%9c%88%eb%8f%84%ec%9a%b0-%ec%84%a4%ec%b9%98" class="header-anchor">&lt;/a>윈도우 설치
+&lt;/h2>&lt;p>시작을 누르면 윈도우10 설치 과정을 따라 가면 됩니다.&lt;/p>
+&lt;p>윈도우를 설치하실 때에는 제품 키가 없음을 눌러서 진행하시면 됩니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/18.png"
+loading="lazy"
+alt="743C2297-AB10-441A-82B2-B058D5236BD2"
+>&lt;/p>
+&lt;p>윈도우 버전은 본인의 필요에 따라 선택하면 됩니다. 가장 기본적인 기능은 Windows10 Home 입니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/19.png"
+loading="lazy"
+alt="5359A096-9DB4-41F4-A929-CB7B70792E76"
+>&lt;/p>
+&lt;p>약관에 동의하시고 사용자 지정 설치로 진행합니다.&lt;/p>
+&lt;p>&lt;img src="https://aiden-jeon.github.io/blog/imgs/windows/20.png"
+loading="lazy"
+alt="3BCF3F77-D130-4CF6-AB61-743CC0DAFFDD"
+>&lt;/p>
+&lt;p>이후에는 본인의 취향에 맞추어서 설정을 선택하면서 진행하면 됩니다.&lt;/p></description></item></channel></rss>

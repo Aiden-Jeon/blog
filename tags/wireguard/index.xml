@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Wireguard on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/wireguard/</link><description>Recent content in Wireguard on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 15 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/wireguard/index.xml" rel="self" type="application/rss+xml"/><item><title>Wireguard 설치하기</title><link>https://aiden-jeon.github.io/blog/p/wireguard-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0/</link><pubDate>Fri, 15 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/wireguard-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0/</guid><description>&lt;h2 id="on-orcale-cloud">&lt;a href="#on-orcale-cloud" class="header-anchor">&lt;/a>On Orcale Cloud
+&lt;/h2>&lt;p>이제 네트워크에 ingress 를 추가해주어야 합니다.&lt;/p>
+&lt;ol>
+&lt;li>Instance 메뉴를 선택합니다.&lt;br>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-0.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>Instance를 선택합니다.&lt;br>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-1.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>Subnet을 선택합니다.&lt;br>
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-2.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>Security를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-3.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>Add Ingress Rules를 눌러 WireGuard를 위한 포트를 추가하겠습니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-4.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>다음 빨간 칸의 내용들을 입력한 후 추가합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-5.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;/ol>
+&lt;h2 id="prxoy-manager">&lt;a href="#prxoy-manager" class="header-anchor">&lt;/a>Prxoy-Manager
+&lt;/h2>&lt;ol>
+&lt;li>Proxy Hosts를 추가합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-6.png"
+loading="lazy"
+alt="select proxy hosts"
+>&lt;/li>
+&lt;/ol>
+&lt;h2 id="on-ubuntu-server">&lt;a href="#on-ubuntu-server" class="header-anchor">&lt;/a>On Ubuntu Server
+&lt;/h2>&lt;p>Wireguard와 이를 쉽게 사용할 수 있는 &lt;a class="link" href="https://github.com/subspacecommunity/subspace/tree/master" target="_blank" rel="noopener"
+>Subspace&lt;/a>를 실행합니다.&lt;/p>
+&lt;ol>
+&lt;li>우선 아래 과정을 통해 Wireguard를 설치합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo su
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt-get update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt-get install -y wireguard
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Remove dnsmasq because it will run inside the container.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt-get remove -y dnsmasq
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Disable systemd-resolved listener if it blocks port 53.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;DNSStubListener=no&amp;#34;&lt;/span> &amp;gt;&amp;gt; /etc/systemd/resolved.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">systemctl restart systemd-resolved
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Set Cloudfare DNS server.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> nameserver 1.1.1.1 &amp;gt; /etc/resolv.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> nameserver 1.0.0.1 &amp;gt;&amp;gt; /etc/resolv.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Load modules.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">modprobe wireguard
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">modprobe iptable_nat
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">modprobe ip6table_nat
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Enable modules when rebooting.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;wireguard&amp;#34;&lt;/span> &amp;gt; /etc/modules-load.d/wireguard.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;iptable_nat&amp;#34;&lt;/span> &amp;gt; /etc/modules-load.d/iptable_nat.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;ip6table_nat&amp;#34;&lt;/span> &amp;gt; /etc/modules-load.d/ip6table_nat.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Check if systemd-modules-load service is active.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">systemctl status systemd-modules-load.service
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># Enable IP forwarding.&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sysctl -w net.ipv4.ip_forward&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sysctl -w net.ipv6.conf.all.forwarding&lt;span class="o">=&lt;/span>&lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">exit&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>docker-compose를 위한 폴더를 생성합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">mkdir subspace&lt;span class="p">;&lt;/span> &lt;span class="nb">cd&lt;/span> subspace
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>다음과 같은 docker-compose 파일을 작성합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat &amp;gt; docker-compose.yml &lt;span class="s">&amp;lt;&amp;lt; EOF
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">version: &amp;#34;3.3&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">services:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> subspace:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> image: subspacecommunity/subspace:latest
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> container_name: subspace
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> volumes:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - /opt/docker/subspace:/data
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> restart: always
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> environment:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_HTTP_HOST=vpn.example.duckdns.org # 설정한 proxy-host의 이름과 동일해야 합니다.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_LETSENCRYPT=false
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_HTTP_INSECURE=true
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_HTTP_ADDR=&amp;#34;:5000&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_NAMESERVERS=1.1.1.1,8.8.8.8
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_LISTENPORT=51820
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_IPV4_POOL=10.99.97.0/24
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_IPV6_POOL=fd00::10:97:0/64
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_IPV4_GW=10.99.97.1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_IPV6_GW=fd00::10:97:1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_IPV6_NAT_ENABLED=1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - SUBSPACE_DNSMASQ_DISABLED=1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> cap_add:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> - NET_ADMIN
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s"> network_mode: &amp;#34;host&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">EOF&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>docker-compose를 실행합니다
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker-compose up -d
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;h2 id="vpn-configure-추가">&lt;a href="#vpn-configure-%ec%b6%94%ea%b0%80" class="header-anchor">&lt;/a>VPN Configure 추가
+&lt;/h2>&lt;ol>
+&lt;li>설정한 vpn domain으로 접속후 계정을 생성합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-7.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>configure를 발급받습니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-8.png"
+loading="lazy"
+alt="img"
+>&lt;/li>
+&lt;li>config 파일을 다운로드 받습니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/wireguard-9.png"
+loading="lazy"
+alt="img"
+>
+config 파일의 내용은 다음과 같습니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Interface&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">PrivateKey&lt;/span> &lt;span class="o">=&lt;/span> ~~~
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">DNS&lt;/span> &lt;span class="o">=&lt;/span> 10.99.97.1, fd00::10:97:1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Address&lt;/span> &lt;span class="o">=&lt;/span> 10.99.97.2/24,fd00::10:97:2/64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Peer&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">PublicKey&lt;/span> &lt;span class="o">=&lt;/span> ~~~
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Endpoint&lt;/span> &lt;span class="o">=&lt;/span> vpn.aiden-jeon.duckdns.org:51820
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">AllowedIPs&lt;/span> &lt;span class="o">=&lt;/span> 0.0.0.0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>이 때 AllowedIPs를 VPN IP의 0번으로 수정합니다.
+제 경우 10.99.97.x 이기 때문에 10.99.97.0/24를 입력합니다.
+수정된 파일은 다음과 같습니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Interface&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">PrivateKey&lt;/span> &lt;span class="o">=&lt;/span> ~~~
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">DNS&lt;/span> &lt;span class="o">=&lt;/span> 10.99.97.1, fd00::10:97:1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Address&lt;/span> &lt;span class="o">=&lt;/span> 10.99.97.2/24,fd00::10:97:2/64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Peer&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">PublicKey&lt;/span> &lt;span class="o">=&lt;/span> ~~~
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Endpoint&lt;/span> &lt;span class="o">=&lt;/span> vpn.aiden-jeon.duckdns.org:51820
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">AllowedIPs&lt;/span> &lt;span class="o">=&lt;/span> 10.99.97.0/24
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>vpn에 추가할 서버에 접속후 wireguard를 설치합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt-get install -y resolvconf wireguard
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>발급 받은 config 파일을 다음 위치에 적어줍니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo cp wg0.conf /etc/wireguard/wg0.conf
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>systemctl을 설정합니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo systemctl &lt;span class="nb">enable&lt;/span> wg-quick@wg0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl start wg-quick@wg0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl status wg-quick@wg0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>인터페이스를 확인하고 서버로 ping을 날려봅니다.
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ifconfig w0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ping 10.99.97.1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol></description></item></channel></rss>
