@@ -1,0 +1,679 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kafka on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/kafka/</link><description>Recent content in Kafka on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 06 Dec 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/kafka/index.xml" rel="self" type="application/rss+xml"/><item><title>Apache Kafka 101</title><link>https://aiden-jeon.github.io/blog/p/apache-kafka-101/</link><pubDate>Tue, 06 Dec 2022 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/apache-kafka-101/</guid><description>&lt;h1 id="apache-kafka-101"&gt;&lt;a href="#apache-kafka-101" class="header-anchor"&gt;&lt;/a&gt;Apache Kafka 101
+&lt;/h1&gt;&lt;p&gt;&lt;a class="link" href="https://developer.confluent.io/learn-kafka/apache-kafka/" target="_blank" rel="noopener"
+&gt;Apache Kafka 101&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id="1-events"&gt;&lt;a href="#1-events" class="header-anchor"&gt;&lt;/a&gt;1. Events
+&lt;/h2&gt;&lt;h3 id="kafka"&gt;&lt;a href="#kafka" class="header-anchor"&gt;&lt;/a&gt;Kafka
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;many use cases&lt;/li&gt;
+&lt;li&gt;⇒ start from event streaming platform&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="event"&gt;&lt;a href="#event" class="header-anchor"&gt;&lt;/a&gt;Event
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;What is Event?
+&lt;ul&gt;
+&lt;li&gt;things that have happened combined with the description of what happend&lt;/li&gt;
+&lt;li&gt;⇒ notification + state&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;eg)
+&lt;ul&gt;
+&lt;li&gt;IOT&lt;/li&gt;
+&lt;li&gt;Business Process Change&lt;/li&gt;
+&lt;li&gt;User Interaction&lt;/li&gt;
+&lt;li&gt;Microservice Output&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Notification
+&lt;ul&gt;
+&lt;li&gt;the element of when-ness that can be used to trigger some other activity&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;State
+&lt;ul&gt;
+&lt;li&gt;Usually small (less than a megabyte)&lt;/li&gt;
+&lt;li&gt;normally represented in some structured format (JSON, an object serialized with Apache Avro or Protocol Buffers)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="key--value"&gt;&lt;a href="#key--value" class="header-anchor"&gt;&lt;/a&gt;Key / Value
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;kafka models events as key/value pair&lt;/li&gt;
+&lt;li&gt;Internally: sequence of bytes&lt;/li&gt;
+&lt;li&gt;externally: structured objects represented in language’s type system
+&lt;ul&gt;
+&lt;li&gt;(JSON, JSON Schema, Avro, or Protobuf)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="3-topics"&gt;&lt;a href="#3-topics" class="header-anchor"&gt;&lt;/a&gt;3. Topics
+&lt;/h2&gt;&lt;h3 id="topic"&gt;&lt;a href="#topic" class="header-anchor"&gt;&lt;/a&gt;Topic
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;most fundamental unit of Kafka&lt;/li&gt;
+&lt;li&gt;something like a table in a relational database&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="named-container-for-similar-events"&gt;&lt;a href="#named-container-for-similar-events" class="header-anchor"&gt;&lt;/a&gt;Named container for similar events
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;create different topics to hold
+&lt;ul&gt;
+&lt;li&gt;different kinds of events&lt;/li&gt;
+&lt;li&gt;filtered and transformed versions of the same kind of event
+&lt;ul&gt;
+&lt;li&gt;→ can duplicate data between topics&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="a-topic-is-a-log-of-events"&gt;&lt;a href="#a-topic-is-a-log-of-events" class="header-anchor"&gt;&lt;/a&gt;A topic is a log of events
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Logs
+&lt;ol&gt;
+&lt;li&gt;Append only: when writing a new message into a log, it always goes on the end&lt;/li&gt;
+&lt;li&gt;Can only seek by offset, not indexed&lt;/li&gt;
+&lt;li&gt;Immutable: once something has happened, it is difficult to make it un-happen&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="topics-are-durable"&gt;&lt;a href="#topics-are-durable" class="header-anchor"&gt;&lt;/a&gt;Topics are durable
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Logs are durable&lt;/li&gt;
+&lt;li&gt;Retention is configurable
+&lt;ul&gt;
+&lt;li&gt;expire data after it has reached a certain age&lt;/li&gt;
+&lt;li&gt;topic overall reached a certain size&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Logs on Kafka topics are files stored on disk
+&lt;ul&gt;
+&lt;li&gt;write on event to a topic, it is durable as it would be of you had written it to any database you ever trusted.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="4-partitioning"&gt;&lt;a href="#4-partitioning" class="header-anchor"&gt;&lt;/a&gt;4. Partitioning
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Kafka: Distributed System
+&lt;ul&gt;
+&lt;li&gt;no one topic could ever get too big&lt;/li&gt;
+&lt;li&gt;aspire to accommodate too many reads and writes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="what-is-partitioning"&gt;&lt;a href="#what-is-partitioning" class="header-anchor"&gt;&lt;/a&gt;What is Partitioning?
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;takes the single topic log
+&lt;ul&gt;
+&lt;li&gt;→ breaks it into multiple logs&lt;/li&gt;
+&lt;li&gt;→ each of which can live on a separate node on cluster&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;need a way of deciding which messages to write to which partition
+&lt;ul&gt;
+&lt;li&gt;message with no key&lt;/li&gt;
+&lt;li&gt;message with a key&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="message-with-no-key"&gt;&lt;a href="#message-with-no-key" class="header-anchor"&gt;&lt;/a&gt;Message with no key
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;round-robin among all the topic’s partitions&lt;/li&gt;
+&lt;li&gt;pros) all partitions get an even share of the data&lt;/li&gt;
+&lt;li&gt;cons) don’t preserve any kind of ordering of the input message&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="message-with-a-key"&gt;&lt;a href="#message-with-a-key" class="header-anchor"&gt;&lt;/a&gt;Message with a key
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;destination partition will be computed from a has of the key
+&lt;ul&gt;
+&lt;li&gt;output of hash function mode of # of partitions&lt;/li&gt;
+&lt;li&gt;guarantee that messages having same key always land in same partition&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;pros) always in order&lt;/li&gt;
+&lt;li&gt;cons) what if very active key? → a larger and more active partition
+&lt;ul&gt;
+&lt;li&gt;⇒ risk is small in practice and manageable&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="6-brokers"&gt;&lt;a href="#6-brokers" class="header-anchor"&gt;&lt;/a&gt;6. Brokers
+&lt;/h2&gt;&lt;h3 id="kafka-brokers"&gt;&lt;a href="#kafka-brokers" class="header-anchor"&gt;&lt;/a&gt;Kafka Brokers
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Actual Computers&lt;/li&gt;
+&lt;li&gt;Kafka is composed of a network of machines called brokers
+&lt;ul&gt;
+&lt;li&gt;machines can be an computer, instance, or container running the Kafka process&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Each broker hosts some set of Kafka partitions
+&lt;ul&gt;
+&lt;li&gt;handles incoming requests
+&lt;ul&gt;
+&lt;li&gt;to write new events to those partitions&lt;/li&gt;
+&lt;li&gt;to read events from them&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;handles replication of partitions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="7-replication"&gt;&lt;a href="#7-replication" class="header-anchor"&gt;&lt;/a&gt;7. Replication
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Copies of data for fault tolerance
+&lt;ul&gt;
+&lt;li&gt;if we store each partition to one broker
+→ susceptible to failure
+→ we need copy partitions data to several brokers&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;One lead partition and N-1 followers
+&lt;ul&gt;
+&lt;li&gt;Leader: writes and reads happens&lt;/li&gt;
+&lt;li&gt;Follower: works together to replicate those new writes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Automatic process → developer don’t need to worry about it&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="8-producers"&gt;&lt;a href="#8-producers" class="header-anchor"&gt;&lt;/a&gt;8. Producers
+&lt;/h2&gt;&lt;h3 id="kafka-producer"&gt;&lt;a href="#kafka-producer" class="header-anchor"&gt;&lt;/a&gt;Kafka Producer
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;application using Kafka : Producer and Consumer&lt;/li&gt;
+&lt;li&gt;Producing and Consuming: how to interface with cluster&lt;/li&gt;
+&lt;li&gt;API surface of the producer library is fairly lightweight&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="9-consumers"&gt;&lt;a href="#9-consumers" class="header-anchor"&gt;&lt;/a&gt;9. Consumers
+&lt;/h2&gt;&lt;h3 id="kafka-consumer"&gt;&lt;a href="#kafka-consumer" class="header-anchor"&gt;&lt;/a&gt;Kafka Consumer
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;many consumers read one topic
+&lt;ul&gt;
+&lt;li&gt;reading does not destroy message&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Rebalancing processes
+&lt;ul&gt;
+&lt;li&gt;using same group ID → fairly split data to consumer&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;traditional topic
+&lt;ul&gt;
+&lt;li&gt;keep ordering guarantee in place&lt;/li&gt;
+&lt;li&gt;sacrifice the ability to scale out consumers&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="11-ecosystem"&gt;&lt;a href="#11-ecosystem" class="header-anchor"&gt;&lt;/a&gt;11. Ecosystem
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Infrastructure
+&lt;ul&gt;
+&lt;li&gt;doesn’t contribute value directly to customers&lt;/li&gt;
+&lt;li&gt;best case ← provided by community or an infrastructure vendor&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;eg)
+&lt;ul&gt;
+&lt;li&gt;Kafka Connect&lt;/li&gt;
+&lt;li&gt;Confluent Schema Registry&lt;/li&gt;
+&lt;li&gt;Kafka Streams&lt;/li&gt;
+&lt;li&gt;ksqlDB&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="12-kafka-connect"&gt;&lt;a href="#12-kafka-connect" class="header-anchor"&gt;&lt;/a&gt;12. Kafka Connect
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Job of Kafka connect
+&lt;ul&gt;
+&lt;li&gt;the data those other systems to get into Kafka topics&lt;/li&gt;
+&lt;li&gt;data in Kafka topics to get into those system&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="what-does-kafka-connect-do"&gt;&lt;a href="#what-does-kafka-connect-do" class="header-anchor"&gt;&lt;/a&gt;What does Kafka Connect Do?
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Data integration system and ecosystem&lt;/li&gt;
+&lt;li&gt;a client application
+&lt;ul&gt;
+&lt;li&gt;External client process; does not run on Brokers
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;if something is not a broker is an producer or and consumer&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Horizontally scalable&lt;/li&gt;
+&lt;li&gt;Fault-tolerant&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="how-kafka-connect-works"&gt;&lt;a href="#how-kafka-connect-works" class="header-anchor"&gt;&lt;/a&gt;How Kafka Connect Works
+&lt;/h3&gt;&lt;p&gt;&lt;img src="https://aiden-jeon.github.io/blog/imgs/kafka/kafka-connect-workflow.png"
+loading="lazy"
+alt="Kafka Connect Workflow"
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Connect worker runs one or more connectors&lt;/li&gt;
+&lt;li&gt;Connectors
+&lt;ul&gt;
+&lt;li&gt;pluggable software component&lt;/li&gt;
+&lt;li&gt;interfacing with the external system&lt;/li&gt;
+&lt;li&gt;Also exist as runtime entities&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Source connector (acts as Producer)
+&lt;ul&gt;
+&lt;li&gt;reads data from and external system and produces it to a Kafka topi&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Sink connector (acts as Consumer)
+&lt;ul&gt;
+&lt;li&gt;subscribes to one or more Kafka topics and writes the messages it reads to an external system&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="benefits-of-kafka-connect"&gt;&lt;a href="#benefits-of-kafka-connect" class="header-anchor"&gt;&lt;/a&gt;Benefits of Kafka Connect
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;large ecosystem of connectors&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="14-confluent-schema-registry"&gt;&lt;a href="#14-confluent-schema-registry" class="header-anchor"&gt;&lt;/a&gt;14. Confluent Schema Registry
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;To solve two problems
+&lt;ol&gt;
+&lt;li&gt;New consumers of existing topics will emerge
+&lt;ul&gt;
+&lt;li&gt;→ need to understand the format of the message in the topic&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;The format of those message will evolve as the business evolves
+&lt;ul&gt;
+&lt;li&gt;→ the schemas of domain objects is a constantly moving target&lt;/li&gt;
+&lt;li&gt;must have a way of agreeing on the schema of messages in any given topic&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="what-is-schema-registry"&gt;&lt;a href="#what-is-schema-registry" class="header-anchor"&gt;&lt;/a&gt;What is Schema Registry
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Sever Process external to Kafka brokers&lt;/li&gt;
+&lt;li&gt;Job: maintain a &lt;em&gt;database&lt;/em&gt; of &lt;em&gt;schemas&lt;/em&gt;
+&lt;ul&gt;
+&lt;li&gt;schema: that have been written into topics in the cluster for which it is responsible.&lt;/li&gt;
+&lt;li&gt;database: internal Kafka topic and cached in Schema Registry for lower latency access&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Consumer/Producer API Component
+&lt;ul&gt;
+&lt;li&gt;Process
+&lt;ol&gt;
+&lt;li&gt;calls on API at the Schema Registry REST endpoint&lt;/li&gt;
+&lt;li&gt;presents the schema of the new message&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Response
+&lt;ul&gt;
+&lt;li&gt;Produce side
+&lt;ul&gt;
+&lt;li&gt;if same as last message → &lt;strong&gt;produce succeed&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;if different from last message
+&lt;ul&gt;
+&lt;li&gt;but matches the compatibility rules defined for the topic → &lt;strong&gt;produce succeed&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;violates compatibility rules → &lt;strong&gt;produce fail&lt;/strong&gt; in a way that the application code can detect&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Consume side
+&lt;ul&gt;
+&lt;li&gt;Consumer API prevents incompatible message from being consumed&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Support Formats
+&lt;ul&gt;
+&lt;li&gt;JSON Schema&lt;/li&gt;
+&lt;li&gt;Avro&lt;/li&gt;
+&lt;li&gt;Protocol Buffers&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="16-kafka-stream"&gt;&lt;a href="#16-kafka-stream" class="header-anchor"&gt;&lt;/a&gt;16. Kafka Stream
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Consumer tend to grow in complexity
+&lt;ul&gt;
+&lt;li&gt;started from &lt;em&gt;stateless&lt;/em&gt; transformation (masking, changing format)&lt;/li&gt;
+&lt;li&gt;→being complexity → stateful&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;state
+&lt;ul&gt;
+&lt;li&gt;memory allocated in program’s heap&lt;/li&gt;
+&lt;li&gt;→ fault-tolerant liability&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="kafka-stream"&gt;&lt;a href="#kafka-stream" class="header-anchor"&gt;&lt;/a&gt;Kafka Stream
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Functional Java API&lt;/li&gt;
+&lt;li&gt;Filtering, grouping, aggregating, joining, and more&lt;/li&gt;
+&lt;li&gt;Scalable, fault-tolerant state management&lt;/li&gt;
+&lt;li&gt;Integrates within your services as a library&lt;/li&gt;
+&lt;li&gt;Runs in the context of your application&lt;/li&gt;
+&lt;li&gt;Does not require special infrastructure&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Kafka Setup</title><link>https://aiden-jeon.github.io/blog/p/kafka-setup/</link><pubDate>Sun, 02 Jan 2022 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/kafka-setup/</guid><description>&lt;h2 id="kafka-cli"&gt;&lt;a href="#kafka-cli" class="header-anchor"&gt;&lt;/a&gt;Kafka CLI
+&lt;/h2&gt;&lt;p&gt;카프카 명령어를 사용할 수 있는 CLI를 설정하는 과정에 대해서 설명합니다.&lt;br&gt;
+kafka_2.13-2.8.1 를 다운로드 받습니다. (버전은 작성일 기준 도커로 이용할 수 있는 최신 버전입니다.)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;wget https://dlcdn.apache.org/kafka/2.8.1/kafka_2.13-2.8.1.tgz
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;압축을 풉니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;tar -xzf kafka_2.13-2.8.1.tgz
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;압축이 해제된 폴더를 홈 디렉토리로 이동합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;mv kafka_2.13-2.8.1 ~/
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ~/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;아래 항목이 실행되는지 확인합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; kafka_2.13-2.8.1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;bin/kafka-topics.sh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;kafka는 백엔드로 java를 사용하는데 자바가 설치되어 있지 않다면 다음 에러 메세지가 나옵니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;The operation couldn’t be completed. Unable to locate a Java Runtime.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Please visit http://www.java.com for information on installing Java.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;또한 카프카를 구동하기 위해 필요한 자바 버전은 8 로 본인의 자바 버전이 맞는지 확인합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;java -version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;만약 호환되는 자바또는 자바 버전이 없을 경우 각 OS별로 자바를 설치합니다.&lt;br&gt;
+Mac OS의 경우 brew를 통해 쉽게 설치할 수 있습니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;brew tap homebrew/cask-versions
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;brew install --cask adoptopenjdk8
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;설치 후 자바 버전을 확인합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;java -version
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;다음과 같이 출력 되면 정상적으로 설치되었습니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;openjdk version &lt;span class="s2"&gt;&amp;#34;1.8.0_292&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;OpenJDK Runtime Environment &lt;span class="o"&gt;(&lt;/span&gt;AdoptOpenJDK&lt;span class="o"&gt;)(&lt;/span&gt;build 1.8.0_292-b10&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;OpenJDK 64-Bit Server VM &lt;span class="o"&gt;(&lt;/span&gt;AdoptOpenJDK&lt;span class="o"&gt;)(&lt;/span&gt;build 25.292-b10, mixed mode
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;다시 아래 명령어를 실행합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;bin/kafka-topics.sh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;정상적으로 실해오디면 다음과 같이 나옵니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Create, delete, describe, or change a topic.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Option Description
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;------ -----------
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;--alter Alter the number of partitions,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; replica assignment, and/or
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; configuration &lt;span class="k"&gt;for&lt;/span&gt; the topic.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;--at-min-isr-partitions &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nb"&gt;set&lt;/span&gt; when describing topics, only
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; show partitions whose isr count is
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; equal to the configured minimum. Not
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; supported with the --zookeeper
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; option.
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;...&lt;span class="o"&gt;(&lt;/span&gt;생략&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;이제 bin 파일에 있는 명령어를 CLI로 사용할 수 있도록 설정합니다.
+사용하고 있는 shell profile 파일에 경로를 추가합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ~/kafka_2.13-2.8.1/bin
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;pwd&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;위 명령어를 통해 출력되는 경로를 아래 명령어의 &lt;code&gt;&amp;lt;YOUR-KAFKA-BIN-PATH&amp;gt;&lt;/code&gt;를 수정하여서 실행합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;export PATH=&amp;#34;$PATH:&amp;lt;YOUR-KAFKA-BIN-PATH&amp;gt;&amp;#34;&amp;#39;&lt;/span&gt; &amp;gt;&amp;gt; ~/.zshrc
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;source&lt;/span&gt; ~/.zshrc
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;다음 명령어가 정상적으로 수행되는지 확인합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kafka-topics.sh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="docker-compose"&gt;&lt;a href="#docker-compose" class="header-anchor"&gt;&lt;/a&gt;Docker-compose
+&lt;/h2&gt;&lt;p&gt;다음과 같은 docker-compose.yaml 파일을 작성합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;span class="lnt"&gt;16
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;3&amp;#39;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nt"&gt;services&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;zookeeper&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;zookeeper&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;wurstmeister/zookeeper&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s2"&gt;&amp;#34;2181:2181&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;kafka&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;wurstmeister/kafka:2.13-2.8.1&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="s2"&gt;&amp;#34;9092:9092&amp;#34;&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;environment&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;KAFKA_ADVERTISED_HOST_NAME&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;localhost&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;KAFKA_ZOOKEEPER_CONNECT&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;zookeeper:2181&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;/var/run/docker.sock:/var/run/docker.sock&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;docker-compose를 실행합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;docker-compose up -d
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;정상적으로 실행되면 다음과 같이 출력됩니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Creating network &lt;span class="s2"&gt;&amp;#34;kafka_default&amp;#34;&lt;/span&gt; with the default driver
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Creating kafka_kafka_1 ... &lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Creating zookeeper ... &lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="kafka-topic"&gt;&lt;a href="#kafka-topic" class="header-anchor"&gt;&lt;/a&gt;Kafka Topic
+&lt;/h2&gt;&lt;h3 id="create"&gt;&lt;a href="#create" class="header-anchor"&gt;&lt;/a&gt;Create
+&lt;/h3&gt;&lt;p&gt;테스트 토픽을 생성합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor &lt;span class="m"&gt;1&lt;/span&gt; --partitions &lt;span class="m"&gt;1&lt;/span&gt; --topic &lt;span class="nb"&gt;test&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;정상적으로 수행되면 다음과 같이 출력됩니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Created topic test.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="list"&gt;&lt;a href="#list" class="header-anchor"&gt;&lt;/a&gt;List
+&lt;/h3&gt;&lt;p&gt;생성된 토픽을 확인해 보겠습니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kafka-topics.sh --list --bootstrap-server localhost:9092
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;다음과 같이 출력됩니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;test&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id="message"&gt;&lt;a href="#message" class="header-anchor"&gt;&lt;/a&gt;Message
+&lt;/h2&gt;&lt;h3 id="전송"&gt;&lt;a href="#%ec%a0%84%ec%86%a1" class="header-anchor"&gt;&lt;/a&gt;전송
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kafka-console-producer.sh --broker-list localhost:9092 --topic &lt;span class="nb"&gt;test&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;위 명령어를 입력하면 console창이 실행됩니다.
+실행된 콘솔창에서 다음과 같이 입력합니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-Bash" data-lang="Bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&amp;gt; This is &lt;span class="nb"&gt;test&lt;/span&gt; message.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;입력 후 단축키를 이용해 콘솔창을 종료합니다.&lt;/p&gt;
+&lt;h3 id="읽기"&gt;&lt;a href="#%ec%9d%bd%ea%b8%b0" class="header-anchor"&gt;&lt;/a&gt;읽기
+&lt;/h3&gt;&lt;p&gt;이제 위에서 작성한 메세지를 확인해 보겠습니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic &lt;span class="nb"&gt;test&lt;/span&gt; --from-beginning
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;정상적으로 실행되면 다음과 같이 출력됩니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;This is &lt;span class="nb"&gt;test&lt;/span&gt; message.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;단축키를 이용해 콘솔창을 종료합니다.
+콘솔창이 종료되면 다음과 같은 메세지가 출력됩니다.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Processed a total of &lt;span class="m"&gt;1&lt;/span&gt; messages
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description></item></channel></rss>

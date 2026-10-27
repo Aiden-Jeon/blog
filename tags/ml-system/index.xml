@@ -1,0 +1,1434 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ml-System on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/ml-system/</link><description>Recent content in Ml-System on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 13 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/ml-system/index.xml" rel="self" type="application/rss+xml"/><item><title>Chapter 9. Continual Learning and Test in Production</title><link>https://aiden-jeon.github.io/blog/p/chapter-9.-continual-learning-and-test-in-production/</link><pubDate>Sun, 13 Nov 2022 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/chapter-9.-continual-learning-and-test-in-production/</guid><description>&lt;p&gt;Summary of &lt;a class="link" href="https://learning.oreilly.com/library/view/designing-machine-learning/9781098107956/" target="_blank" rel="noopener"
+&gt;Designing Machine Learning Systems&lt;/a&gt; written by Chip Huyen.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id="chapter-9-continual-learning-and-test-in-production"&gt;&lt;a href="#chapter-9-continual-learning-and-test-in-production" class="header-anchor"&gt;&lt;/a&gt;Chapter 9. Continual Learning and Test in Production
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;continual learning
+&lt;ul&gt;
+&lt;li&gt;to adapt our models to data distribution shifts&lt;/li&gt;
+&lt;li&gt;infrastructural problem&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;test in production
+&lt;ul&gt;
+&lt;li&gt;model is retrained to adapt to the changing environment
+&lt;ul&gt;
+&lt;li&gt;evaluating it on a stationary set&lt;/li&gt;
+&lt;li&gt;also test in production&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;monitoring &amp;amp; test in production
+&lt;ul&gt;
+&lt;li&gt;monitoring: passively keeping track of the outputs&lt;/li&gt;
+&lt;li&gt;test in production: proactively choosing which model to produce outputs&lt;/li&gt;
+&lt;li&gt;Goal: to understand a model’s performance and figure out when to update it&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Goal of continual learning
+&lt;ul&gt;
+&lt;li&gt;to safely and efficiently automate the update&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="continual-learning"&gt;&lt;a href="#continual-learning" class="header-anchor"&gt;&lt;/a&gt;Continual Learning
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Misunderstand in term of “Continual learning”
+&lt;ul&gt;
+&lt;li&gt;A models updates itself with every incoming sample in production
+&lt;ul&gt;
+&lt;li&gt;problems
+&lt;ol&gt;
+&lt;li&gt;catastrophic forgetting
+&lt;ul&gt;
+&lt;li&gt;tendency of a neural network to completely and abruptly forget previous learned information upon learning new information&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;make training more expensive&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Update their model in micro-batch (512, 1024)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;updated model shouldn’t be deployed until it’s been evaluated
+&lt;ul&gt;
+&lt;li&gt;existing model → champion model&lt;/li&gt;
+&lt;li&gt;replica model → challenger model&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Don’t need to update model frequently
+&lt;ol&gt;
+&lt;li&gt;don’t have enough traffic&lt;/li&gt;
+&lt;li&gt;model don’t decay that fast&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="1-stateless-retraining-versus-stateful-training"&gt;&lt;a href="#1-stateless-retraining-versus-stateful-training" class="header-anchor"&gt;&lt;/a&gt;1. Stateless Retraining Versus Stateful Training
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;continual learning isn’t about retraining frequency → manner in which model is retrained&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="1-stateless-retraining"&gt;&lt;a href="#1-stateless-retraining" class="header-anchor"&gt;&lt;/a&gt;1. Stateless retraining
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;the model is trained from scratch&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;for example&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&amp;lt;--&amp;gt; (model v1)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &amp;lt;--&amp;gt; (model v2)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &amp;lt;--&amp;gt; (model v3)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;require a lot more data&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-stateful-training"&gt;&lt;a href="#2-stateful-training" class="header-anchor"&gt;&lt;/a&gt;2. Stateful training
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;the model continues training on new data&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;fine-tuning or incremental learning&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;for example&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&amp;lt;--&amp;gt; (model v1)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &amp;lt;-&amp;gt; (model v1.1)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &amp;lt;-&amp;gt; (model v1.2)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;allows to update model with less data&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="3-types-of-model-updates"&gt;&lt;a href="#3-types-of-model-updates" class="header-anchor"&gt;&lt;/a&gt;3. Types of model updates
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;Model iteration
+&lt;ul&gt;
+&lt;li&gt;A new feature is added to an existing model architecture&lt;/li&gt;
+&lt;li&gt;model architecture is changed&lt;/li&gt;
+&lt;li&gt;to be stateful training
+&lt;ul&gt;
+&lt;li&gt;knowledge transfer&lt;/li&gt;
+&lt;li&gt;model surgery&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Data iteration
+&lt;ul&gt;
+&lt;li&gt;model architecture and features remain the same&lt;/li&gt;
+&lt;li&gt;but refresh this model with new data&lt;/li&gt;
+&lt;li&gt;means stateful training&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="2-why-continual-learning"&gt;&lt;a href="#2-why-continual-learning" class="header-anchor"&gt;&lt;/a&gt;2. Why Continual Learning
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Continual Learning
+&lt;ul&gt;
+&lt;li&gt;setting up infrastructure so that you can update your model and deploy these changes as fast as you want&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Use case
+&lt;ol&gt;
+&lt;li&gt;to combat data distribution shifts, especially when the shifts happens suddenly&lt;/li&gt;
+&lt;li&gt;to adapt to rare events&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Continuous cold start problem
+&lt;ul&gt;
+&lt;li&gt;arises when your model has to make predictions for a new user without any historical data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-continual-learning-challenges"&gt;&lt;a href="#3-continual-learning-challenges" class="header-anchor"&gt;&lt;/a&gt;3. Continual Learning Challenges
+&lt;/h3&gt;&lt;h4 id="1-fresh-data-access-challenge"&gt;&lt;a href="#1-fresh-data-access-challenge" class="header-anchor"&gt;&lt;/a&gt;1. Fresh data access challenge
+&lt;/h4&gt;&lt;h4 id="2-evaluation-challenged"&gt;&lt;a href="#2-evaluation-challenged" class="header-anchor"&gt;&lt;/a&gt;2. Evaluation challenged
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;The biggest challenge of continual learning
+&lt;ul&gt;
+&lt;li&gt;making sure that this update is good enough to be deployed&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;The risk of catastrophic failures amplify with continual learning
+&lt;ol&gt;
+&lt;li&gt;The more frequently you update your models → the more opportunities there are for updates to fail&lt;/li&gt;
+&lt;li&gt;make your models more susceptible to coordinated manipulation and adversarial attack&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;evaluation pipeline
+&lt;ul&gt;
+&lt;li&gt;evaluation takes time → can be another bottleneck for model update frequency&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="3-algorithm-challenged"&gt;&lt;a href="#3-algorithm-challenged" class="header-anchor"&gt;&lt;/a&gt;3. Algorithm challenged
+&lt;/h4&gt;&lt;h3 id="4-four-stages-of-continual-learning"&gt;&lt;a href="#4-four-stages-of-continual-learning" class="header-anchor"&gt;&lt;/a&gt;4. Four Stages of continual learning
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;Stage 1: Manual, stateless retraining&lt;/li&gt;
+&lt;li&gt;Stage 2: Automated retraining&lt;/li&gt;
+&lt;li&gt;Stage 3: Automated, stateful retraining&lt;/li&gt;
+&lt;li&gt;Stage 4: Continual learning&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="5-how-often-to-update-your-model"&gt;&lt;a href="#5-how-often-to-update-your-model" class="header-anchor"&gt;&lt;/a&gt;5. How Often to Update Your Model
+&lt;/h3&gt;&lt;h4 id="1-value-of-data-freshness"&gt;&lt;a href="#1-value-of-data-freshness" class="header-anchor"&gt;&lt;/a&gt;1. Value of data freshness
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;Q) How often to update a model? → How much the model performance will improve with updating?&lt;/li&gt;
+&lt;li&gt;To figure out the gain
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;training your model on the data from different time windows in the past and see how the performance changes&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;for example&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&amp;lt;--&amp;gt; model A
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &amp;lt;--&amp;gt; model B
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &amp;lt;--&amp;gt; model C
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Test data
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-model-iteration-versus-data-iteration"&gt;&lt;a href="#2-model-iteration-versus-data-iteration" class="header-anchor"&gt;&lt;/a&gt;2. Model iteration versus data iteration
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;model iteration
+&lt;ul&gt;
+&lt;li&gt;data iterating doesn’t give you much performance gain&lt;/li&gt;
+&lt;li&gt;→ spend resources on finding a better model&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;data iteration
+&lt;ul&gt;
+&lt;li&gt;finding a better model architecture requires 100X compute for training and gives 1% performance gain&lt;/li&gt;
+&lt;li&gt;whereas data iteration requires 1X compute and also gives 1% performance gain&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="test-in-production"&gt;&lt;a href="#test-in-production" class="header-anchor"&gt;&lt;/a&gt;Test in Production
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;To sufficiently evaluate models
+&lt;ul&gt;
+&lt;li&gt;use mixture of offline evaluation and online evaluation&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Offline evaluation
+&lt;ul&gt;
+&lt;li&gt;Good old test split to evaluate models&lt;/li&gt;
+&lt;li&gt;→ not sufficient to evaluate new model&lt;/li&gt;
+&lt;li&gt;→backtest&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;backtest
+&lt;ul&gt;
+&lt;li&gt;method of testing a predictive model on data from a specific period of time in the past
+&lt;ul&gt;
+&lt;li&gt;not quite sufficient&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="1-shadow-deployment"&gt;&lt;a href="#1-shadow-deployment" class="header-anchor"&gt;&lt;/a&gt;1. Shadow Deployment
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;the safest way to deploy model&lt;/li&gt;
+&lt;li&gt;steps
+&lt;ol&gt;
+&lt;li&gt;Deploy the candidate model in parallel with the existing model&lt;/li&gt;
+&lt;li&gt;For each incoming request, route it both models to make predictions, but only serve the existing model’s prediction to user&lt;/li&gt;
+&lt;li&gt;Log the predictions from the new model for analysis purpose&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Replace model when new model’s predictions are satisfactory&lt;/li&gt;
+&lt;li&gt;But expensive: doubling cost&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-ab-testing"&gt;&lt;a href="#2-ab-testing" class="header-anchor"&gt;&lt;/a&gt;2. A/B Testing
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;a way to compare two variants of an object&lt;/li&gt;
+&lt;li&gt;testing responses to these two variants → determining which of two variants is more effective&lt;/li&gt;
+&lt;li&gt;steps
+&lt;ol&gt;
+&lt;li&gt;Deploy the candidate model alongside the existing model&lt;/li&gt;
+&lt;li&gt;A percentage of traffic is routed to the new model, the rest is routed to the existing model&lt;/li&gt;
+&lt;li&gt;Monitor and analyze the predictions and user feedback, if any, from both models to determine whether the difference in the two models’ performance is statistically significant&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;A/B testing requires
+&lt;ol&gt;
+&lt;li&gt;A/B testing consists of a randomized experiment&lt;/li&gt;
+&lt;li&gt;A/B test should be run on a sufficient number of samples to gain enough confidence about the outcome&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-canary-release"&gt;&lt;a href="#3-canary-release" class="header-anchor"&gt;&lt;/a&gt;3. Canary Release
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;technique to reduce the risk of introducing a new software version in production
+&lt;ul&gt;
+&lt;li&gt;by slow rolling out the change to a small subset of users&lt;/li&gt;
+&lt;li&gt;before rolling it out to everybody&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;steps
+&lt;ol&gt;
+&lt;li&gt;Deploy the candidate model alongside the existing model.
+&lt;ul&gt;
+&lt;li&gt;candidate model is called canary&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;A portion of the traffic is routed to the candidate model&lt;/li&gt;
+&lt;li&gt;If its performance is satisfactory increase the traffic to the candidate model. If not, abort the canary and route all traffic to the existing model&lt;/li&gt;
+&lt;li&gt;Stop when either the canary serves all the traffic or the canary is aborted&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="4-interleaving-experiments"&gt;&lt;a href="#4-interleaving-experiments" class="header-anchor"&gt;&lt;/a&gt;4. Interleaving Experiments
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Reliably identifies the best algorithms with considerably smaller sample size compare to traditional A/B testomg&lt;/li&gt;
+&lt;li&gt;A/B testing**********************************:********************************** core metrics are compared&lt;/li&gt;
+&lt;li&gt;Interleaving: compared by measuring user preferences&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="5-bandits"&gt;&lt;a href="#5-bandits" class="header-anchor"&gt;&lt;/a&gt;5. Bandits
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;A/B testing
+&lt;ul&gt;
+&lt;li&gt;randomly route traffic&lt;/li&gt;
+&lt;li&gt;stateless&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Bandits
+&lt;ul&gt;
+&lt;li&gt;allow to determine how to route traffic&lt;/li&gt;
+&lt;li&gt;stateful&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;a lot more data-efficient that A/B testing
+&lt;ul&gt;
+&lt;li&gt;require less data&lt;/li&gt;
+&lt;li&gt;reduce opportunity cost as they route traffic to the better model more quickly&lt;/li&gt;
+&lt;li&gt;A/B testing 630,000 to get a 95% confidence interval&lt;/li&gt;
+&lt;li&gt;12,000 samples to determine&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;a lot more difficult to implement
+&lt;ul&gt;
+&lt;li&gt;bandits requires computing and keeping track of models’ payoffs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Chapter 8. Data Distribution Shifts and Monitoring</title><link>https://aiden-jeon.github.io/blog/p/chapter-8.-data-distribution-shifts-and-monitoring/</link><pubDate>Thu, 10 Nov 2022 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/chapter-8.-data-distribution-shifts-and-monitoring/</guid><description>&lt;p&gt;Summary of &lt;a class="link" href="https://learning.oreilly.com/library/view/designing-machine-learning/9781098107956/" target="_blank" rel="noopener"
+&gt;Designing Machine Learning Systems&lt;/a&gt; written by Chip Huyen.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id="chapter-8-data-distribution-shifts-and-monitoring"&gt;&lt;a href="#chapter-8-data-distribution-shifts-and-monitoring" class="header-anchor"&gt;&lt;/a&gt;Chapter 8. Data Distribution Shifts and Monitoring
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;Deploying a model isn’t the end of process
+&lt;ul&gt;
+&lt;li&gt;Model’s performance degrades over time in production&lt;/li&gt;
+&lt;li&gt;Once models has deployed, still have to continually monitor its performance to detect issue
+&lt;ul&gt;
+&lt;li&gt;→ deploy updates to fix issues&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="1-causes-of-ml-system-failures"&gt;&lt;a href="#1-causes-of-ml-system-failures" class="header-anchor"&gt;&lt;/a&gt;1. Causes of ML System Failures
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Failure
+&lt;ul&gt;
+&lt;li&gt;one or more expectations of the system is violated&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Traditional software
+&lt;ul&gt;
+&lt;li&gt;system’s operational expectations
+&lt;ul&gt;
+&lt;li&gt;system executes its logic with in expected operational metrics&lt;/li&gt;
+&lt;li&gt;latency, throughput&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ML System
+&lt;ul&gt;
+&lt;li&gt;operational expectations and ML performance metrics
+&lt;ul&gt;
+&lt;li&gt;operational expectation violates → easier to detect&lt;/li&gt;
+&lt;li&gt;ML performance metric violates → harder to detect&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="1-software-system-failures"&gt;&lt;a href="#1-software-system-failures" class="header-anchor"&gt;&lt;/a&gt;1. Software System Failures
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;Dependency failure&lt;/li&gt;
+&lt;li&gt;Deployment failure&lt;/li&gt;
+&lt;li&gt;Hardware failure&lt;/li&gt;
+&lt;li&gt;Downtime or Crashing&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="2-ml-specific-failures"&gt;&lt;a href="#2-ml-specific-failures" class="header-anchor"&gt;&lt;/a&gt;2. ML-Specific Failures
+&lt;/h3&gt;&lt;h4 id="1-production-data-differing-from-training-data"&gt;&lt;a href="#1-production-data-differing-from-training-data" class="header-anchor"&gt;&lt;/a&gt;1. Production data differing from training data
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;model generalizes to unseen data
+&lt;ul&gt;
+&lt;li&gt;generate accurate predictions for unseen data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Assumption: unseen data comes from a stationary distribution that is the same as the training data distribution&lt;/li&gt;
+&lt;li&gt;→ incorrect in most case
+&lt;ol&gt;
+&lt;li&gt;underlying distribution of the real-world data is unlikely to be the same as the training data distribution&lt;/li&gt;
+&lt;li&gt;the real-word isn’t stationary&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-edge-cases"&gt;&lt;a href="#2-edge-cases" class="header-anchor"&gt;&lt;/a&gt;2. Edge cases
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;edge cases: the data samples so extreme that cause the model to make catastrophic mistakes&lt;/li&gt;
+&lt;li&gt;outlier vs edge case
+&lt;ul&gt;
+&lt;li&gt;outlier
+&lt;ul&gt;
+&lt;li&gt;refers to data&lt;/li&gt;
+&lt;li&gt;an example that differs significantly differs from other examples&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;edge case
+&lt;ul&gt;
+&lt;li&gt;refers to performance&lt;/li&gt;
+&lt;li&gt;an example where a model performs significantly worse than other examples&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-degenerate-feedback-loops"&gt;&lt;a href="#3-degenerate-feedback-loops" class="header-anchor"&gt;&lt;/a&gt;3. Degenerate Feedback Loops
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;feedback loop
+&lt;ul&gt;
+&lt;li&gt;the time it takes from when a prediction is show until the time feedback on the prediction is provided.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;degenerate feedback loop
+&lt;ul&gt;
+&lt;li&gt;predictions themselves influence feedback → influences the next iteration of the model&lt;/li&gt;
+&lt;li&gt;created when systems’s outputs are used → to generate the system’s future inputs
+&lt;ul&gt;
+&lt;li&gt;⇒ influence the system’s output&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;eg) recommendation system&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="4-detecting-degenerate-feedback-loop"&gt;&lt;a href="#4-detecting-degenerate-feedback-loop" class="header-anchor"&gt;&lt;/a&gt;4. Detecting Degenerate Feedback Loop
+&lt;/h3&gt;&lt;h3 id="5-correcting-degenerate-feedback-loop"&gt;&lt;a href="#5-correcting-degenerate-feedback-loop" class="header-anchor"&gt;&lt;/a&gt;5. Correcting Degenerate Feedback Loop
+&lt;/h3&gt;&lt;h2 id="2-data-distribution-shifts"&gt;&lt;a href="#2-data-distribution-shifts" class="header-anchor"&gt;&lt;/a&gt;2. Data Distribution Shifts
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Data distribution shifts
+&lt;ul&gt;
+&lt;li&gt;phenomenon in supervised learning when the data a model works with changes over time
+&lt;ul&gt;
+&lt;li&gt;→ causes this model’s prediction to become less accurate as time passes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Source distribution&lt;/li&gt;
+&lt;li&gt;Target distribution&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="1-types-of-data-distribution-shifts"&gt;&lt;a href="#1-types-of-data-distribution-shifts" class="header-anchor"&gt;&lt;/a&gt;1. Types of Data Distribution Shifts
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;Covariate Shift: when $P(X)$ changes but $P(Y|X)$ remains the same&lt;/li&gt;
+&lt;li&gt;Label Shift: when $P(Y)$ changes but $P(X|Y)$ remains the same&lt;/li&gt;
+&lt;li&gt;Concept Drift: when $P(Y|X)$ changes but $P(X)$ remains the same&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="1-covariate-shift"&gt;&lt;a href="#1-covariate-shift" class="header-anchor"&gt;&lt;/a&gt;1. Covariate shift
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;one of most widely studied forms&lt;/li&gt;
+&lt;li&gt;model development
+&lt;ul&gt;
+&lt;li&gt;during data selection process
+&lt;ol&gt;
+&lt;li&gt;difficult to collect data&lt;/li&gt;
+&lt;li&gt;training data is artificially altered (under-sampling, over-sampling)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;model’s learning process
+&lt;ul&gt;
+&lt;li&gt;active learning&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;In production
+&lt;ul&gt;
+&lt;li&gt;major change in
+&lt;ul&gt;
+&lt;li&gt;the environment&lt;/li&gt;
+&lt;li&gt;the way application is used&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-label-shift"&gt;&lt;a href="#2-label-shift" class="header-anchor"&gt;&lt;/a&gt;2. Label shift
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;a.k.a prior shift, target shift&lt;/li&gt;
+&lt;li&gt;closely related to covariate shift, methods for detecting and adapting models are similar&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="3-concept-drift"&gt;&lt;a href="#3-concept-drift" class="header-anchor"&gt;&lt;/a&gt;3. Concept Drift
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;a.k.a posterior shift&lt;/li&gt;
+&lt;li&gt;same input, different output&lt;/li&gt;
+&lt;li&gt;usually cyclic or seasonal&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-general-data-distribution-shifts"&gt;&lt;a href="#2-general-data-distribution-shifts" class="header-anchor"&gt;&lt;/a&gt;2. General Data Distribution Shifts
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;feature change
+&lt;ul&gt;
+&lt;li&gt;new features are added&lt;/li&gt;
+&lt;li&gt;old features are removed&lt;/li&gt;
+&lt;li&gt;set of all possible values of a feature changed&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Label schema change
+&lt;ul&gt;
+&lt;li&gt;set of possible value for Y change&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-detecting-data-distribution-shifts"&gt;&lt;a href="#3-detecting-data-distribution-shifts" class="header-anchor"&gt;&lt;/a&gt;3. Detecting Data Distribution Shifts
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;monitoring model’s accuracy-related metrics&lt;/li&gt;
+&lt;li&gt;Input&lt;/li&gt;
+&lt;li&gt;Output&lt;/li&gt;
+&lt;li&gt;Joint dist&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="1-statistical-method"&gt;&lt;a href="#1-statistical-method" class="header-anchor"&gt;&lt;/a&gt;1. Statistical method
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;compare statistics&lt;/li&gt;
+&lt;li&gt;two-sample hypothesis test (two-sample test)
+&lt;ul&gt;
+&lt;li&gt;Kolmogrov-Smirnov test (KS test)
+&lt;ul&gt;
+&lt;li&gt;non-parametric test&lt;/li&gt;
+&lt;li&gt;can used for one-dimensional data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Least-Square Density Difference
+&lt;ul&gt;
+&lt;li&gt;Maximum Mean Discrepancy (MMD)&lt;/li&gt;
+&lt;li&gt;Learned Kernel MMD&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id="2-time-scale-windows-for-detecting-shifts"&gt;&lt;a href="#2-time-scale-windows-for-detecting-shifts" class="header-anchor"&gt;&lt;/a&gt;2. Time scale windows for detecting shifts
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;shifts across two dimensions:
+&lt;ul&gt;
+&lt;li&gt;spatial: happens across points&lt;/li&gt;
+&lt;li&gt;temporal: happens across time
+&lt;ul&gt;
+&lt;li&gt;→ to detect: treat input data as time-series data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="4-addressing-data-distribution-shifts"&gt;&lt;a href="#4-addressing-data-distribution-shifts" class="header-anchor"&gt;&lt;/a&gt;4. Addressing Data Distribution Shifts
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Assume data shifts are inevitable → periodically retrain their model&lt;/li&gt;
+&lt;li&gt;To make a model work with a new distribution in production:
+&lt;ol&gt;
+&lt;li&gt;Train models using massive datasets&lt;/li&gt;
+&lt;li&gt;Adopt a trained model to a target distribution without new labels
+&lt;ul&gt;
+&lt;li&gt;Domain Adoption under Target and Conditional Shift&lt;/li&gt;
+&lt;li&gt;On Learning Invariant Representations for Domain Adoption&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Retrain model using the labeled data from the target distribution
+&lt;ol&gt;
+&lt;li&gt;whether to
+&lt;ol&gt;
+&lt;li&gt;train model from scratch (stateless training)&lt;/li&gt;
+&lt;li&gt;continuing training the existing model (stateful training)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;what data to use&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="3-monitoring-and-observability"&gt;&lt;a href="#3-monitoring-and-observability" class="header-anchor"&gt;&lt;/a&gt;3. Monitoring and Observability
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;monitoring
+&lt;ul&gt;
+&lt;li&gt;refers to act of tracking, measuring, and logging different metrics that can help us determine when something goes wrong&lt;/li&gt;
+&lt;li&gt;operational metrics: health of systems
+&lt;ol&gt;
+&lt;li&gt;network&lt;/li&gt;
+&lt;li&gt;machine&lt;/li&gt;
+&lt;li&gt;applications&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;observability
+&lt;ul&gt;
+&lt;li&gt;setting up our system (instrumentation) in a way that give us visibility into our system to help us investigate what meant wrong&lt;/li&gt;
+&lt;li&gt;part of monitoring&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="1-ml-specific-metrics"&gt;&lt;a href="#1-ml-specific-metrics" class="header-anchor"&gt;&lt;/a&gt;1. ML-Specific Metrics
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Types
+&lt;ol&gt;
+&lt;li&gt;model accuracy-related metrics&lt;/li&gt;
+&lt;li&gt;predictions&lt;/li&gt;
+&lt;li&gt;features&lt;/li&gt;
+&lt;li&gt;raw inputs&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;from 1 to 4
+&lt;ul&gt;
+&lt;li&gt;easier to monitor ←→ harder to monitor&lt;/li&gt;
+&lt;li&gt;closer to business metrics ←→ less likely to be caused by human errors&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="1-monitoring-accuracy-related-metrics"&gt;&lt;a href="#1-monitoring-accuracy-related-metrics" class="header-anchor"&gt;&lt;/a&gt;1. Monitoring accuracy-related metrics
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;direct metrics to help decide whether a model’s performance has degraded&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="2-monitoring-predictions"&gt;&lt;a href="#2-monitoring-predictions" class="header-anchor"&gt;&lt;/a&gt;2. Monitoring predictions
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;most common artifact to monitor&lt;/li&gt;
+&lt;li&gt;easy to visualize&lt;/li&gt;
+&lt;li&gt;monitor predictions for distribution shifts&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="3-monitoring-features"&gt;&lt;a href="#3-monitoring-features" class="header-anchor"&gt;&lt;/a&gt;3. Monitoring features
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;feature validation
+&lt;ul&gt;
+&lt;li&gt;ensuring that features follow an expected schema&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="4-monitoring-raw-inputs"&gt;&lt;a href="#4-monitoring-raw-inputs" class="header-anchor"&gt;&lt;/a&gt;4. Monitoring raw inputs
+&lt;/h4&gt;&lt;h3 id="2-monitoring-toolbox"&gt;&lt;a href="#2-monitoring-toolbox" class="header-anchor"&gt;&lt;/a&gt;2. Monitoring Toolbox
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;logs&lt;/li&gt;
+&lt;li&gt;dashboards&lt;/li&gt;
+&lt;li&gt;alerts&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="3-observability"&gt;&lt;a href="#3-observability" class="header-anchor"&gt;&lt;/a&gt;3. Observability
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;better visibility into understanding the complex behavior of software using [outputs] collected from the system at run time&lt;/li&gt;
+&lt;li&gt;telemetry
+&lt;ul&gt;
+&lt;li&gt;system’s outputs collected at runtime&lt;/li&gt;
+&lt;li&gt;remote measures
+&lt;ul&gt;
+&lt;li&gt;logs and metrics collected from remote component such as
+&lt;ul&gt;
+&lt;li&gt;cloud services&lt;/li&gt;
+&lt;li&gt;applications on customer device&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Chapter 7. Model Deployment and Prediction Service</title><link>https://aiden-jeon.github.io/blog/p/chapter-7.-model-deployment-and-prediction-service/</link><pubDate>Wed, 09 Nov 2022 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/chapter-7.-model-deployment-and-prediction-service/</guid><description>&lt;p&gt;Summary of &lt;a class="link" href="https://learning.oreilly.com/library/view/designing-machine-learning/9781098107956/" target="_blank" rel="noopener"
+&gt;Designing Machine Learning Systems&lt;/a&gt; written by Chip Huyen.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id="chapter-7-model-deployment-and-prediction-service"&gt;&lt;a href="#chapter-7-model-deployment-and-prediction-service" class="header-anchor"&gt;&lt;/a&gt;Chapter 7. Model Deployment and Prediction Service
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;ML App Logic
+&lt;ul&gt;
+&lt;li&gt;data engineering → feature engineering → model → metrics&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Deploy &amp;amp; Inference
+&lt;ul&gt;
+&lt;li&gt;Deploy: a loose term that generally means making your model running and accessible&lt;/li&gt;
+&lt;li&gt;Inference: the process of generating predictions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;To be deployed:
+&lt;ul&gt;
+&lt;li&gt;model will have to leave the development environment&lt;/li&gt;
+&lt;li&gt;model can be deployed to
+&lt;ul&gt;
+&lt;li&gt;a staging environment for testing&lt;/li&gt;
+&lt;li&gt;a production environment to be used by end users&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="1-machine-learning-deployment-myths"&gt;&lt;a href="#1-machine-learning-deployment-myths" class="header-anchor"&gt;&lt;/a&gt;1. Machine Learning Deployment Myths
+&lt;/h2&gt;&lt;h3 id="1-myth1-you-only-deploy-one-or-two-ml-models-at-a-time"&gt;&lt;a href="#1-myth1-you-only-deploy-one-or-two-ml-models-at-a-time" class="header-anchor"&gt;&lt;/a&gt;1. Myth1: You Only Deploy One or Two ML Models at a Time
+&lt;/h3&gt;&lt;h3 id="2-myth2-if-we-dont-do-anything-model-performance-remains-the-same"&gt;&lt;a href="#2-myth2-if-we-dont-do-anything-model-performance-remains-the-same" class="header-anchor"&gt;&lt;/a&gt;2. Myth2: If we Don’t Do Anything, Model Performance Remains the same.
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;“software rot” or “bit rot”
+&lt;ul&gt;
+&lt;li&gt;software program degrades over time even if nothing has been changed.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ML Systems suffer from data distribution shifts&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-myth3-you-wont-need-to-update-your-model-as-much"&gt;&lt;a href="#3-myth3-you-wont-need-to-update-your-model-as-much" class="header-anchor"&gt;&lt;/a&gt;3. Myth3: You Won’t Need to Update Your Model as Much
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;“How often &lt;em&gt;SHOULD&lt;/em&gt; I update my models?” → “How often &lt;em&gt;CAN&lt;/em&gt; I update my models?”&lt;/li&gt;
+&lt;li&gt;Model’s performance decays over time → want to update model as fast as possible&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="4-myth4-most-ml-engineers-dont-need-to-worry-about-scale"&gt;&lt;a href="#4-myth4-most-ml-engineers-dont-need-to-worry-about-scale" class="header-anchor"&gt;&lt;/a&gt;4. Myth4: Most ML Engineers Don’t Need to Worry About Scale
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;scale
+&lt;ul&gt;
+&lt;li&gt;eg) a system that serves hundreds of queries per second of millions of users a month&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="2-batch-prediction-versus-online-prediction"&gt;&lt;a href="#2-batch-prediction-versus-online-prediction" class="header-anchor"&gt;&lt;/a&gt;2. Batch Prediction versus Online Prediction
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;types of predictions
+&lt;ol&gt;
+&lt;li&gt;Batch prediction, which use only batch features&lt;/li&gt;
+&lt;li&gt;Online prediction that uses only batch features (eg. precomputed embeddings)&lt;/li&gt;
+&lt;li&gt;Online prediction(Streaming prediction) that use both batch features and streaming features&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="1-online-prediction"&gt;&lt;a href="#1-online-prediction" class="header-anchor"&gt;&lt;/a&gt;1. Online Prediction
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;when predictions are generated and returned as soon as requests for these predictions arrive&lt;/li&gt;
+&lt;li&gt;on-demand prediction, synchronous prediction&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-batch-prediction"&gt;&lt;a href="#2-batch-prediction" class="header-anchor"&gt;&lt;/a&gt;2. Batch Prediction
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;when predictions are generated periodically or whenever triggered.&lt;/li&gt;
+&lt;li&gt;predictions are store somewhere like in-memory or SQL Tables → retrieved as needed&lt;/li&gt;
+&lt;li&gt;asynchronous prediction&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="3-from-batch-prediction-to-online-prediction"&gt;&lt;a href="#3-from-batch-prediction-to-online-prediction" class="header-anchor"&gt;&lt;/a&gt;3. From Batch Prediction to Online Prediction
+&lt;/h2&gt;&lt;h3 id="1-online-prediction-1"&gt;&lt;a href="#1-online-prediction-1" class="header-anchor"&gt;&lt;/a&gt;1. Online Prediction
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;easy to start&lt;/li&gt;
+&lt;li&gt;problem with online prediction:
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;model might take too long to generate predictions&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;to solve…
+&lt;ul&gt;
+&lt;li&gt;compute predictions in advance → store in database → fetch then when request arrive&lt;/li&gt;
+&lt;li&gt;→ called batch prediction&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-batch-prediction-1"&gt;&lt;a href="#2-batch-prediction-1" class="header-anchor"&gt;&lt;/a&gt;2. Batch Prediction
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;predictions are precomputed → trick to reduce the inference latency&lt;/li&gt;
+&lt;li&gt;good to generate a lot of predictions and don’t need the results immediately&lt;/li&gt;
+&lt;li&gt;problem of batch prediction:
+&lt;ol&gt;
+&lt;li&gt;Less responsive to users’ change preferences&lt;/li&gt;
+&lt;li&gt;Need to know what requests to generate predictions in advance&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-online-prediction-becomes-default"&gt;&lt;a href="#3-online-prediction-becomes-default" class="header-anchor"&gt;&lt;/a&gt;3. Online prediction becomes default
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;As hardware becomes more powerful → Online prediction becomes default&lt;/li&gt;
+&lt;li&gt;To overcome the latency challenge of online prediction:
+&lt;ol&gt;
+&lt;li&gt;A (near) real-time pipeline that can work with incoming data:
+&lt;ul&gt;
+&lt;li&gt;extract streaming features → input them into a model → return prediction in a near real time&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;A model that can generate predictions at a speed acceptable to its end users&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="4-unifying-batch-pipeline-and-streaming-pipeline"&gt;&lt;a href="#4-unifying-batch-pipeline-and-streaming-pipeline" class="header-anchor"&gt;&lt;/a&gt;4. Unifying Batch Pipeline and Streaming Pipeline
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;using sliding features
+&lt;ul&gt;
+&lt;li&gt;In training this feature is computed in batch&lt;/li&gt;
+&lt;li&gt;Whereas during inference this feature is computed in a streaming pipeline
+&lt;ul&gt;
+&lt;li&gt;Apache Flink&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="5-model-compression"&gt;&lt;a href="#5-model-compression" class="header-anchor"&gt;&lt;/a&gt;5. Model Compression
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Deployed model takes too long to generate predictions:
+&lt;ol&gt;
+&lt;li&gt;make it do inference faster
+&lt;ul&gt;
+&lt;li&gt;→ inference optimization&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;make the model smaller
+&lt;ul&gt;
+&lt;li&gt;→ model compression
+&lt;ul&gt;
+&lt;li&gt;originally, to make model fit on edge device&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;make the hardware it’s deployed on run faster&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;model compression
+&lt;ol&gt;
+&lt;li&gt;low-rank optimization&lt;/li&gt;
+&lt;li&gt;knowledge distillation&lt;/li&gt;
+&lt;li&gt;pruning&lt;/li&gt;
+&lt;li&gt;quantization&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="1-low-rank-factorization"&gt;&lt;a href="#1-low-rank-factorization" class="header-anchor"&gt;&lt;/a&gt;1. Low-Rank Factorization
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;key-idea
+&lt;ul&gt;
+&lt;li&gt;replace high-dimensional tensors with low-dimensional tensors&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;compact convolutional filters
+&lt;ul&gt;
+&lt;li&gt;replace over-parameterized (having too many parameters) convolutional filters to compact convolutional filters&lt;/li&gt;
+&lt;li&gt;compact blocks to both reduce the number of parameters and increase speed
+&lt;ul&gt;
+&lt;li&gt;eg) 3x3 conv → 1x1 conv&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-knowledge-distillation"&gt;&lt;a href="#2-knowledge-distillation" class="header-anchor"&gt;&lt;/a&gt;2. Knowledge Distillation
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;smaller model (student) is train to mimic a larger model or ensemble model (teacher)&lt;/li&gt;
+&lt;li&gt;can work regardless of the architectural differences between teacher and student&lt;/li&gt;
+&lt;li&gt;disadvantages
+&lt;ul&gt;
+&lt;li&gt;highly dependent on the availability of a teacher network&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-pruning"&gt;&lt;a href="#3-pruning" class="header-anchor"&gt;&lt;/a&gt;3. Pruning
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;in neural network, it means
+&lt;ol&gt;
+&lt;li&gt;remove entire nodes of a neural network
+&lt;ul&gt;
+&lt;li&gt;changing its architecture and reducing its number of parameters&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;find parameters least useful to predictions and set them to zero(0).
+&lt;ul&gt;
+&lt;li&gt;do not change architecture, only the number of nonzero parameters&lt;/li&gt;
+&lt;li&gt;sparse architecture
+&lt;ul&gt;
+&lt;li&gt;make a neural network more sparse&lt;/li&gt;
+&lt;li&gt;require less storage than dense structure&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="4-quantization"&gt;&lt;a href="#4-quantization" class="header-anchor"&gt;&lt;/a&gt;4. Quantization
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;most general and commonly used model compression method&lt;/li&gt;
+&lt;li&gt;reduce model size by using fewer bits to represent its parameters&lt;/li&gt;
+&lt;li&gt;advantage
+&lt;ul&gt;
+&lt;li&gt;reduce memory size&lt;/li&gt;
+&lt;li&gt;improves the computational speed
+&lt;ol&gt;
+&lt;li&gt;allows to increase batch size&lt;/li&gt;
+&lt;li&gt;less precision speeds up computation&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;disadvantage
+&lt;ul&gt;
+&lt;li&gt;rounding numbers → rounding errors&lt;/li&gt;
+&lt;li&gt;small rounding errors → large performance change&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;lower-precision training increasingly popular&lt;/li&gt;
+&lt;li&gt;Fixed-point inference for edge device&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="ml-on-the-cloud-and-on-the-edge"&gt;&lt;a href="#ml-on-the-cloud-and-on-the-edge" class="header-anchor"&gt;&lt;/a&gt;ML on the Cloud and on the Edge
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;where your model’s computation will happen?&lt;/li&gt;
+&lt;li&gt;⇒ due to cost of cloud, trend are moving to edge&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Chapter 3. Data Engineer Fundamentals</title><link>https://aiden-jeon.github.io/blog/p/chapter-3.-data-engineer-fundamentals/</link><pubDate>Mon, 07 Nov 2022 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/chapter-3.-data-engineer-fundamentals/</guid><description>&lt;p&gt;Summary of &lt;a class="link" href="https://learning.oreilly.com/library/view/designing-machine-learning/9781098107956/" target="_blank" rel="noopener"
+&gt;Designing Machine Learning Systems&lt;/a&gt; written by Chip Huyen.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id="chapter-3-data-engineer-fundamentals"&gt;&lt;a href="#chapter-3-data-engineer-fundamentals" class="header-anchor"&gt;&lt;/a&gt;Chapter 3. Data Engineer Fundamentals
+&lt;/h1&gt;&lt;p&gt;To retrive stored data&lt;/p&gt;
+&lt;p&gt;→ important to know&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;not only how it’s formatted&lt;/li&gt;
+&lt;li&gt;but also how it’s structured&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Database: data sotrage engine&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;transactional&lt;/li&gt;
+&lt;li&gt;Analytical&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Data in Production&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Pipeline
+&lt;ul&gt;
+&lt;li&gt;Data → multiple processes and service&lt;/li&gt;
+&lt;li&gt;Raw data → featur engineering service → predictions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Types
+&lt;ul&gt;
+&lt;li&gt;Historical data in data storage engines&lt;/li&gt;
+&lt;li&gt;Streaming data in real-time transports
+→ requires different processing paradigms&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="1-data-sources"&gt;&lt;a href="#1-data-sources" class="header-anchor"&gt;&lt;/a&gt;1. Data Sources
+&lt;/h2&gt;&lt;h3 id="1-user-input-data"&gt;&lt;a href="#1-user-input-data" class="header-anchor"&gt;&lt;/a&gt;1. User input data
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;data explicitly input by users&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Text, image, videos, upload files, etc…&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Users possibly can input wrong data → easily malformatted&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Eg) text is too long or too short&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Users have little patience&lt;/p&gt;
+&lt;p&gt;→ expect to get result bach immediately&lt;/p&gt;
+&lt;p&gt;→ user input data tends to require fast processing&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-system-generated-data"&gt;&lt;a href="#2-system-generated-data" class="header-anchor"&gt;&lt;/a&gt;2. System-generated data
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;data generated by different components of systems&lt;/li&gt;
+&lt;li&gt;Types
+&lt;ul&gt;
+&lt;li&gt;Various types of logs
+&lt;ul&gt;
+&lt;li&gt;Eg) memory usage, …&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;system outputs
+&lt;ul&gt;
+&lt;li&gt;Eg) model predictions, …&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Property
+&lt;ul&gt;
+&lt;li&gt;less likely to be malformatted&lt;/li&gt;
+&lt;li&gt;volume of logs can grow very quickly → cause two problems
+&lt;ol&gt;
+&lt;li&gt;Hard to know where to lokk because signals are lost in noise&lt;/li&gt;
+&lt;li&gt;How to store? → discard old data and get only recent data&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-internal-databases"&gt;&lt;a href="#3-internal-databases" class="header-anchor"&gt;&lt;/a&gt;3. Internal databases
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;generated by various services and enterprise applications in a company&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Manages inventory, customer relationship, users&lt;/p&gt;
+&lt;p&gt;→ can be used by ML Models&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="4-third-party-data"&gt;&lt;a href="#4-third-party-data" class="header-anchor"&gt;&lt;/a&gt;4. Third-party data
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;first-party data
+&lt;ul&gt;
+&lt;li&gt;Company already collects about users and customers&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;second-party data
+&lt;ul&gt;
+&lt;li&gt;collected by another compnay on their own customers that they make available to you&lt;/li&gt;
+&lt;li&gt;Probably have to pay for it&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Third-party data
+&lt;ul&gt;
+&lt;li&gt;companies collect data on the public who aren’t direct customers
+&lt;ul&gt;
+&lt;li&gt;Eg) unique advertiser ID&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="2-data-formats"&gt;&lt;a href="#2-data-formats" class="header-anchor"&gt;&lt;/a&gt;2. Data Formats
+&lt;/h2&gt;&lt;p&gt;‘How to store data?’ Chech List&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;how do I store &lt;em&gt;multimodal data?&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;how do I store &lt;em&gt;my data so that it’s cheap and still fast to access?&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;how do I store c&lt;em&gt;omplex models so that the can be loaded and run correctly on different hardwares?&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Data serialiazations&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Converting a
+&lt;ul&gt;
+&lt;li&gt;data structure&lt;/li&gt;
+&lt;li&gt;Object state&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Into a format that can be
+&lt;ol&gt;
+&lt;li&gt;Stored&lt;/li&gt;
+&lt;li&gt;Transmitted&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;And reconstructed later&lt;/li&gt;
+&lt;/ol&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Format&lt;/th&gt;
+&lt;th&gt;Binary / Text&lt;/th&gt;
+&lt;th&gt;Human-Readable&lt;/th&gt;
+&lt;th&gt;Use case&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;JSON&lt;/td&gt;
+&lt;td&gt;Text&lt;/td&gt;
+&lt;td&gt;O&lt;/td&gt;
+&lt;td&gt;Everywhere&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CSV&lt;/td&gt;
+&lt;td&gt;Text&lt;/td&gt;
+&lt;td&gt;O&lt;/td&gt;
+&lt;td&gt;Everywhere&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Parquet&lt;/td&gt;
+&lt;td&gt;Binary&lt;/td&gt;
+&lt;td&gt;X&lt;/td&gt;
+&lt;td&gt;Hadoop&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Auro&lt;/td&gt;
+&lt;td&gt;Binary Primary&lt;/td&gt;
+&lt;td&gt;X&lt;/td&gt;
+&lt;td&gt;Hadoop&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Protobuf&lt;/td&gt;
+&lt;td&gt;Binary Primary&lt;/td&gt;
+&lt;td&gt;X&lt;/td&gt;
+&lt;td&gt;Google, TF Record&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Pickle&lt;/td&gt;
+&lt;td&gt;Binary&lt;/td&gt;
+&lt;td&gt;X&lt;/td&gt;
+&lt;td&gt;Python, Python serializations&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id="1-json-javascript-object-notation"&gt;&lt;a href="#1-json-javascript-object-notation" class="header-anchor"&gt;&lt;/a&gt;1. JSON (JavaScript Object Notation)
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Human-readable&lt;/li&gt;
+&lt;li&gt;Key-value
+&lt;ul&gt;
+&lt;li&gt;Simple&lt;/li&gt;
+&lt;li&gt;Capable of handling data different levles of structedness&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-row-major-versus-column-major"&gt;&lt;a href="#2-row-major-versus-column-major" class="header-anchor"&gt;&lt;/a&gt;2. Row-Major versus Column-Major
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Row-Major
+&lt;ul&gt;
+&lt;li&gt;CSV&lt;/li&gt;
+&lt;li&gt;Use case) Accessing all the examples collected today&lt;/li&gt;
+&lt;li&gt;Data is stored and retrived row by row&lt;/li&gt;
+&lt;li&gt;Good for accessing samples&lt;/li&gt;
+&lt;li&gt;Better when you have to do a lot of writes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Column-Major
+&lt;ul&gt;
+&lt;li&gt;Parquet&lt;/li&gt;
+&lt;li&gt;Use case) accessing the timestamp of all examples&lt;/li&gt;
+&lt;li&gt;Data is stored and retrived column by column&lt;/li&gt;
+&lt;li&gt;Good for accessing features&lt;/li&gt;
+&lt;li&gt;Better when you have to do a lot of column-based readsd&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Numpy(Row) vs Pandas(Column)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-text-versus-binary-format"&gt;&lt;a href="#3-text-versus-binary-format" class="header-anchor"&gt;&lt;/a&gt;3. Text versus binary format
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;human-readable vs compact&lt;/li&gt;
+&lt;li&gt;Eg) “1000000”
+&lt;ul&gt;
+&lt;li&gt;Text: 7byte&lt;/li&gt;
+&lt;li&gt;Binary: int32 → 32bits or 4bytes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="3-data-models"&gt;&lt;a href="#3-data-models" class="header-anchor"&gt;&lt;/a&gt;3. Data Models
+&lt;/h2&gt;&lt;p&gt;How data is represented.&lt;/p&gt;
+&lt;h3 id="1relation-model"&gt;&lt;a href="#1relation-model" class="header-anchor"&gt;&lt;/a&gt;1.Relation Model
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;data is organized into relations : each relation is a set of tuples
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th&gt;column: unordered&lt;/th&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;Column1&lt;/td&gt;
+&lt;td&gt;Column2&lt;/td&gt;
+&lt;td&gt;…&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Tuple (row): unordered&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-nosql-not-only-sql"&gt;&lt;a href="#2-nosql-not-only-sql" class="header-anchor"&gt;&lt;/a&gt;2. NoSQL (Not Only SQL)
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;document model&lt;/li&gt;
+&lt;li&gt;graph model&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-structured-versus-unstructed-data"&gt;&lt;a href="#3-structured-versus-unstructed-data" class="header-anchor"&gt;&lt;/a&gt;3. Structured versus Unstructed data
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;structured data
+&lt;ul&gt;
+&lt;li&gt;follows a predefined data model → data schema&lt;/li&gt;
+&lt;li&gt;make easier to analyze&lt;/li&gt;
+&lt;li&gt;data warehouse
+&lt;ul&gt;
+&lt;li&gt;to store data that has been processed into formats ready to be used&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;unstructured data
+&lt;ul&gt;
+&lt;li&gt;doesn’t adhere to a schema&lt;/li&gt;
+&lt;li&gt;eg)
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;lisa,43
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;hack,23
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;xxx,xxx,xxx &amp;lt;- possible
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="4-data-storage-engine-and-processing"&gt;&lt;a href="#4-data-storage-engine-and-processing" class="header-anchor"&gt;&lt;/a&gt;4. Data Storage Engine and Processing
+&lt;/h2&gt;&lt;p&gt;two types of workloads that database are optimized for&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;transactional processing&lt;/li&gt;
+&lt;li&gt;analytical processing&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="1-transactional-and-analytical-processing"&gt;&lt;a href="#1-transactional-and-analytical-processing" class="header-anchor"&gt;&lt;/a&gt;1. Transactional and Analytical Processing
+&lt;/h3&gt;&lt;h4 id="online-transaction-processing-oltp"&gt;&lt;a href="#online-transaction-processing-oltp" class="header-anchor"&gt;&lt;/a&gt;Online Transaction Processing (OLTP)
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;inserted, updated, deleted&lt;/li&gt;
+&lt;li&gt;often involve users so need 2 requirements:
+&lt;ul&gt;
+&lt;li&gt;low latency: processed fast&lt;/li&gt;
+&lt;li&gt;high availability: processing system needs to be available any time&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id="transactional-database"&gt;&lt;a href="#transactional-database" class="header-anchor"&gt;&lt;/a&gt;Transactional Database
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Transactional Database&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;designed: to process online transactions&lt;/li&gt;
+&lt;li&gt;requirements: low latency and high availability&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ACID&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Atomcity
+&lt;ul&gt;
+&lt;li&gt;To guarantee that all steps in a transaction are completed successfully as a group.&lt;/li&gt;
+&lt;li&gt;eg) User payment fails → do not assign driver&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Consistency
+&lt;ul&gt;
+&lt;li&gt;To guarantee that all transactions coming through must follow predefined rules&lt;/li&gt;
+&lt;li&gt;eg) a transaction must be made by a valid user&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Isolation
+&lt;ul&gt;
+&lt;li&gt;To guarantee that two transaction happen at the same time as if they were isolated.&lt;/li&gt;
+&lt;li&gt;eg) Do not book same driver to two users&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Durability
+&lt;ul&gt;
+&lt;li&gt;To guarantee that once a transaction is committed, it will remain committed even in the case of a system failure.&lt;/li&gt;
+&lt;li&gt;eg) often ordered a ride and phone dies, still want ride to come&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;BASE (Basically Available, Soft state, and Eventually consistency)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;don’t necessarily need to be ACID&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;often row-major&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;not be efficient for question like: “average of something in one month”
+→ Online Analytical Processing (OLAP)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Both OLTP &amp;amp; OLAP → Outdated&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Separation of OLTP &amp;amp; OLAP was due to limitation of technology&lt;/li&gt;
+&lt;li&gt;Storage and processing are tightly coupled
+&lt;ul&gt;
+&lt;li&gt;store same data in different databases&lt;/li&gt;
+&lt;li&gt;decouple storage and processing (Big Query, Snowflake, IBM, Teradata)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-etl-extract-transform-and-load"&gt;&lt;a href="#2-etl-extract-transform-and-load" class="header-anchor"&gt;&lt;/a&gt;2. ETL: Extract, Transform, and Load
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Flow
+&lt;ul&gt;
+&lt;li&gt;Different sources ⇒ Extract → transformed → loaded ⇒ target destination&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Difficult to keep data structured ⇒ ELT&lt;/li&gt;
+&lt;li&gt;ELT → Inefficient to search data&lt;/li&gt;
+&lt;li&gt;Hybrid solution (Databricks, Snowflake)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="5-models-of-dataflow"&gt;&lt;a href="#5-models-of-dataflow" class="header-anchor"&gt;&lt;/a&gt;5. Models of Dataflow
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;dataflow
+&lt;ul&gt;
+&lt;li&gt;data is passed from one process to another&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Three main models of dataflow
+&lt;ol&gt;
+&lt;li&gt;Data passing through databases&lt;/li&gt;
+&lt;li&gt;Data passing through services using requests by REST and RPC APIs&lt;/li&gt;
+&lt;li&gt;Data passing through a real-time transport like Apache Kafka and Amazon Kinesis&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="1-data-processing-through-database"&gt;&lt;a href="#1-data-processing-through-database" class="header-anchor"&gt;&lt;/a&gt;1. Data Processing Through Database
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;The easiest way to pass data between two process&lt;/li&gt;
+&lt;li&gt;To pass data from process A to process B
+&lt;ul&gt;
+&lt;li&gt;eg) process A write data into database and process B just read it&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Doesn’t work
+&lt;ol&gt;
+&lt;li&gt;Two process are running in different companies&lt;/li&gt;
+&lt;li&gt;Requires both process to access data from databases
+&lt;ul&gt;
+&lt;li&gt;read/write from database can be slow&lt;/li&gt;
+&lt;li&gt;make it unsuitable for low latency&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="2-data-passing-through-services"&gt;&lt;a href="#2-data-passing-through-services" class="header-anchor"&gt;&lt;/a&gt;2. Data Passing Through Services
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;send data directly through a network&lt;/li&gt;
+&lt;li&gt;Request-driven
+&lt;ul&gt;
+&lt;li&gt;process communicate through requests&lt;/li&gt;
+&lt;li&gt;→ microservice architecture&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;styles of request
+&lt;ol&gt;
+&lt;li&gt;REST (Representational State Transfer)
+&lt;ul&gt;
+&lt;li&gt;designed for requests over network&lt;/li&gt;
+&lt;li&gt;predominant style for public APIs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;RPC (Remote Procedure Call)
+&lt;ul&gt;
+&lt;li&gt;tries to make a request to a remote network service look the same as &lt;em&gt;calling a function or method&lt;/em&gt; in programming language&lt;/li&gt;
+&lt;li&gt;requests between services owned by the same organization&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="3-data-passing-through-real-time-transport"&gt;&lt;a href="#3-data-passing-through-real-time-transport" class="header-anchor"&gt;&lt;/a&gt;3. Data Passing Through Real-Time Transport
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;request-driven : synchronous
+&lt;ul&gt;
+&lt;li&gt;target service has to listen to the request for the request to go through&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Broker
+&lt;ul&gt;
+&lt;li&gt;coordinates data passing among services&lt;/li&gt;
+&lt;li&gt;each service only has to communicate with the broker&lt;/li&gt;
+&lt;li&gt;use in-memory storage&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Real-time transport: in-memory storage for data passing among services&lt;/li&gt;
+&lt;li&gt;Event
+&lt;ul&gt;
+&lt;li&gt;A piece of data broadcast to a real-time transport (a.k.a event-bus)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Architecture
+&lt;ul&gt;
+&lt;li&gt;Request-driven architecture
+&lt;ul&gt;
+&lt;li&gt;rely more on logic than on data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Event-driven architecture
+&lt;ul&gt;
+&lt;li&gt;works better for system that are data-heavy&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Common types of real-time transports
+&lt;ol&gt;
+&lt;li&gt;pubsub (publish-subscribe)
+&lt;ul&gt;
+&lt;li&gt;overview
+&lt;ul&gt;
+&lt;li&gt;any service can publish to different topics in a real-time transport&lt;/li&gt;
+&lt;li&gt;any service that subscribes to a topic can read all events in that topic&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;retention policy
+&lt;ul&gt;
+&lt;li&gt;data will be retained in the real-time transport for a certain period time of time before
+&lt;ul&gt;
+&lt;li&gt;deleted&lt;/li&gt;
+&lt;li&gt;move to a permanent storage (Amazon S3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;service produce don’t care about what services consume their data&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Apache Kafka, Amazon Kinesis&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Message Queue
+&lt;ul&gt;
+&lt;li&gt;responsible for getting the message to right consumer&lt;/li&gt;
+&lt;li&gt;Apache RocketMQ, RabbitMQ&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

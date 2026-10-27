@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Oracle on Aiden's Camp</title><link>https://aiden-jeon.github.io/blog/tags/oracle/</link><description>Recent content in Oracle on Aiden's Camp</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 13 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://aiden-jeon.github.io/blog/tags/oracle/index.xml" rel="self" type="application/rss+xml"/><item><title>Oracle Cloud Public IP 사용하기</title><link>https://aiden-jeon.github.io/blog/p/oracle-cloud-public-ip-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</link><pubDate>Wed, 13 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/oracle-cloud-public-ip-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0/</guid><description>&lt;p&gt;이번 포스트에서는 할당 받은 Public IP를 사용하는 방법에 대해서 설명합니다.&lt;/p&gt;
+&lt;h2 id="1-인스턴스-생성하기"&gt;&lt;a href="#1-%ec%9d%b8%ec%8a%a4%ed%84%b4%ec%8a%a4-%ec%83%9d%ec%84%b1%ed%95%98%ea%b8%b0" class="header-anchor"&gt;&lt;/a&gt;1. 인스턴스 생성하기
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Instances 메뉴를 선택합니다.&lt;br&gt;
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-0.png"
+loading="lazy"
+alt="instances"
+&gt;&lt;/li&gt;
+&lt;li&gt;Create Instance를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-1.png"
+loading="lazy"
+alt="create instance"
+&gt;&lt;/li&gt;
+&lt;li&gt;Instances 이름을 입력합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-2.png"
+loading="lazy"
+alt="instance name"
+&gt;&lt;/li&gt;
+&lt;li&gt;이미지를 변경합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-3.png"
+loading="lazy"
+alt="change image"
+&gt;&lt;/li&gt;
+&lt;li&gt;사용할 이미지는 Canonical Ubuntu 입니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-4.png"
+loading="lazy"
+alt="select image"
+&gt;&lt;/li&gt;
+&lt;li&gt;저는 ssh key를 자체적으로 발급받고 사용하려고 합니다.
+이를 위해서 Private Key를 저장합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-5.png"
+loading="lazy"
+alt="ssh"
+&gt;&lt;/li&gt;
+&lt;li&gt;볼륨은 따로 건들지 않겠습니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-6.png"
+loading="lazy"
+alt="volume"
+&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="2-public-ip-할당하기"&gt;&lt;a href="#2-public-ip-%ed%95%a0%eb%8b%b9%ed%95%98%ea%b8%b0" class="header-anchor"&gt;&lt;/a&gt;2. Public IP 할당하기
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;생성된 인스턴스 화면에서 Attached VNCs 메뉴를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-7.png"
+loading="lazy"
+alt="attached vcns"
+&gt;&lt;/li&gt;
+&lt;li&gt;생성한 instance 이름을 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-8.png"
+loading="lazy"
+alt="select instance"
+&gt;&lt;/li&gt;
+&lt;li&gt;IPv4 Addrresses 를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-9.png"
+loading="lazy"
+alt="ipv4"
+&gt;&lt;/li&gt;
+&lt;li&gt;&amp;hellip;을 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-10.png"
+loading="lazy"
+alt="more"
+&gt;&lt;/li&gt;
+&lt;li&gt;Edit을 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-11.png"
+loading="lazy"
+alt="edit"
+&gt;&lt;/li&gt;
+&lt;li&gt;No Pulic IP를 선택하고 Update합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-12.png"
+loading="lazy"
+alt="no publice ip"
+&gt;&lt;/li&gt;
+&lt;li&gt;다시 edit을 누릅니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-13.png"
+loading="lazy"
+alt="edit"
+&gt;&lt;/li&gt;
+&lt;li&gt;Reserved public IP를 선택하고 생성된 IP를 선택한뒤 Update합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-14.png"
+loading="lazy"
+alt="reserved public ip"
+&gt;&lt;/li&gt;
+&lt;li&gt;다음과 같이 IP가 할당된 것을 확인합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/expose_public_ip-15.png"
+loading="lazy"
+alt="check ip"
+&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="3-접속하기"&gt;&lt;a href="#3-%ec%a0%91%ec%86%8d%ed%95%98%ea%b8%b0" class="header-anchor"&gt;&lt;/a&gt;3. 접속하기
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;이미지를 생성할 때 다운로드 받은 key를 &lt;code&gt;~/.ssh&lt;/code&gt;로 옮깁니다.
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;mv ssh-key-2021-10-13.key ~/.ssh/oracle.key
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; ~/.ssh
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;400 권한을 줍니다.
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;chmod &lt;span class="m"&gt;400&lt;/span&gt; oracle.key
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;ssh를 이용해 접속합니다.
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ssh ubuntu@&amp;lt;PUBLIC IP&amp;gt; -i ~/.ssh/oracle.key
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;</description></item><item><title>Oracle Cloud Public IP 할당 받기</title><link>https://aiden-jeon.github.io/blog/p/oracle-cloud-public-ip-%ED%95%A0%EB%8B%B9-%EB%B0%9B%EA%B8%B0/</link><pubDate>Wed, 13 Oct 2021 00:00:00 +0000</pubDate><guid>https://aiden-jeon.github.io/blog/p/oracle-cloud-public-ip-%ED%95%A0%EB%8B%B9-%EB%B0%9B%EA%B8%B0/</guid><description>&lt;p&gt;이번 포스트에서는 Oracle Cloud 무료 버전을 이용해 Public IP를 할당 받는 방법에 대해서 설명합니다.&lt;/p&gt;
+&lt;h2 id="1-구획-생성하기"&gt;&lt;a href="#1-%ea%b5%ac%ed%9a%8d-%ec%83%9d%ec%84%b1%ed%95%98%ea%b8%b0" class="header-anchor"&gt;&lt;/a&gt;1. 구획 생성하기
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Compartments 메뉴를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-0.png"
+loading="lazy"
+alt="compartments"
+&gt;&lt;/li&gt;
+&lt;li&gt;Create Compartment를 누른 후 사용할 이름과 설명을 적어줍니다
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-1.png"
+loading="lazy"
+alt="create compartments"
+&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="2-networking"&gt;&lt;a href="#2-networking" class="header-anchor"&gt;&lt;/a&gt;2. Networking
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;Virtual Cloud Networks 메뉴를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-2.png"
+loading="lazy"
+alt="virtual cloud networks"
+&gt;&lt;/li&gt;
+&lt;li&gt;Compartment에서 생성한 구획을 선택하고 Start VCN Wizard 버튼을 눌러줍니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-3.png"
+loading="lazy"
+alt="start vcn wizard"
+&gt;&lt;/li&gt;
+&lt;li&gt;다음 항목들을 클릭하고 넘어갑니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-4.png"
+loading="lazy"
+alt="next vcn wizard"
+&gt;&lt;/li&gt;
+&lt;li&gt;vcn 이름을 작성하고 다음으로 넘어갑니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-5.png"
+loading="lazy"
+alt="vcn name"
+&gt;&lt;/li&gt;
+&lt;li&gt;생성을 누릅니다.$$
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-6.png"
+loading="lazy"
+alt="create vcn"
+&gt;&lt;/li&gt;
+&lt;li&gt;생성이 완료되면 다음과 같이 나옵니다.
+View Virtual Cloud Network를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-7.png"
+loading="lazy"
+alt="view vcn"
+&gt;&lt;/li&gt;
+&lt;li&gt;구획 이름과 vcn 이름을 확인합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-8.png"
+loading="lazy"
+alt="check vcn"
+&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="3-security"&gt;&lt;a href="#3-security" class="header-anchor"&gt;&lt;/a&gt;3. Security
+&lt;/h2&gt;&lt;h3 id="31-http-https"&gt;&lt;a href="#31-http-https" class="header-anchor"&gt;&lt;/a&gt;3.1 http, https
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;security list를 선택하고 Default Security List를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-9.png"
+loading="lazy"
+alt="security list"
+&gt;&lt;/li&gt;
+&lt;li&gt;Add Ingress Rules를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-10.png"
+loading="lazy"
+alt="add ingress rule"
+&gt;&lt;/li&gt;
+&lt;li&gt;다음과 같이 http와 https를 위한 포트를 추가합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-11.png"
+loading="lazy"
+alt="http https port"
+&gt;&lt;/li&gt;
+&lt;li&gt;다음과 같이 룰이 추가된 것을 확인합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-12.png"
+loading="lazy"
+alt="check http https port"
+&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="32-nginx-proxy"&gt;&lt;a href="#32-nginx-proxy" class="header-anchor"&gt;&lt;/a&gt;3.2 nginx proxy
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;다음과 같이 nginx proxy를 위한 81 포트를 추가합니다.
+ngix설정 후 해당 포트는 삭제합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-13.png"
+loading="lazy"
+alt="nginx proxy port"
+&gt;&lt;/li&gt;
+&lt;li&gt;다음과 같이 룰이 추가된 것을 확인합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-14.png"
+loading="lazy"
+alt="checkt nginx proxy port"
+&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="4-public-ip"&gt;&lt;a href="#4-public-ip" class="header-anchor"&gt;&lt;/a&gt;4. Public IP
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;IP Management 메뉴를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-15.png"
+loading="lazy"
+alt="ip management"
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Public 구획에서 Reserve Public IP Address를 선택합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-16.png"
+loading="lazy"
+alt="reserve public ip address"
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ip 이름을 설정한 후 Reserve Public IP Address를 선택합니다.&lt;br&gt;
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-17.png"
+loading="lazy"
+alt="security list"
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;다음과 같이 IP가 추가된 것을 확인합니다.
+&lt;img src="https://aiden-jeon.github.io/blog/imgs/self-hosted/self-hosted-18.png"
+loading="lazy"
+alt="security list"
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;</description></item></channel></rss>
