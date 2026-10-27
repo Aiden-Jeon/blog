@@ -1,5 +1,6 @@
 ---
 title: "Tabular Foundation Model 은 Kaggle 에서 GBDT 를 이길까 — kaggle-master 리더보드"
+slug: kaggle-master-leaderboard
 categories: [machine-learning]
 tags: ["tabular", "tabpfn", "kaggle", "gbdt"]
 toc: false
