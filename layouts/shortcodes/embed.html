@@ -1,0 +1,17 @@
+{{- /* 외부 HTML 을 iframe 으로 임베드. 사용: {{< embed src="https://..." title="..." height="1200" >}}
+       임베드 페이지가 {kmHeight} 를 postMessage 로 보내면 높이를 맞추고, 블로그 테마(html[data-scheme])를 {kmTheme} 로 전달 */ -}}
+{{- $id := printf "embed-%d" .Ordinal -}}
+<iframe id="{{ $id }}" src="{{ .Get "src" }}" title="{{ .Get "title" | default "embed" }}" loading="lazy"
+  style="display:block;width:100%;height:{{ .Get "height" | default "1200" }}px;border:0;border-radius:8px"></iframe>
+<p style="text-align:right;font-size:0.85em"><a href="{{ .Get "src" }}" target="_blank" rel="noopener">새 창에서 크게 보기 ↗</a></p>
+<script>
+(() => {
+  const f = document.getElementById("{{ $id }}");
+  const send = () => f.contentWindow && f.contentWindow.postMessage({ kmTheme: document.documentElement.dataset.scheme || "auto" }, "*");
+  f.addEventListener("load", send);
+  new MutationObserver(send).observe(document.documentElement, { attributes: true, attributeFilter: ["data-scheme"] });
+  addEventListener("message", e => {
+    if (e.source === f.contentWindow && e.data && e.data.kmHeight) f.style.height = e.data.kmHeight + "px";
+  });
+})();
+</script>
